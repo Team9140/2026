@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Shooter extends SubsystemBase{
     private final TalonFX motor;
 
-    private Shooter instance;
+    private static Shooter instance;
 
     public Shooter getInstance() {
         return (instance == null) ? instance = new Shooter() : instance;

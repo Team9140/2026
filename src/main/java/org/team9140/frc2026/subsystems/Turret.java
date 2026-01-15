@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Turret extends SubsystemBase {
     private final TalonFX motor;
 
-    private Turret instance;
+    private static Turret instance;
 
     public Turret getInstance() {
         return (instance == null) ? instance = new Turret() : instance;
