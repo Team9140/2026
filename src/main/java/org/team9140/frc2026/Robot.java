@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import org.team9140.lib.Util;
+
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
@@ -26,7 +28,9 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    Util.updateAlliance();
+  }
 
   @Override
   public void disabledExit() {}
