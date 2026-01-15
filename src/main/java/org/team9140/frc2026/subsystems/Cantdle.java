@@ -29,7 +29,7 @@ public class Cantdle extends SubsystemBase {
 
     private Cantdle() {
         this.candle = new CANdle(0);
-        colorcontrol = new SolidColor(0, 0);
+        colorcontrol = new SolidColor(0, 7);
 
         if (Optional.of(DriverStation.Alliance.Red).equals(Util.getAlliance()))
             this.setColor(RED);
