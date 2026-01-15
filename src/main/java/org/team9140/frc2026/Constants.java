@@ -8,4 +8,6 @@ public class Constants {
     public static class Intake {}
 
     public static class Shooter {}
+
+    public static class Turret {}
 }
