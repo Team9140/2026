@@ -8,7 +8,7 @@ public class Intake extends SubsystemBase {
     private static Intake instance;
 
     private Intake(){
-        motor = new TalonFX(0);
+        this.motor = new TalonFX(0);
     }
 
     public static Intake getInstance(){

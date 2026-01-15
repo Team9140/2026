@@ -14,6 +14,6 @@ public class Shooter extends SubsystemBase{
     }
 
     private Shooter() {
-        motor = new TalonFX(0);
+        this.motor = new TalonFX(0);
     }
 }

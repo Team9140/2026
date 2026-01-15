@@ -14,6 +14,6 @@ public class Turret extends SubsystemBase {
     }
 
     private Turret() {
-        motor = new TalonFX(0);
+        this.motor = new TalonFX(0);
     }
 }
