@@ -9,10 +9,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Util {
-    private static DriverStation.Alliance alliance = null;
-
     private final static double EPSILON = 0.00000001;
-
+    
+    private static DriverStation.Alliance alliance = null;
 
     public static void updateAlliance() {
         alliance = DriverStation.getAlliance().orElse(null);
