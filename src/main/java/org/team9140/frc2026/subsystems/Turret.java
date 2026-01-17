@@ -178,5 +178,4 @@ public class Turret extends SubsystemBase {
         pitchMotorSimState.setRawRotorPosition(pitchMotorSim.getAngleRads() / 2.0 / Math.PI);
         pitchMotorSimState.setRotorVelocity(pitchMotorSim.getVelocityRadPerSec() / 2.0 / Math.PI);
     }
-
 }
