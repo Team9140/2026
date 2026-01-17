@@ -24,9 +24,6 @@ public class Constants {
     public static class Climber {
     }
 
-    public static class Intake {
-    }
-
     public static class Shooter {
         public static final double SHOOTER_ACCELERATION = 1;
         public static final double SHOOTER_CRUISE_VELOCITY = 1;
@@ -41,6 +38,18 @@ public class Constants {
         public static final double SHOOT_VELOCITY_RATIO = 1;
     }
 
+    public static class Intake {
+        public static final int ON = 0;
+        public static final int OFF = 0;
+        public static final int REVERSE_INTAKE = 0;
+        public static final int STATOR_CURRENT_LIMIT = 0;
+        public static final int MOTION_MAGIC_CRUISE_VELOCITY = 0;
+        public static final int MOTION_MAGIC_ACCELERATION = 0;
+        public static final int FORWARD_SOFT_LIMIT_THRESHOLD = 0;
+        public static final int REVERSE_SOFT_LIMIT_THRESHOLD = 0;
+        public static final int ARM_IN_POSITION = 0;
+        public static final int ARM_OUT_POSITION = 0;
+    }
     public static class Turret {
         public static final double YAW_ACCELERATION = 1;
         public static final double YAW_CRUISE_VELOCITY = 1;
