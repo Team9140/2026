@@ -71,6 +71,7 @@ public class Turret extends SubsystemBase {
     }
 
     private Turret() {
+        
         MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
             .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
             .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
