@@ -9,6 +9,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -26,11 +28,12 @@ public class Turret extends SubsystemBase {
 
     private static Turret instance;
 
-    public Turret getInstance() {
+    public static Turret getInstance() {
         return (instance == null) ? instance = new Turret() : instance;
     }
 
     private Turret() {
+        
         MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
             .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
             .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
@@ -87,6 +90,13 @@ public class Turret extends SubsystemBase {
         }).andThen(new WaitUntilCommand(pitchIsAtPosition));
     }
 
+    public Command aimAtPosition(Pose2d turretPos, Translation3d endPos) {
+        return this.runOnce(() -> 
+            moveYawToPosition(AimAlign.yawAngleToPosition(turretPos, endPos))
+            .andThen(movePitchToPosition(AimAlign.pitchAngleToPosition(turretPos, endPos)))
+        );
+    }
+
     public final Trigger yawIsAtPosition = new Trigger(() -> 
         Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(), this.yawTargetPosition)
     );
@@ -94,4 +104,10 @@ public class Turret extends SubsystemBase {
     public final Trigger pitchIsAtPosition = new Trigger(() -> 
         Util.epsilonEquals(this.pitchMotor.getPosition(false).getValueAsDouble(), this.pitchTargetPosition)
     );  
+
+    @Override
+    public void simulationPeriodic() {
+
+    }
+
 }
