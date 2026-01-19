@@ -14,7 +14,19 @@ public class Constants {
 
     public static class Intake {}
 
-    public static class Shooter {}
+    public static class Shooter {
+        public static final double SHOOTER_ACCELERATION = 1;
+        public static final double SHOOTER_CRUISE_VELOCITY = 1;
+
+        public static final double SHOOTER_KS = 0;
+        public static final double SHOOTER_KV = 0;
+        public static final double SHOOTER_KA = 0;
+        public static final double SHOOTER_KP = 150.0;
+        public static final double SHOOTER_KI = 0;
+        public static final double SHOOTER_KD = 9.6;
+
+        public static final double SHOOT_VELOCITY_RATIO = 1;
+    }
 
     public static class Turret {
         public static final double YAW_ACCELERATION = 1;
