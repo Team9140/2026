@@ -39,9 +39,9 @@ public class AimAlign {
 
     public static double speedToPosition(Pose2d turretPos, Translation3d endPos, double robotSpeed) {
         double dist = distanceToPosition(turretPos, endPos);
-        for(int i = 0; i < 2; i++) {
+        do {
             dist -= lookupAirTime.get(dist) * (robotSpeed + lookupSpeed.get(dist));
-        }
+        } while(dist > 2);
         return lookupSpeed.get(dist);
     }
 
