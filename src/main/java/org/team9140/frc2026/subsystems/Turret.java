@@ -14,15 +14,20 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Turret extends SubsystemBase {
-    private final TalonFX yawMotor = new TalonFX(0);
-    private final TalonFX pitchMotor = new TalonFX(0);
+    private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR);
+    private final TalonFX pitchMotor = new TalonFX(Constants.Ports.PITCH_MOTOR);
 
     private double yawTargetPosition;
     private double pitchTargetPosition;
@@ -41,6 +46,10 @@ public class Turret extends SubsystemBase {
         false, 
         0
     );
+    Mechanism2d yawMech = new Mechanism2d(1, 1);
+    MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
+    MechanismLigament2d yawArmLigament;
+    double ARM_LENGTH = 5.0;
 
     private TalonFXSimState pitchMotorSimState;
     private final SingleJointedArmSim pitchMotorSim = new SingleJointedArmSim(
@@ -61,7 +70,6 @@ public class Turret extends SubsystemBase {
     }
 
     private Turret() {
-        
         MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
             .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
             .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
@@ -102,6 +110,17 @@ public class Turret extends SubsystemBase {
 
         yawMotor.setControl(yawMM.withPosition(0));
         pitchMotor.setControl(pitchMM.withPosition(0));
+
+        yawArmLigament = yawRoot.append(new MechanismLigament2d(
+            "yawArm", 
+            ARM_LENGTH,
+            0,
+            6,
+            new Color8Bit(Color.kYellow)
+            )
+        );
+
+        SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
     }
 
     public Command moveYawToPosition(double pos) {
@@ -147,6 +166,7 @@ public class Turret extends SubsystemBase {
 
         SmartDashboard.putNumber("yawAngle", yawMotor.getPosition().getValueAsDouble());
         yawMotor.getPosition().refresh();
+        yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble());
 
         SmartDashboard.putNumber("pitchAngle", pitchMotor.getPosition().getValueAsDouble());
         pitchMotor.getPosition().refresh();
