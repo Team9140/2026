@@ -39,7 +39,7 @@ public class Constants {
     }
 
     public static class Intake {
-        public static final int ON = 0;
+        public static final int INTAKE_VOLTAGE = 0;
         public static final int OFF = 0;
         public static final int REVERSE_INTAKE = 0;
         public static final int STATOR_CURRENT_LIMIT = 0;

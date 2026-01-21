@@ -77,10 +77,10 @@ public class Intake extends SubsystemBase {
         }));
     }
 
-    public Command on(){
+    public Command intake(){
         return this.armOut().andThen(this.runOnce(() -> {
-            this.spinMotor.setVoltage(Constants.Intake.ON);
-            this.extendMotor.setVoltage(Constants.Intake.ON);
+            this.spinMotor.setVoltage(Constants.Intake.INTAKE_VOLTAGE);
+            this.extendMotor.setVoltage(Constants.Intake.INTAKE_VOLTAGE);
         }));
     }
 
