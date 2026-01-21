@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class Constants {
     public static class Ports {
         public static final String CANIVORE_NAME = "buzz"; // Buzz Aldrin
+        public static final int YAW_MOTOR = 0;
+        public static final int PITCH_MOTOR = 1;
     }
 
     public static class Cantdle {}
