@@ -10,11 +10,14 @@ public class Constants {
         public static final int PITCH_MOTOR = 1;
     }
 
-    public static class Cantdle {}
+    public static class Cantdle {
+    }
 
-    public static class Climber {}
+    public static class Climber {
+    }
 
-    public static class Intake {}
+    public static class Intake {
+    }
 
     public static class Shooter {
         public static final double SHOOTER_ACCELERATION = 1;
