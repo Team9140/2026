@@ -4,6 +4,7 @@
 
 package org.team9140.frc2026;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -14,6 +15,8 @@ public class RobotContainer {
 
   private Turret turret = Turret.getInstance();
   private final CommandXboxController driverController = new CommandXboxController(0);
+
+  private Joystick testJoystick = new Joystick(0);
 
   public RobotContainer() {
     configureBindings();

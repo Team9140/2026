@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -69,7 +70,6 @@ public class Turret extends SubsystemBase {
     }
 
     private Turret() {
-
         MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
                 .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
                 .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
