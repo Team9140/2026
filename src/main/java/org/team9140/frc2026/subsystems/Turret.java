@@ -13,6 +13,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -33,19 +34,18 @@ public class Turret extends SubsystemBase {
     private double pitchTargetPosition;
 
     private MotionMagicTorqueCurrentFOC yawMM = new MotionMagicTorqueCurrentFOC(0);
-    private MotionMagicTorqueCurrentFOC pitchMM= new MotionMagicTorqueCurrentFOC(0);
+    private MotionMagicTorqueCurrentFOC pitchMM = new MotionMagicTorqueCurrentFOC(0);
 
     private TalonFXSimState yawMotorSimState;
     private final SingleJointedArmSim yawMotorSim = new SingleJointedArmSim(
-        DCMotor.getKrakenX60Foc(1),
-        60, 
-        1, 
-        0.2, 
-        0, 
-        Math.PI, 
-        false, 
-        0
-    );
+            DCMotor.getKrakenX60Foc(1),
+            60,
+            1,
+            0.2,
+            0,
+            Math.PI,
+            false,
+            0);
     Mechanism2d yawMech = new Mechanism2d(1, 1);
     MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
     MechanismLigament2d yawArmLigament;
@@ -53,15 +53,14 @@ public class Turret extends SubsystemBase {
 
     private TalonFXSimState pitchMotorSimState;
     private final SingleJointedArmSim pitchMotorSim = new SingleJointedArmSim(
-        DCMotor.getKrakenX60Foc(1),
-        60, 
-        1, 
-        0.2, 
-        0, 
-        Math.PI, 
-        false, 
-        0
-    );
+            DCMotor.getKrakenX60Foc(1),
+            60,
+            1,
+            0.2,
+            0,
+            Math.PI,
+            false,
+            0);
 
     private static Turret instance;
 
@@ -70,38 +69,38 @@ public class Turret extends SubsystemBase {
     }
 
     private Turret() {
-        
+
         MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
-            .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
-            .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
+                .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
+                .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
 
         Slot0Configs yawSlot0Configs = new Slot0Configs()
-            .withKS(Constants.Turret.YAW_KS)
-            .withKV(Constants.Turret.YAW_KV)
-            .withKA(Constants.Turret.YAW_KA)
-            .withKP(Constants.Turret.YAW_KP)
-            .withKI(Constants.Turret.YAW_KI)
-            .withKD(Constants.Turret.YAW_KD);
+                .withKS(Constants.Turret.YAW_KS)
+                .withKV(Constants.Turret.YAW_KV)
+                .withKA(Constants.Turret.YAW_KA)
+                .withKP(Constants.Turret.YAW_KP)
+                .withKI(Constants.Turret.YAW_KI)
+                .withKD(Constants.Turret.YAW_KD);
 
         MotionMagicConfigs pitchMMConfigs = new MotionMagicConfigs()
-            .withMotionMagicAcceleration(Constants.Turret.PITCH_ACCELERATION)
-            .withMotionMagicCruiseVelocity(Constants.Turret.PITCH_CRUISE_VELOCITY);
+                .withMotionMagicAcceleration(Constants.Turret.PITCH_ACCELERATION)
+                .withMotionMagicCruiseVelocity(Constants.Turret.PITCH_CRUISE_VELOCITY);
 
         Slot0Configs pitchSlot0Configs = new Slot0Configs()
-            .withKS(Constants.Turret.PITCH_KS)
-            .withKV(Constants.Turret.PITCH_KV)
-            .withKA(Constants.Turret.PITCH_KA)
-            .withKP(Constants.Turret.PITCH_KP)
-            .withKI(Constants.Turret.PITCH_KI)
-            .withKD(Constants.Turret.PITCH_KD);
+                .withKS(Constants.Turret.PITCH_KS)
+                .withKV(Constants.Turret.PITCH_KV)
+                .withKA(Constants.Turret.PITCH_KA)
+                .withKP(Constants.Turret.PITCH_KP)
+                .withKI(Constants.Turret.PITCH_KI)
+                .withKD(Constants.Turret.PITCH_KD);
 
         TalonFXConfiguration yawConfig = new TalonFXConfiguration()
-            .withMotionMagic(yawMMConfigs)
-            .withSlot0(yawSlot0Configs);
+                .withMotionMagic(yawMMConfigs)
+                .withSlot0(yawSlot0Configs);
 
         TalonFXConfiguration pitchConfig = new TalonFXConfiguration()
-            .withMotionMagic(pitchMMConfigs)
-            .withSlot0(pitchSlot0Configs);
+                .withMotionMagic(pitchMMConfigs)
+                .withSlot0(pitchSlot0Configs);
 
         yawMM = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
         pitchMM = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
@@ -113,13 +112,11 @@ public class Turret extends SubsystemBase {
         pitchMotor.setControl(pitchMM.withPosition(0));
 
         yawArmLigament = yawRoot.append(new MechanismLigament2d(
-            "yawArm", 
-            ARM_LENGTH,
-            0,
-            6,
-            new Color8Bit(Color.kYellow)
-            )
-        );
+                "yawArm",
+                ARM_LENGTH,
+                0,
+                6,
+                new Color8Bit(Color.kYellow)));
 
         SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
     }
@@ -139,19 +136,15 @@ public class Turret extends SubsystemBase {
     }
 
     public Command aimAtPosition(Pose2d turretPos, Translation3d endPos) {
-        return this.runOnce(() -> 
-            moveYawToPosition(AimAlign.yawAngleToPosition(turretPos, endPos))
-            .andThen(movePitchToPosition(AimAlign.pitchAngleToPosition(turretPos, endPos)))
-        );
+        return this.runOnce(() -> moveYawToPosition(AimAlign.yawAngleToPosition(turretPos, endPos))
+                .andThen(movePitchToPosition(AimAlign.pitchAngleToPosition(turretPos, endPos))));
     }
 
-    public final Trigger yawIsAtPosition = new Trigger(() -> 
-        Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(), this.yawTargetPosition)
-    );
+    public final Trigger yawIsAtPosition = new Trigger(
+            () -> Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(), this.yawTargetPosition));
 
-    public final Trigger pitchIsAtPosition = new Trigger(() -> 
-        Util.epsilonEquals(this.pitchMotor.getPosition(false).getValueAsDouble(), this.pitchTargetPosition)
-    );  
+    public final Trigger pitchIsAtPosition = new Trigger(
+            () -> Util.epsilonEquals(this.pitchMotor.getPosition(false).getValueAsDouble(), this.pitchTargetPosition));
 
     @Override
     public void periodic() {
