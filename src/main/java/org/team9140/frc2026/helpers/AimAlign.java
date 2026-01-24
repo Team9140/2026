@@ -1,4 +1,4 @@
-package org.team9140.frc2026.subsystems;
+package org.team9140.frc2026.helpers;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -44,6 +44,5 @@ public class AimAlign {
         } while(dist > 2);
         return lookupSpeed.get(dist);
     }
-
-    
+     
 }
