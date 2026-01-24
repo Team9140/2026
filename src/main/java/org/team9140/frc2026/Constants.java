@@ -1,5 +1,7 @@
 package org.team9140.frc2026;
 
+import edu.wpi.first.math.util.Units;
+
 import org.team9140.frc2026.generated.TunerConstants;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -39,16 +41,20 @@ public class Constants {
     }
 
     public static class Intake {
-        public static final int INTAKE_VOLTAGE = 0;
-        public static final int OFF = 0;
-        public static final int REVERSE_INTAKE = 0;
-        public static final int STATOR_CURRENT_LIMIT = 0;
-        public static final int MOTION_MAGIC_CRUISE_VELOCITY = 0;
-        public static final int MOTION_MAGIC_ACCELERATION = 0;
-        public static final int FORWARD_SOFT_LIMIT_THRESHOLD = 0;
-        public static final int REVERSE_SOFT_LIMIT_THRESHOLD = 0;
-        public static final int ARM_IN_POSITION = 0;
-        public static final int ARM_OUT_POSITION = 0;
+        public static final double INTAKE_VOLTAGE = 0;
+        public static final double OFF = 0;
+        public static final double REVERSE_INTAKE = 0;
+        public static final double STATOR_CURRENT_LIMIT = 0;
+        public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
+        public static final double MOTION_MAGIC_ACCELERATION = 0;
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0;
+        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
+        public static final double ARM_IN_POSITION = 0;
+        public static final double ARM_OUT_POSITION = 0;
+        public static final double EXTENSION_GEAR_RATIO = 1;
+        public static final int PINION_TEETH = 10;
+        public static final double PINION_DP = 10;
+        public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
     }
     public static class Turret {
         public static final double YAW_ACCELERATION = 1;
