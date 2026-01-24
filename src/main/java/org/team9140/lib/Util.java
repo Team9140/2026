@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class Util {
     private final static double EPSILON = 0.00000001;
-    
+
     private static DriverStation.Alliance alliance = null;
 
     public static void updateAlliance() {
