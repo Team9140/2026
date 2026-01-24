@@ -1,6 +1,7 @@
 package org.team9140.frc2026.subsystems;
 
 import org.team9140.frc2026.Constants;
+import org.team9140.frc2026.helpers.AimAlign;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;

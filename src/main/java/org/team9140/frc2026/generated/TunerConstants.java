@@ -191,9 +191,6 @@ public class TunerConstants {
             kBackRightXPos, kBackRightYPos, kInvertRightSide, kBackRightSteerMotorInverted, kBackRightEncoderInverted
         );
 
-    private static CommandSwerveDrivetrain instance = null;
-
-
     /**
      * Creates a CommandSwerveDrivetrain instance.
      * This should only be called once in your robot program,.
@@ -204,13 +201,6 @@ public class TunerConstants {
         );
     }
 
-     /**
-     * Retrieves a CommandSwerveDrivetrain instance.
-     */
-    public static CommandSwerveDrivetrain getDrivetrain() {
-        return instance == null ? (instance = new CommandSwerveDrivetrain(
-                DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight)) : instance;
-    }
 
     /**
      * Swerve Drive class utilizing CTR Electronics' Phoenix 6 API with the selected device types.
