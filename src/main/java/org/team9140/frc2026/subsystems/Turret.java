@@ -50,7 +50,7 @@ public class Turret extends SubsystemBase {
     Mechanism2d yawMech = new Mechanism2d(1, 1);
     MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
     MechanismLigament2d yawArmLigament;
-    double ARM_LENGTH = 5.0;
+    double ARM_LENGTH = 1.0;
 
     private TalonFXSimState pitchMotorSimState;
     private final SingleJointedArmSim pitchMotorSim = new SingleJointedArmSim(
@@ -160,7 +160,7 @@ public class Turret extends SubsystemBase {
 
         SmartDashboard.putNumber("yawAngle", yawMotor.getPosition().getValueAsDouble());
         yawMotor.getPosition().refresh();
-        yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble());
+        yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
 
         SmartDashboard.putNumber("pitchAngle", pitchMotor.getPosition().getValueAsDouble());
         pitchMotor.getPosition().refresh();
