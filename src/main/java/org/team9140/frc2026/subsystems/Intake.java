@@ -1,12 +1,10 @@
 package org.team9140.frc2026.subsystems;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -27,12 +25,19 @@ public class Intake extends SubsystemBase {
         this.extendMotor = new TalonFX(1);
 
         // separate extend and spin current limits
-        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(Constants.Intake.STATOR_CURRENT_LIMIT)
+        CurrentLimitsConfigs currentSpinLimits = new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(Constants.Intake.SPIN_STATOR_CURRENT_LIMIT)
+                .withStatorCurrentLimitEnable(true);
+
+        CurrentLimitsConfigs currentExtendLimits = new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(Constants.Intake.EXTEND_STATOR_CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true);
 
         // separate extend and spin
-        MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
+        MotorOutputConfigs spinMotorOutputConfigs = new MotorOutputConfigs()
+                .withInverted(InvertedValue.Clockwise_Positive);
+
+        MotorOutputConfigs extendMotorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(InvertedValue.Clockwise_Positive);
 
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs()
@@ -46,16 +51,17 @@ public class Intake extends SubsystemBase {
                 .withReverseSoftLimitEnable(true);
 
         TalonFXConfiguration spinMotorConfigs = new TalonFXConfiguration()
-                .withCurrentLimits(currentLimits)
-                .withMotorOutput(motorOutputConfigs);
+                .withCurrentLimits(currentSpinLimits)
+                .withMotorOutput(spinMotorOutputConfigs);
 
         TalonFXConfiguration extendMotorConfigs = new TalonFXConfiguration()
-                .withCurrentLimits(currentLimits)
-                .withMotorOutput(motorOutputConfigs)
+                .withCurrentLimits(currentExtendLimits)
+                .withMotorOutput(extendMotorOutputConfigs)
                 .withMotionMagic(motionMagicConfigs)
                 .withSoftwareLimitSwitch(softwareLimitSwitchConfigs);
 
         // set extension sensor to mechanism ratio
+        extendMotorConfigs.Feedback.SensorToMechanismRatio = Constants.Intake.EXTENSION_GEAR_RATIO;
 
         this.spinMotor.getConfigurator().apply(spinMotorConfigs);
         this.extendMotor.getConfigurator().apply(extendMotorConfigs);
@@ -94,36 +100,35 @@ public class Intake extends SubsystemBase {
     }
 
     public final Trigger atPosition = new Trigger(
-            () -> Util.epsilonEquals(getPosition(), this.targetPosition, Units.inchesToMeters(0.5))); // move 0.5 inch tolerance to a Constant
+            () -> Util.epsilonEquals(getPosition(), this.targetPosition, Units.inchesToMeters(Constants.Intake.TOLERANCE))); // move 0.5 inch tolerance to a Constant
 
-    // convertion of motor rotations to length extended
     public Command armIn() {
-        return this.setPosition(in_position);
+        return this.setPosition(Constants.Intake.ARM_IN_POSITION);
     }
 
     public Command armOut() {
-        return this.setPosition(out_position);
+        return this.setPosition(Constants.Intake.ARM_OUT_POSITION);
     }
 
     public Command setRollerSpeed(double speed) {
-        return null; // this.runOnce, then make three methods below compose with this method
+        return this.runOnce(()-> spinMotor.set(speed)); // this.runOnce, then make three methods below compose with this method
     }
 
     public Command off() {
         return this.armIn().andThen(this.runOnce(() -> {
-            this.spinMotor.setVoltage(Constants.Intake.OFF);
+            setRollerSpeed(Constants.Intake.INTAKE_OFF);
         }));
     }
 
     public Command intake() {
         return this.armOut().andThen(this.runOnce(() -> {
-            this.spinMotor.setVoltage(Constants.Intake.INTAKE_VOLTAGE);
+            setRollerSpeed(Constants.Intake.INTAKE_VOLTAGE);
         }));
     }
 
     public Command reverse() {
         return this.armOut().andThen(this.runOnce(() -> {
-            this.spinMotor.setVoltage(Constants.Intake.REVERSE_INTAKE);
+            setRollerSpeed(-Constants.Intake.INTAKE_VOLTAGE);
         }));
     }
 }

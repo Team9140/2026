@@ -41,10 +41,10 @@ public class Constants {
     }
 
     public static class Intake {
-        public static final double INTAKE_VOLTAGE = 0;
-        public static final double OFF = 0;
-        public static final double REVERSE_INTAKE = 0;
-        public static final double STATOR_CURRENT_LIMIT = 0;
+        public static final double INTAKE_VOLTAGE = 0.7;
+        public static final double INTAKE_OFF = 0;
+        public static final double SPIN_STATOR_CURRENT_LIMIT = 0;
+        public static final double EXTEND_STATOR_CURRENT_LIMIT = 0;
         public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
         public static final double MOTION_MAGIC_ACCELERATION = 0;
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0;
@@ -52,6 +52,7 @@ public class Constants {
         public static final double ARM_IN_POSITION = 0;
         public static final double ARM_OUT_POSITION = 0;
         public static final double EXTENSION_GEAR_RATIO = 1;
+        public static final double TOLERANCE = 0.5;
         public static final int PINION_TEETH = 10;
         public static final double PINION_DP = 10;
         public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
