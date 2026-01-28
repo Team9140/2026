@@ -52,10 +52,10 @@ public class Shooter extends SubsystemBase {
                         Math.PI,
                         false,
                         0);
-        Mechanism2d yawMech = new Mechanism2d(1, 1);
-        MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
-        MechanismLigament2d yawArmLigament;
-        double ARM_LENGTH = 1.0;
+        private Mechanism2d yawMech = new Mechanism2d(1, 1);
+        private MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
+        private MechanismLigament2d yawArmLigament;
+        private double ARM_LENGTH = 1.0;
 
         private TalonFXSimState pitchMotorSimState;
         private final SingleJointedArmSim pitchMotorSim = new SingleJointedArmSim(
@@ -161,8 +161,8 @@ public class Shooter extends SubsystemBase {
         }
 
         public Command aimAtPosition(Pose2d turretPos, Translation3d endPos) {
-                return this.runOnce(() -> moveYawToPosition(AimAlign.yawAngleToPosition(turretPos, endPos))
-                                .andThen(movePitchToPosition(AimAlign.pitchAngleToPosition(turretPos, endPos))));
+                return moveYawToPosition(AimAlign.yawAngleToPosition(turretPos, endPos))
+                                .andThen(movePitchToPosition(AimAlign.pitchAngleToPosition(turretPos, endPos)));
         }
 
         public final Trigger yawIsAtPosition = new Trigger(
@@ -181,15 +181,13 @@ public class Shooter extends SubsystemBase {
         }
 
         public Command shoot(double velocity, double time) {
-                return this.runOnce(() -> {
-                        setShooterReleaseSpeed(velocity)
-                                        .andThen(Commands.waitSeconds(time).andThen(setShooterReleaseSpeed(0)));
-                });
+                return setShooterReleaseSpeed(velocity)
+                                .andThen(Commands.waitSeconds(time).andThen(setShooterReleaseSpeed(0)));
         }
 
-        public Command shootAtEndPosistion(Pose2d turretPos, Translation3d endPos, double time, double robotSpeed) {
-                return this.runOnce(() -> Shooter.getInstance().aimAtPosition(turretPos, endPos)
-                                .andThen(shoot(AimAlign.speedToPosition(turretPos, endPos, robotSpeed), time)));
+        public Command shootAtEndPosition(Pose2d turretPos, Translation3d endPos, double time, double robotSpeed) {
+                return Shooter.getInstance().aimAtPosition(turretPos, endPos)
+                                .andThen(shoot(AimAlign.speedToPosition(turretPos, endPos, robotSpeed), time));
         }
 
         @Override
