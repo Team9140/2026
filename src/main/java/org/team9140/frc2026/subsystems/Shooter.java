@@ -186,7 +186,7 @@ public class Shooter extends SubsystemBase {
         }
 
         public Command shootAtEndPosition(Pose2d turretPos, Translation3d endPos, double time, double robotSpeed) {
-                return Shooter.getInstance().aimAtPosition(turretPos, endPos)
+                return aimAtPosition(turretPos, endPos)
                                 .andThen(shoot(AimAlign.speedToPosition(turretPos, endPos, robotSpeed), time));
         }
 
