@@ -54,4 +54,20 @@ public class Util {
             return limit;
         } else return Math.max(val, -limit);
     }
+
+    private final static double defaultDeadband = 0.12;
+
+    public static double applyDeadband(double in, double deadband) {
+        if (Math.abs(in) < deadband) {
+            return 0.0;
+        } else if (in > 0) {
+            return (in - deadband) / (1.0 - deadband);
+        } else {
+            return (in + deadband) / (1.0 - deadband);
+        }
+    }
+
+    public static double applyDeadband(double in) {
+        return applyDeadband(in, defaultDeadband);
+    }
 }
