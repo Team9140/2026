@@ -42,9 +42,15 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
 
+    private CommandSwerveDrivetrain instance;
+
+    public CommandSwerveDrivetrain getInstance() {
+        return (instance == null) ? instance = new CommandSwerveDrivetrain(null, null) : instance;
+    }
+
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(Constants.Drive.MAX_TELEOP_VELOCITY * 0.1)
-            .withRotationalDeadband(Constants.Drive.MAX_TELEOP_ROTATION * 0.1)
+            .withDeadband(Constants.Drive.MAX_TELEOP_VELOCITY)
+            .withRotationalDeadband(Constants.Drive.MAX_TELEOP_ROTATION)
             .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
             .withDriveRequestType(DriveRequestType.Velocity);
 
@@ -317,9 +323,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command teleopDrive(DoubleSupplier leftStickX, DoubleSupplier leftStickY, DoubleSupplier rightStickX) {
         return this.run(() -> {
+<<<<<<< HEAD
             double vX = Constants.Drive.MAX_TELEOP_VELOCITY * -1 * leftStickY.getAsDouble();
             double vY = Constants.Drive.MAX_TELEOP_VELOCITY * -1 * leftStickX.getAsDouble();
             double omega = Constants.Drive.MAX_TELEOP_ROTATION * -1 * rightStickX.getAsDouble();
+=======
+            double vX = Constants.Drive.MAX_TELEOP_VELOCITY * Util.applyDeadband(-leftStickY.getAsDouble());
+            double vY = Constants.Drive.MAX_TELEOP_VELOCITY * Util.applyDeadband(-leftStickX.getAsDouble());
+            double omega = Constants.Drive.MAX_TELEOP_ROTATION * Util.applyDeadband(-rightStickX.getAsDouble());
+>>>>>>> 24c1ed7 (Added methods to drivetrain and added moving capacbilities in RobotContainer)
             
             if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
                 vX = -1 * vX;
