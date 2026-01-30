@@ -42,12 +42,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
 
-    private CommandSwerveDrivetrain instance;
-
-    public CommandSwerveDrivetrain getInstance() {
-        return (instance == null) ? instance = new CommandSwerveDrivetrain(null, null) : instance;
-    }
-
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(Constants.Drive.MAX_TELEOP_VELOCITY)
             .withRotationalDeadband(Constants.Drive.MAX_TELEOP_ROTATION)
