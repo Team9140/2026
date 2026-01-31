@@ -1,6 +1,10 @@
 package org.team9140.frc2026.subsystems;
 
-import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.signals.InvertedValue;
 
@@ -21,10 +25,9 @@ public class Intake extends SubsystemBase {
     private final MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
 
     private Intake() {
-        this.spinMotor = new TalonFX(0); // move magic numbers to constants
-        this.extendMotor = new TalonFX(1);
+        this.spinMotor = new TalonFX(Constants.Ports.INTAKE_SPIN_MOTOR);
+        this.extendMotor = new TalonFX(Constants.Ports.INTAKE_EXTEND_MOTOR);
 
-        // separate extend and spin current limits
         CurrentLimitsConfigs currentSpinLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Intake.SPIN_STATOR_CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true);
@@ -33,7 +36,6 @@ public class Intake extends SubsystemBase {
                 .withStatorCurrentLimit(Constants.Intake.EXTEND_STATOR_CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true);
 
-        // separate extend and spin
         MotorOutputConfigs spinMotorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(InvertedValue.Clockwise_Positive);
 
@@ -60,7 +62,6 @@ public class Intake extends SubsystemBase {
                 .withMotionMagic(motionMagicConfigs)
                 .withSoftwareLimitSwitch(softwareLimitSwitchConfigs);
 
-        // set extension sensor to mechanism ratio
         extendMotorConfigs.Feedback.SensorToMechanismRatio = Constants.Intake.EXTENSION_GEAR_RATIO;
 
         this.spinMotor.getConfigurator().apply(spinMotorConfigs);
@@ -76,11 +77,9 @@ public class Intake extends SubsystemBase {
         this.extendMotor.getPosition().refresh();
     }
 
-    // javadoc comment every method that uses position to specify units
     double targetPosition = 0;
 
     /**
-     * 
      * @return how many meters extended out is the thing
      */
     public double getPosition() {
@@ -88,9 +87,8 @@ public class Intake extends SubsystemBase {
     }
 
     /**
-     * 
      * @param position Target extension in meters
-     * @return
+     * @return command that moves the arm to the given position
      */
     public Command setPosition(double position) {
         return this.runOnce(() -> {
@@ -102,16 +100,22 @@ public class Intake extends SubsystemBase {
     public final Trigger atPosition = new Trigger(
             () -> Util.epsilonEquals(getPosition(), this.targetPosition, Units.inchesToMeters(Constants.Intake.TOLERANCE))); // move 0.5 inch tolerance to a Constant
 
+    /**
+     * @return command that moves the arm to the "in" position (meters)
+     */
     public Command armIn() {
         return this.setPosition(Constants.Intake.ARM_IN_POSITION);
     }
 
+    /**
+     * @return command that moves the arm to the "out" position (meters)
+     */
     public Command armOut() {
         return this.setPosition(Constants.Intake.ARM_OUT_POSITION);
     }
 
     public Command setRollerSpeed(double speed) {
-        return this.runOnce(()-> spinMotor.set(speed)); // this.runOnce, then make three methods below compose with this method
+        return this.runOnce(()-> spinMotor.set(speed));
     }
 
     public Command off() {

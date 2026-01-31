@@ -19,6 +19,8 @@ public class Constants {
         public static final int YAW_MOTOR = 0;
         public static final int PITCH_MOTOR = 1;
         public static final int SHOOTER_MOTOR = 2;
+        public static final int INTAKE_SPIN_MOTOR = 3;
+        public static final int INTAKE_EXTEND_MOTOR = 4;
     }
 
     public static class Cantdle {
