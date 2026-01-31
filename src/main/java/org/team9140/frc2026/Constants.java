@@ -2,12 +2,6 @@ package org.team9140.frc2026;
 
 import edu.wpi.first.math.util.Units;
 
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-
 import org.team9140.frc2026.generated.TunerConstants;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,6 +15,7 @@ public class Constants {
         public static final int SHOOTER_MOTOR = 2;
         public static final int INTAKE_SPIN_MOTOR = 3;
         public static final int INTAKE_EXTEND_MOTOR = 4;
+        public static final int CLIMBER_MOTOR = 5;
     }
 
     public static class Cantdle {
@@ -47,16 +42,16 @@ public class Constants {
     }
     public static class Climber {
         public static final double GEAR_RATIO = 25;
-        public static final Distance SPOOL_RADIUS = Inches.of(1.0);
+        public static final double SPOOL_RADIUS = 1.0;
 
-        public static final Current STATOR_CURRENT_LIMIT = Amps.of(80);
+        public static final double STATOR_CURRENT_LIMIT = 80;
         public static final double SUPPLY_CURRENT_LIMIT = 1.0;
 
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
 
         public static final double EXTENSION_VOLTAGE = 12.0;
-        public static final Distance EXTEND_POSITION = Inches.of(1.0);
+        public static final double EXTEND_POSITION = 1.0;
     }
 
     public static class Intake {

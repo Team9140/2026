@@ -1,13 +1,17 @@
 package org.team9140.frc2026.subsystems;
 
-import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.InvertedValue;
-import edu.wpi.first.units.measure.Distance;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import org.team9140.frc2026.Constants;
 
@@ -16,7 +20,7 @@ public class Climber extends SubsystemBase {
     private final TalonFX motor;
 
     private Climber() {
-        this.motor = new TalonFX(0);
+        this.motor = new TalonFX(Constants.Ports.CLIMBER_MOTOR);
 
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Climber.STATOR_CURRENT_LIMIT)
@@ -51,19 +55,19 @@ public class Climber extends SubsystemBase {
         return instance;
     }
 
-    public Distance getPosition() {
-        return Constants.Climber.SPOOL_RADIUS.times(2*Math.PI*this.motor.getPosition().getValueAsDouble());
+    public double getPosition() {
+        return Constants.Climber.SPOOL_RADIUS*2*Math.PI*this.motor.getPosition().getValueAsDouble();
     }
 
     public Command extend() {
         return this.runOnce(() -> this.motor.setControl(new VoltageOut(Constants.Climber.EXTENSION_VOLTAGE)))
-                .andThen(new WaitUntilCommand(() -> this.getPosition().gt(Constants.Climber.EXTEND_POSITION)))
+                .andThen(new WaitUntilCommand(() -> this.getPosition() > Constants.Climber.EXTEND_POSITION))
                 .andThen(this.runOnce(() -> this.motor.setControl(new StaticBrake())));
     }
 
     public Command retract() {
         return this.runOnce(() -> this.motor.setControl(new VoltageOut(-Constants.Climber.EXTENSION_VOLTAGE)))
-                .andThen(new WaitUntilCommand(() -> this.getPosition().lte(Constants.Climber.EXTEND_POSITION)))
+                .andThen(new WaitUntilCommand(() -> this.getPosition() <= Constants.Climber.EXTEND_POSITION))
                 .andThen(this.runOnce(() -> this.motor.setControl(new StaticBrake())));
     }
 }
