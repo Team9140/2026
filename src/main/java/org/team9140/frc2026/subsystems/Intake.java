@@ -1,5 +1,6 @@
 package org.team9140.frc2026.subsystems;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -8,7 +9,14 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -23,6 +31,12 @@ public class Intake extends SubsystemBase {
     private final TalonFX extendMotor;
     private static Intake instance;
     private final MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
+
+    // TODO: what are these numbers mean
+    // TODO: read this https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html
+    Mechanism2d extendo = new Mechanism2d(100, 100);
+    MechanismRoot2d rootyTooty = extendo.getRoot("joe mama", 0, 50);
+    MechanismLigament2d ligma = rootyTooty.append(new MechanismLigament2d("ligma", 20, 0));
 
     private Intake() {
         this.spinMotor = new TalonFX(Constants.Ports.INTAKE_SPIN_MOTOR, Constants.Ports.CANIVORE);
@@ -66,6 +80,10 @@ public class Intake extends SubsystemBase {
 
         this.spinMotor.getConfigurator().apply(spinMotorConfigs);
         this.extendMotor.getConfigurator().apply(extendMotorConfigs);
+
+        if (Utils.isSimulation()) {
+            startSimThread();
+        }
     }
 
     public static Intake getInstance() {
@@ -98,7 +116,8 @@ public class Intake extends SubsystemBase {
     }
 
     public final Trigger atPosition = new Trigger(
-            () -> Util.epsilonEquals(getPosition(), this.targetPosition, Units.inchesToMeters(Constants.Intake.TOLERANCE))); // move 0.5 inch tolerance to a Constant
+            () -> Util.epsilonEquals(getPosition(), this.targetPosition,
+                    Units.inchesToMeters(Constants.Intake.TOLERANCE))); // TODO: move SI conversion to constants
 
     /**
      * @return command that moves the arm to the "in" position (meters)
@@ -115,7 +134,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command setRollerSpeed(double speed) {
-        return this.runOnce(()-> spinMotor.set(speed));
+        return this.runOnce(() -> spinMotor.set(speed));
     }
 
     public Command off() {
@@ -134,5 +153,49 @@ public class Intake extends SubsystemBase {
         return this.armOut().andThen(this.runOnce(() -> {
             setRollerSpeed(-Constants.Intake.INTAKE_VOLTAGE);
         }));
+    }
+
+    // TODO: move sim period to constants
+    private static final double kSimLoopPeriod = 0.004; // 4 ms
+    private Notifier m_simNotifier = null;
+    private double m_lastSimTime;
+
+    // TODO: all this but for climber
+    private void startSimThread() {
+        m_lastSimTime = Utils.getCurrentTimeSeconds();
+
+        /* Run simulation at a faster rate so PID gains behave more reasonably */
+        m_simNotifier = new Notifier(() -> {
+            final double currentTime = Utils.getCurrentTimeSeconds();
+            double deltaTime = currentTime - m_lastSimTime;
+            m_lastSimTime = currentTime;
+
+            /* use the measured time delta, get battery voltage from WPILib */
+            updateSimState(deltaTime, RobotController.getBatteryVoltage());
+        });
+        m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    ElevatorSim extensionSim = new ElevatorSim(DCMotor.getKrakenX44(1), 
+    Constants.Intake.EXTENSION_GEAR_RATIO,
+    1, 
+    Constants.Intake.PINION_CIRCUMFERENCE / Math.PI / 2.0,
+    0, //TODO add measurements, something like 15 inches?? but in meters
+    123, 
+    false, 
+    0);
+
+    private void updateSimState(double t, double volts) {
+        double extendVolts = this.extendMotor.getSimState().getMotorVoltage();
+        this.extensionSim.setInputVoltage(extendVolts);
+        this.extensionSim.update(t);
+
+        double pos = this.extensionSim.getPositionMeters();
+        double vel = this.extensionSim.getVelocityMetersPerSecond();
+
+        this.extendMotor.getSimState().setRawRotorPosition(pos * Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
+        this.extendMotor.getSimState().setRotorVelocity(vel * Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
+
+        ligma.setLength(pos);
     }
 }
