@@ -1,5 +1,7 @@
 package org.team9140.frc2026.subsystems;
 
+import java.util.function.Supplier;
+
 import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
@@ -13,7 +15,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -69,12 +72,25 @@ public class Shooter extends SubsystemBase {
                         0);
 
         private static Shooter instance;
+        
+        private Supplier<Pose2d> robotPose;
+        double offsetX = 0.5;
+        double offsetY = 0.5;
 
-        public static Shooter getInstance() {
-                return (instance == null) ? instance = new Shooter() : instance;
+        public static Shooter getInstance(Supplier<Pose2d> rPos) {
+                return (instance == null) ? instance = new Shooter(rPos) : instance;
         }
 
-        private Shooter() {
+        public Pose2d getTurretPose() {               
+                Translation2d translation = new Translation2d(
+                        robotPose.get().getTranslation().getX() + offsetX,
+                        robotPose.get().getTranslation().getY() + offsetY
+                );
+                return new Pose2d(translation, new Rotation2d(robotPose.get().getRotation().getRadians()));
+        }
+
+        private Shooter(Supplier<Pose2d> rPos) {
+                this.robotPose = rPos;
                 MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
                                 .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
                                 .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
@@ -143,7 +159,6 @@ public class Shooter extends SubsystemBase {
                                 new Color8Bit(Color.kYellow)));
 
                 SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
-
         }
 
         public Command moveYawToPosition(double pos) {
@@ -160,9 +175,9 @@ public class Shooter extends SubsystemBase {
                 }).andThen(new WaitUntilCommand(pitchIsAtPosition));
         }
 
-        public Command aimAtPosition(Pose2d turretPos, Translation3d endPos) {
-                return moveYawToPosition(AimAlign.yawAngleToPosition(turretPos, endPos))
-                                .andThen(movePitchToPosition(AimAlign.pitchAngleToPosition(turretPos, endPos)));
+        public Command aimAtPosition(Translation2d endPos) {
+                return moveYawToPosition(AimAlign.yawAngleToPosition(getTurretPose(), endPos))
+                                .andThen(movePitchToPosition(AimAlign.pitchAngleToPosition(getTurretPose(), endPos)));
         }
 
         public final Trigger yawIsAtPosition = new Trigger(
@@ -185,9 +200,9 @@ public class Shooter extends SubsystemBase {
                                 .andThen(Commands.waitSeconds(time).andThen(setShooterReleaseSpeed(0)));
         }
 
-        public Command shootAtEndPosition(Pose2d turretPos, Translation3d endPos, double time, double robotSpeed) {
-                return aimAtPosition(turretPos, endPos)
-                                .andThen(shoot(AimAlign.speedToPosition(turretPos, endPos, robotSpeed), time));
+        public Command shootAtEndPosition(Translation2d endPos, double time, double robotSpeed) {
+                return aimAtPosition(endPos)
+                                .andThen(shoot(AimAlign.speedToPosition(getTurretPose(), endPos, robotSpeed), time));
         }
 
         @Override
