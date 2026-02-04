@@ -10,7 +10,6 @@ import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -117,7 +116,7 @@ public class Intake extends SubsystemBase {
 
     public final Trigger atPosition = new Trigger(
             () -> Util.epsilonEquals(getPosition(), this.targetPosition,
-                    Units.inchesToMeters(Constants.Intake.TOLERANCE))); // TODO: move SI conversion to constants
+                    Constants.Intake.TOLERANCE));
 
     /**
      * @return command that moves the arm to the "in" position (meters)
@@ -155,12 +154,10 @@ public class Intake extends SubsystemBase {
         }));
     }
 
-    // TODO: move sim period to constants
-    private static final double kSimLoopPeriod = 0.004; // 4 ms
+    private static final double kSimLoopPeriod = Constants.Intake.SIM_PERIOD; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    // TODO: all this but for climber
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
@@ -180,7 +177,7 @@ public class Intake extends SubsystemBase {
     Constants.Intake.EXTENSION_GEAR_RATIO,
     1, 
     Constants.Intake.PINION_CIRCUMFERENCE / Math.PI / 2.0,
-    0, //TODO add measurements, something like 15 inches?? but in meters
+    0,
     123, 
     false, 
     0);
