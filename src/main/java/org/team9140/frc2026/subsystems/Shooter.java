@@ -32,14 +32,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Shooter extends SubsystemBase {
         private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR);
-        private final TalonFX pitchMotor = new TalonFX(Constants.Ports.PITCH_MOTOR);
         private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR);
 
         private double yawTargetPosition;
-        private double pitchTargetPosition;
 
         private MotionMagicTorqueCurrentFOC yawMM = new MotionMagicTorqueCurrentFOC(0);
-        private MotionMagicTorqueCurrentFOC pitchMM = new MotionMagicTorqueCurrentFOC(0);
         private MotionMagicVelocityTorqueCurrentFOC shooterMM = new MotionMagicVelocityTorqueCurrentFOC(0);
 
         private TalonFXSimState yawMotorSimState;
@@ -57,27 +54,18 @@ public class Shooter extends SubsystemBase {
         private MechanismLigament2d yawArmLigament;
         private double ARM_LENGTH = 1.0;
 
-        private TalonFXSimState pitchMotorSimState;
-        private final SingleJointedArmSim pitchMotorSim = new SingleJointedArmSim(
-                        DCMotor.getKrakenX60Foc(1),
-                        60,
-                        1,
-                        0.2,
-                        0,
-                        Math.PI,
-                        false,
-                        0);
-
         private static Shooter instance;
 
-        public static Shooter getInstance(Supplier<Pose2d> rPos) {
-                return (instance == null) ? instance = new Shooter(rPos) : instance;
+        public static Shooter getInstance(Supplier<Pose2d> rPos, Supplier<ChassisSpeeds> speeds) {
+                return (instance == null) ? instance = new Shooter(rPos, speeds) : instance;
         }
 
         private Supplier<Pose2d> robotPose;
+        private Supplier<ChassisSpeeds> robotSpeeds;
 
-        private Shooter(Supplier<Pose2d> rPos) {
+        private Shooter(Supplier<Pose2d> rPos, Supplier<ChassisSpeeds> speeds) {
                 this.robotPose = rPos;
+                this.robotSpeeds= speeds;
                 
                 MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
                                 .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
@@ -90,18 +78,6 @@ public class Shooter extends SubsystemBase {
                                 .withKP(Constants.Turret.YAW_KP)
                                 .withKI(Constants.Turret.YAW_KI)
                                 .withKD(Constants.Turret.YAW_KD);
-
-                MotionMagicConfigs pitchMMConfigs = new MotionMagicConfigs()
-                                .withMotionMagicAcceleration(Constants.Turret.PITCH_ACCELERATION)
-                                .withMotionMagicCruiseVelocity(Constants.Turret.PITCH_CRUISE_VELOCITY);
-
-                Slot0Configs pitchSlot0Configs = new Slot0Configs()
-                                .withKS(Constants.Turret.PITCH_KS)
-                                .withKV(Constants.Turret.PITCH_KV)
-                                .withKA(Constants.Turret.PITCH_KA)
-                                .withKP(Constants.Turret.PITCH_KP)
-                                .withKI(Constants.Turret.PITCH_KI)
-                                .withKD(Constants.Turret.PITCH_KD);
 
                 MotionMagicConfigs shooterMMConfigs = new MotionMagicConfigs()
                                 .withMotionMagicAcceleration(Constants.Shooter.SHOOTER_ACCELERATION)
@@ -119,24 +95,17 @@ public class Shooter extends SubsystemBase {
                                 .withMotionMagic(yawMMConfigs)
                                 .withSlot0(yawSlot0Configs);
 
-                TalonFXConfiguration pitchConfig = new TalonFXConfiguration()
-                                .withMotionMagic(pitchMMConfigs)
-                                .withSlot0(pitchSlot0Configs);
-
                 TalonFXConfiguration shooterConfig = new TalonFXConfiguration()
                                 .withMotionMagic(shooterMMConfigs)
                                 .withSlot0(shooterSlot0Configs);
 
                 yawMM = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
-                pitchMM = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
                 shooterMM = new MotionMagicVelocityTorqueCurrentFOC(0).withSlot(0);
 
                 yawMotor.getConfigurator().apply(yawConfig);
-                pitchMotor.getConfigurator().apply(pitchConfig);
                 shooterMotor.getConfigurator().apply(shooterConfig);
 
                 yawMotor.setControl(yawMM.withPosition(0));
-                pitchMotor.setControl(pitchMM.withPosition(0));
                 shooterMotor.setControl(shooterMM.withVelocity(0));
 
                 yawArmLigament = yawRoot.append(new MechanismLigament2d(
@@ -161,10 +130,6 @@ public class Shooter extends SubsystemBase {
                         () -> Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(),
                                         this.yawTargetPosition));
 
-        public final Trigger pitchIsAtPosition = new Trigger(
-                        () -> Util.epsilonEquals(this.pitchMotor.getPosition(false).getValueAsDouble(),
-                                        this.pitchTargetPosition));
-
         public Command runShooterMotor(double angularVelocity) {
                 return this.runOnce(() -> {
                         shooterMotor.setControl(shooterMM.withVelocity(angularVelocity / 2.0 / Math.PI));
@@ -181,8 +146,13 @@ public class Shooter extends SubsystemBase {
                 return moveYawToPos(AimAlign.yawAngleToPos(this.robotPose.get(), goalPos));
         }
 
-        public Command shootAtGoal(Translation2d goalPos, ChassisSpeeds robotSpeed) {
+        public Command shootAtTarget(Translation2d goalPos, ChassisSpeeds robotSpeed) {
                 return runShooterMotor(AimAlign.getRequiredSpeed(robotPose.get(), goalPos, robotSpeed));
+        }
+
+        public Command shootAtGoal() {
+                return this.aimTowardsPos(Constants.Turret.HOOP_POSITION.getTranslation()).andThen(
+                                this.shootAtTarget(Constants.Turret.HOOP_POSITION.getTranslation(), robotSpeeds.get()));
         }
 
         @Override
@@ -192,22 +162,11 @@ public class Shooter extends SubsystemBase {
                 yawMotorSim.setInputVoltage(yawSimVolts);
                 yawMotorSim.update(0.02);
 
-                pitchMotorSimState = pitchMotor.getSimState();
-                double pitchSimVolts = pitchMotorSimState.getMotorVoltage();
-                pitchMotorSim.setInputVoltage(pitchSimVolts);
-                pitchMotorSim.update(0.02);
-
                 SmartDashboard.putNumber("yawAngle", yawMotor.getPosition().getValueAsDouble());
                 yawMotor.getPosition().refresh();
                 yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
 
-                SmartDashboard.putNumber("pitchAngle", pitchMotor.getPosition().getValueAsDouble());
-                pitchMotor.getPosition().refresh();
-
                 yawMotorSimState.setRawRotorPosition(yawMotorSim.getAngleRads() / 2.0 / Math.PI);
                 yawMotorSimState.setRotorVelocity(yawMotorSim.getVelocityRadPerSec() / 2.0 / Math.PI);
-
-                pitchMotorSimState.setRawRotorPosition(pitchMotorSim.getAngleRads() / 2.0 / Math.PI);
-                pitchMotorSimState.setRotorVelocity(pitchMotorSim.getVelocityRadPerSec() / 2.0 / Math.PI);
         }
 }
