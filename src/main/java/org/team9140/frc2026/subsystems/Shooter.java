@@ -34,7 +34,7 @@ public class Shooter extends SubsystemBase {
         private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR);
         private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR);
 
-        private double yawTargetPosition;
+        private double yawTargetPosition = 0;
 
         private MotionMagicTorqueCurrentFOC yawMM = new MotionMagicTorqueCurrentFOC(0);
         private MotionMagicVelocityTorqueCurrentFOC shooterMM = new MotionMagicVelocityTorqueCurrentFOC(0);
@@ -162,7 +162,8 @@ public class Shooter extends SubsystemBase {
                 yawMotorSim.setInputVoltage(yawSimVolts);
                 yawMotorSim.update(0.02);
 
-                SmartDashboard.putNumber("yawAngle", yawMotor.getPosition().getValueAsDouble());
+                SmartDashboard.putNumber("Yaw Angle", yawMotor.getPosition().getValueAsDouble()); //yaw motor position in rotations
+                SmartDashboard.putNumber("Yaw Target Position", this.yawTargetPosition / Math.PI / 2); //target position in rotations
                 yawMotor.getPosition().refresh();
                 yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
 
