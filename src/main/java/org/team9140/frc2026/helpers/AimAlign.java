@@ -1,48 +1,43 @@
 package org.team9140.frc2026.helpers;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class AimAlign {
-    private static InterpolatingDoubleTreeMap lookupPitch =  new InterpolatingDoubleTreeMap();
-    private static InterpolatingDoubleTreeMap lookupSpeed =  new InterpolatingDoubleTreeMap();
-    private static InterpolatingDoubleTreeMap lookupAirTime =  new InterpolatingDoubleTreeMap();
+    private static InterpolatingDoubleTreeMap lookupSpeedFromDistance =  new InterpolatingDoubleTreeMap();
+    private static InterpolatingDoubleTreeMap lookupMotorFromSpeed =  new InterpolatingDoubleTreeMap();
+
+    private static double latency = 0;
+    private static double pitchAngle = 46;
 
     static {
-        lookupPitch.put(Double.valueOf(14.85), Double.valueOf(-0.11));
-        lookupPitch.put(Double.valueOf(9.74), Double.valueOf(-0.119));
-        
-        lookupSpeed.put(Double.valueOf(14.85), Double.valueOf(-0.11));
-        lookupSpeed.put(Double.valueOf(9.74), Double.valueOf(-0.119));
-        
-        lookupAirTime.put(Double.valueOf(14.85), Double.valueOf(-0.11));
-        lookupAirTime.put(Double.valueOf(9.74), Double.valueOf(-0.119));
+        lookupSpeedFromDistance.put(Double.valueOf(14.85), Double.valueOf(-0.11));
+        lookupSpeedFromDistance.put(Double.valueOf(9.74), Double.valueOf(-0.119));
+       
+        lookupMotorFromSpeed.put(Double.valueOf(14.85), Double.valueOf(-0.11));
+        lookupMotorFromSpeed.put(Double.valueOf(9.74), Double.valueOf(-0.119));
     }
 
-    public static double yawAngleToPosition(Pose2d turretPos, Translation3d endPos) {
+    public static double getRequiredSpeed(Pose2d robotPose, Translation2d goalPose, ChassisSpeeds robotSpeed) {
+        Translation2d futurePos = robotPose.getTranslation().plus(
+            new Translation2d(robotSpeed.vxMetersPerSecond, robotSpeed.vyMetersPerSecond).times(latency)
+        );
+        Translation2d targetTranslation = goalPose.minus(futurePos);
+        double idealSpeed = lookupSpeedFromDistance.get(targetTranslation.getNorm());
+
+        Translation2d shotVector = new Translation2d(idealSpeed * Math.cos(pitchAngle), targetTranslation.getAngle());
+        shotVector = shotVector.minus(new Translation2d(robotSpeed.vxMetersPerSecond, robotSpeed.vyMetersPerSecond));
+
+        double requiredSpeed = Math.hypot(shotVector.getNorm(), idealSpeed * Math.sin(pitchAngle));
+
+        return lookupMotorFromSpeed.get(requiredSpeed);
+    }
+   
+    public static double yawAngleToPos(Pose2d turretPos, Translation2d endPos) {
         return Math.atan(
             (endPos.getY() - turretPos.getY())/(endPos.getX() - turretPos.getX())
             ) - turretPos.getRotation().getRadians();
     }
-
-    public static double distanceToPosition(Pose2d turretPos, Translation3d endPos) {
-        return Math.sqrt(
-            Math.pow(turretPos.getX() - endPos.getX(), 2) + 
-            Math.pow(turretPos.getY() - endPos.getY(), 2)
-            );
-    }
-
-    public static double pitchAngleToPosition(Pose2d turretPos, Translation3d endPos) {
-        return lookupPitch.get(distanceToPosition(turretPos, endPos));
-    }
-
-    public static double speedToPosition(Pose2d turretPos, Translation3d endPos, double robotSpeed) {
-        double dist = distanceToPosition(turretPos, endPos);
-        do {
-            dist -= lookupAirTime.get(dist) * (robotSpeed + lookupSpeed.get(dist));
-        } while(dist > 2);
-        return lookupSpeed.get(dist);
-    }
-     
 }
