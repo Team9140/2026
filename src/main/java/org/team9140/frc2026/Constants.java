@@ -10,12 +10,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class Constants {
     public static class Ports {
         public static final String CANIVORE_NAME = "buzz"; // Buzz Aldrin
-        public static final int YAW_MOTOR = 0;
-        public static final int PITCH_MOTOR = 1;
-        public static final int SHOOTER_MOTOR = 2;
-        public static final int INTAKE_SPIN_MOTOR = 3;
-        public static final int INTAKE_EXTEND_MOTOR = 4;
-        public static final int CLIMBER_MOTOR = 5;
+        public static final int YAW_MOTOR = 9;
+        public static final int PITCH_MOTOR = 98;
+        public static final int SHOOTER_MOTOR = 97;
+        public static final int INTAKE_SPIN_MOTOR = 96;
+        public static final int INTAKE_EXTEND_MOTOR = 95;
+        public static final int CLIMBER_MOTOR = 94;
         public static final int HOPPER_SPINNER_MOTOR = 6;
         public static final int HOPPER_OUTAKE_MOTOR = 7;
     }
@@ -80,19 +80,9 @@ public class Constants {
         public static final double YAW_KS = 0;
         public static final double YAW_KV = 0;
         public static final double YAW_KA = 0;
-        public static final double YAW_KP = 0;
+        public static final double YAW_KP = 150;
         public static final double YAW_KI = 0;
-        public static final double YAW_KD = 0;
-
-        public static final double PITCH_ACCELERATION = 1;
-        public static final double PITCH_CRUISE_VELOCITY = 1;
-
-        public static final double PITCH_KS = 0;
-        public static final double PITCH_KV = 0;
-        public static final double PITCH_KA = 0;
-        public static final double PITCH_KP = 0;
-        public static final double PITCH_KI = 0;
-        public static final double PITCH_KD = 96;
+        public static final double YAW_KD = 96;
 
         public static final Pose2d HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
     }
