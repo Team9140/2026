@@ -2,11 +2,14 @@ package org.team9140.frc2026.subsystems;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -16,6 +19,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -35,7 +39,7 @@ public class Intake extends SubsystemBase {
     // TODO: read this https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html
     //pretend its meters
     Mechanism2d intakeMechanism = new Mechanism2d(Constants.Intake.MECHANISM_LENGTH, Constants.Intake.MECHANISM_HEIGHT);
-    MechanismRoot2d root = intakeMechanism.getRoot("root", 32, 14);
+    MechanismRoot2d root = intakeMechanism.getRoot("root", 1, 1);
     MechanismLigament2d intakeSlide = root.append(new MechanismLigament2d("intakeSlide", Constants.Intake.LIGAMENT_LENGTH, 0));
 
     private Intake() {
@@ -54,7 +58,7 @@ public class Intake extends SubsystemBase {
                 .withInverted(InvertedValue.Clockwise_Positive);
 
         MotorOutputConfigs extendMotorOutputConfigs = new MotorOutputConfigs()
-                .withInverted(InvertedValue.Clockwise_Positive);
+                .withInverted(InvertedValue.CounterClockwise_Positive);
 
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs()
                 .withMotionMagicCruiseVelocity(Constants.Intake.MOTION_MAGIC_CRUISE_VELOCITY)
@@ -74,9 +78,9 @@ public class Intake extends SubsystemBase {
                 .withCurrentLimits(currentExtendLimits)
                 .withMotorOutput(extendMotorOutputConfigs)
                 .withMotionMagic(motionMagicConfigs)
-                .withSoftwareLimitSwitch(softwareLimitSwitchConfigs);
-
-        extendMotorConfigs.Feedback.SensorToMechanismRatio = Constants.Intake.EXTENSION_GEAR_RATIO;
+                .withSoftwareLimitSwitch(softwareLimitSwitchConfigs)
+                .withSlot0(new Slot0Configs().withKP(0.5))
+                .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(Constants.Intake.EXTENSION_GEAR_RATIO));
 
         this.spinMotor.getConfigurator().apply(spinMotorConfigs);
         this.extendMotor.getConfigurator().apply(extendMotorConfigs);
@@ -93,6 +97,9 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         this.extendMotor.getPosition().refresh();
+        SmartDashboard.putNumber("extend volts", this.extendMotor.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("target position", this.targetPosition);
+        SmartDashboard.putNumber("motor target", this.extendMotor.getClosedLoopReference().getValueAsDouble());
     }
 
     double targetPosition = 0;
@@ -185,15 +192,16 @@ public class Intake extends SubsystemBase {
 
     private void updateSimState(double t, double volts) {
         double extendVolts = this.extendMotor.getSimState().getMotorVoltage();
+        SmartDashboard.putNumber("bla", extendVolts);
         this.extensionSim.setInputVoltage(extendVolts);
         this.extensionSim.update(t);
 
         double pos = this.extensionSim.getPositionMeters();
         double vel = this.extensionSim.getVelocityMetersPerSecond();
 
-        this.extendMotor.getSimState().setRawRotorPosition(pos * Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
-        this.extendMotor.getSimState().setRotorVelocity(vel * Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
+        this.extendMotor.getSimState().setRawRotorPosition(pos / Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
+        this.extendMotor.getSimState().setRotorVelocity(vel / Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
 
-        intakeSlide.setLength(pos);
+        intakeSlide.setLength(0.5+pos);
     }
 }
