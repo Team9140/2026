@@ -6,6 +6,7 @@ package org.team9140.frc2026;
 
 import org.team9140.frc2026.generated.TunerConstants;
 import org.team9140.frc2026.subsystems.CommandSwerveDrivetrain;
+import org.team9140.frc2026.subsystems.Shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -16,6 +17,10 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.getDrivetrain();
   private final SwerveTelemetry logger = new SwerveTelemetry(Constants.Drive.MAX_TELEOP_VELOCITY);
+  private final Shooter shooter = Shooter.getInstance(
+      () -> drivetrain.getState().Pose,
+      () -> drivetrain.getState().Speeds
+    );
 
   public RobotContainer() {
     configureBindings();
