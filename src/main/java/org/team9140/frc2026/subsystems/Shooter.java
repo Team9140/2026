@@ -1,5 +1,7 @@
 package org.team9140.frc2026.subsystems;
 
+import java.util.function.Supplier;
+
 import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
@@ -13,9 +15,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
-
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -23,9 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -70,11 +70,15 @@ public class Shooter extends SubsystemBase {
 
         private static Shooter instance;
 
-        public static Shooter getInstance() {
-                return (instance == null) ? instance = new Shooter() : instance;
+        public static Shooter getInstance(Supplier<Pose2d> rPos) {
+                return (instance == null) ? instance = new Shooter(rPos) : instance;
         }
 
-        private Shooter() {
+        private Supplier<Pose2d> robotPose;
+
+        private Shooter(Supplier<Pose2d> rPos) {
+                this.robotPose = rPos;
+                
                 MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
                                 .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
                                 .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
@@ -146,23 +150,11 @@ public class Shooter extends SubsystemBase {
 
         }
 
-        public Command moveYawToPosition(double pos) {
+        public Command moveYawToPos(double pos) {
                 return this.runOnce(() -> {
                         this.yawTargetPosition = pos;
                         yawMotor.setControl(yawMM.withPosition(yawTargetPosition / 2.0 / Math.PI));
                 }).andThen(new WaitUntilCommand(yawIsAtPosition));
-        }
-
-        public Command movePitchToPosition(double pos) {
-                return this.runOnce(() -> {
-                        this.pitchTargetPosition = pos;
-                        pitchMotor.setControl(pitchMM.withPosition(pitchTargetPosition / 2.0 / Math.PI));
-                }).andThen(new WaitUntilCommand(pitchIsAtPosition));
-        }
-
-        public Command aimAtPosition(Pose2d turretPos, Translation3d endPos) {
-                return moveYawToPosition(AimAlign.yawAngleToPosition(turretPos, endPos))
-                                .andThen(movePitchToPosition(AimAlign.pitchAngleToPosition(turretPos, endPos)));
         }
 
         public final Trigger yawIsAtPosition = new Trigger(
@@ -173,21 +165,24 @@ public class Shooter extends SubsystemBase {
                         () -> Util.epsilonEquals(this.pitchMotor.getPosition(false).getValueAsDouble(),
                                         this.pitchTargetPosition));
 
-        public Command setShooterReleaseSpeed(double releaseSpeed) {
+        public Command runShooterMotor(double angularVelocity) {
                 return this.runOnce(() -> {
-                        shooterMotor.setControl(shooterMM.withVelocity(
-                                        releaseSpeed * Constants.Shooter.SHOOT_VELOCITY_RATIO / 2.0 / Math.PI));
+                        shooterMotor.setControl(shooterMM.withVelocity(angularVelocity / 2.0 / Math.PI));
                 });
         }
 
-        public Command shoot(double velocity, double time) {
-                return setShooterReleaseSpeed(velocity)
-                                .andThen(Commands.waitSeconds(time).andThen(setShooterReleaseSpeed(0)));
+        public Command stopShooterMotor() {
+                return this.runOnce(() -> {
+                        shooterMotor.setControl(shooterMM.withVelocity(0));
+                });
         }
 
-        public Command shootAtEndPosition(Pose2d turretPos, Translation3d endPos, double time, double robotSpeed) {
-                return aimAtPosition(turretPos, endPos)
-                                .andThen(shoot(AimAlign.speedToPosition(turretPos, endPos, robotSpeed), time));
+        public Command aimTowardsPos(Translation2d goalPos) {
+                return moveYawToPos(AimAlign.yawAngleToPos(this.robotPose.get(), goalPos));
+        }
+
+        public Command shootAtGoal(Translation2d goalPos, ChassisSpeeds robotSpeed) {
+                return runShooterMotor(AimAlign.getRequiredSpeed(robotPose.get(), goalPos, robotSpeed));
         }
 
         @Override
