@@ -86,11 +86,14 @@ public class Constants {
         public static final double EXTEND_POSITION = 1.0;
 
         public static final double SIM_PERIOD = 0.004;
-        public static final double MIN_HEIGHT = Units.inchesToMeters(15);
+        public static final double MIN_HEIGHT = Units.inchesToMeters(0);
+        public static final double MAX_HEIGHT = Units.inchesToMeters(8);
 
-        public static final int PINION_TEETH = 10;
-        public static final double PINION_DP = 10;
-        public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
+        public static final double SPOOL_DIAMETER = Units.inchesToMeters(15);
+        public static final double SPOOL_CIRCUMFERENCE = Units.inchesToMeters(SPOOL_DIAMETER * Math.PI);
+
+        public static final double MECHANISM_WIDTH = 3;
+        public static final double MECHANISM_HEIGHT = 3;
     }
 
     public static class Intake {
@@ -113,6 +116,13 @@ public class Constants {
         public static final int PINION_TEETH = 10;
         public static final double PINION_DP = 10;
         public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
+
+        public static final double MIN_HEIGHT = 0;
+        public static final double MAX_HEIGHT = Units.inchesToMeters(14);
+
+        public static final double LIGAMENT_LENGTH = 12;
+        public static final double MECHANISM_LENGTH = 2;
+        public static final double MECHANISM_HEIGHT = 2;
 
         public static final double SIM_PERIOD = 0.004;
     }

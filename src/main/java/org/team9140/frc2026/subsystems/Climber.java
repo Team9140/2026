@@ -29,9 +29,10 @@ public class Climber extends SubsystemBase {
 
     // TODO: what are these numbers mean
     // TODO: read this https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html
-    Mechanism2d extendo = new Mechanism2d(100, 100);
-    MechanismRoot2d rootyTooty = extendo.getRoot("joe mama", 0, 50);
-    MechanismLigament2d ligma = rootyTooty.append(new MechanismLigament2d("ligma", 20, 0));
+    //pretend its meters
+    Mechanism2d climberMechanism = new Mechanism2d(Constants.Climber.MECHANISM_WIDTH, Constants.Climber.MECHANISM_HEIGHT);
+    MechanismRoot2d root = climberMechanism.getRoot("root", 32, 14);
+    MechanismLigament2d telescope = root.append(new MechanismLigament2d("telescope", 20, 0));
 
     private Climber() {
         this.motor = new TalonFX(Constants.Ports.CLIMBER_MOTOR, Constants.Ports.CANIVORE);
@@ -107,9 +108,9 @@ public class Climber extends SubsystemBase {
     ElevatorSim extensionSim = new ElevatorSim(DCMotor.getKrakenX44(1),
             Constants.Climber.GEAR_RATIO,
             1,
-            Constants.Climber.PINION_CIRCUMFERENCE / Math.PI / 2.0,
+            Constants.Climber.SPOOL_CIRCUMFERENCE / Math.PI / 2.0,
             Constants.Climber.MIN_HEIGHT,
-            123,
+            Constants.Climber.MAX_HEIGHT,
             false,
             0);
 
@@ -121,9 +122,9 @@ public class Climber extends SubsystemBase {
         double pos = this.extensionSim.getPositionMeters();
         double vel = this.extensionSim.getVelocityMetersPerSecond();
 
-        this.motor.getSimState().setRawRotorPosition(pos * Constants.Climber.PINION_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
-        this.motor.getSimState().setRotorVelocity(vel * Constants.Climber.PINION_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
+        this.motor.getSimState().setRawRotorPosition(pos * Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
+        this.motor.getSimState().setRotorVelocity(vel * Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
 
-        ligma.setLength(pos);
+        telescope.setLength(pos);
     }
 }

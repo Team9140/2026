@@ -33,9 +33,10 @@ public class Intake extends SubsystemBase {
 
     // TODO: what are these numbers mean
     // TODO: read this https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html
-    Mechanism2d extendo = new Mechanism2d(100, 100);
-    MechanismRoot2d rootyTooty = extendo.getRoot("joe mama", 0, 50);
-    MechanismLigament2d ligma = rootyTooty.append(new MechanismLigament2d("ligma", 20, 0));
+    //pretend its meters
+    Mechanism2d intakeMechanism = new Mechanism2d(Constants.Intake.MECHANISM_LENGTH, Constants.Intake.MECHANISM_HEIGHT);
+    MechanismRoot2d root = intakeMechanism.getRoot("root", 32, 14);
+    MechanismLigament2d intakeSlide = root.append(new MechanismLigament2d("intakeSlide", Constants.Intake.LIGAMENT_LENGTH, 0));
 
     private Intake() {
         this.spinMotor = new TalonFX(Constants.Ports.INTAKE_SPIN_MOTOR, Constants.Ports.CANIVORE);
@@ -173,12 +174,12 @@ public class Intake extends SubsystemBase {
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    ElevatorSim extensionSim = new ElevatorSim(DCMotor.getKrakenX44(1), 
+    ElevatorSim extensionSim = new ElevatorSim(DCMotor.getKrakenX44(1),
     Constants.Intake.EXTENSION_GEAR_RATIO,
     1, 
     Constants.Intake.PINION_CIRCUMFERENCE / Math.PI / 2.0,
-    0,
-    123, 
+    Constants.Intake.MIN_HEIGHT,
+    Constants.Intake.MAX_HEIGHT,
     false, 
     0);
 
@@ -193,6 +194,6 @@ public class Intake extends SubsystemBase {
         this.extendMotor.getSimState().setRawRotorPosition(pos * Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
         this.extendMotor.getSimState().setRotorVelocity(vel * Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
 
-        ligma.setLength(pos);
+        intakeSlide.setLength(pos);
     }
 }
