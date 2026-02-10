@@ -45,7 +45,7 @@ public class Shooter extends SubsystemBase {
                         60,
                         1,
                         0.2,
-                        0,
+                        -Math.PI,
                         Math.PI,
                         false,
                         0);
@@ -121,7 +121,7 @@ public class Shooter extends SubsystemBase {
 
         public Command moveYawToPos(double pos) {
                 return this.runOnce(() -> {
-                        this.yawTargetPosition = pos;
+                        this.yawTargetPosition = pos % (2*Math.PI) - Math.PI;
                         yawMotor.setControl(yawMM.withPosition(yawTargetPosition / 2.0 / Math.PI));
                 }).andThen(new WaitUntilCommand(yawIsAtPosition));
         }
