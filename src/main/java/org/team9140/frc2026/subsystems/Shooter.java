@@ -15,9 +15,13 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -54,19 +58,18 @@ public class Shooter extends SubsystemBase {
         private MechanismLigament2d yawArmLigament;
         private double ARM_LENGTH = 1.0;
 
+        StructPublisher<Pose3d> publisher1 = NetworkTableInstance.getDefault()
+            .getStructTopic("shooter", Pose3d.struct).publish();
+        Pose3d shooterPos = new Pose3d();
+
         private static Shooter instance;
 
-        public static Shooter getInstance(Supplier<Pose2d> rPos, Supplier<ChassisSpeeds> speeds) {
-                return (instance == null) ? instance = new Shooter(rPos, speeds) : instance;
+        public static Shooter getInstance() {
+                return (instance == null) ? instance = new Shooter() : instance;
         }
 
-        private Supplier<Pose2d> robotPose;
-        private Supplier<ChassisSpeeds> robotSpeeds;
+        private Shooter() {
 
-        private Shooter(Supplier<Pose2d> rPos, Supplier<ChassisSpeeds> speeds) {
-                this.robotPose = rPos;
-                this.robotSpeeds= speeds;
-                
                 MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
                                 .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
                                 .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
@@ -142,17 +145,17 @@ public class Shooter extends SubsystemBase {
                 });
         }
 
-        public Command aimTowardsPos(Translation2d goalPos) {
-                return moveYawToPos(AimAlign.yawAngleToPos(this.robotPose.get(), goalPos));
+        public Command aimTowardsPos(Translation2d goalPos, Pose2d robotPose) {
+                return moveYawToPos(AimAlign.yawAngleToPos(robotPose, goalPos));
         }
 
-        public Command shootAtTarget(Translation2d goalPos, ChassisSpeeds robotSpeed) {
-                return runShooterMotor(AimAlign.getRequiredSpeed(robotPose.get(), goalPos, robotSpeed));
+        public Command shootAtTarget(Translation2d goalPos, ChassisSpeeds robotSpeed, Pose2d robotPose) {
+                return runShooterMotor(AimAlign.getRequiredSpeed(robotPose, goalPos, robotSpeed));
         }
 
-        public Command shootAtGoal() {
-                return this.aimTowardsPos(Constants.Turret.HOOP_POSITION.getTranslation()).andThen(
-                                this.shootAtTarget(Constants.Turret.HOOP_POSITION.getTranslation(), robotSpeeds.get()));
+        public Command shootAtGoal(Pose2d robotPose, ChassisSpeeds robotSpeeds) {
+                return this.aimTowardsPos(Constants.Turret.HOOP_POSITION.getTranslation(), robotPose).andThen(
+                                this.shootAtTarget(Constants.Turret.HOOP_POSITION.getTranslation(), robotSpeeds, robotPose));
         }
 
         @Override
@@ -169,5 +172,8 @@ public class Shooter extends SubsystemBase {
 
                 yawMotorSimState.setRawRotorPosition(yawMotorSim.getAngleRads() / 2.0 / Math.PI);
                 yawMotorSimState.setRotorVelocity(yawMotorSim.getVelocityRadPerSec() / 2.0 / Math.PI);
+                
+                shooterPos = new Pose3d(0, 0, 0, new Rotation3d(0, 0, yawMotor.getPosition().getValueAsDouble() * 2*Math.PI));;
+                publisher1.set(shooterPos);
         }
 }

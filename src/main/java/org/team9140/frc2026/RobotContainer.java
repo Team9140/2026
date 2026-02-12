@@ -17,10 +17,7 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.getDrivetrain();
   private final SwerveTelemetry logger = new SwerveTelemetry(Constants.Drive.MAX_TELEOP_VELOCITY);
-  private final Shooter shooter = Shooter.getInstance(
-      () -> drivetrain.getState().Pose,
-      () -> drivetrain.getState().Speeds
-    );
+  private final Shooter shooter = Shooter.getInstance();
 
   public RobotContainer() {
     configureBindings();
