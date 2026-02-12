@@ -80,9 +80,9 @@ public class Constants {
         public static final double YAW_KS = 0;
         public static final double YAW_KV = 0;
         public static final double YAW_KA = 0;
-        public static final double YAW_KP = 150;
+        public static final double YAW_KP = 1000;
         public static final double YAW_KI = 0;
-        public static final double YAW_KD = 96;
+        public static final double YAW_KD = 50;
 
         public static final Pose2d HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
     }

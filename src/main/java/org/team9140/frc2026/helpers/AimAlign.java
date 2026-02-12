@@ -36,8 +36,8 @@ public class AimAlign {
     }
    
     public static double yawAngleToPos(Pose2d turretPos, Translation2d endPos) {
-        return Math.atan(
-            (endPos.getY() - turretPos.getY())/(endPos.getX() - turretPos.getX())
+        return Math.atan2(
+            (endPos.getY() - turretPos.getY()), (endPos.getX() - turretPos.getX())
             ) - turretPos.getRotation().getRadians();
     }
 }
