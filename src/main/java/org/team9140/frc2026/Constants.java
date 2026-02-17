@@ -12,7 +12,7 @@ public class Constants {
         public static final String CANIVORE_NAME = "buzz"; // Buzz Aldrin
         public static final int YAW_MOTOR = 9;
         public static final int PITCH_MOTOR = 98;
-        public static final int SHOOTER_MOTOR = 97;
+        public static final int SHOOTER_MOTOR = 19;
         public static final int INTAKE_SPIN_MOTOR = 96;
         public static final int INTAKE_EXTEND_MOTOR = 95;
         public static final int CLIMBER_MOTOR = 94;
