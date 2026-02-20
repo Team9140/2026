@@ -5,11 +5,15 @@ import java.util.function.Supplier;
 import org.team9140.frc2026.Constants;
 import org.team9140.lib.Util;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -39,8 +43,10 @@ public class Shooter extends SubsystemBase {
         private double yawTargetPosition = 0;
         private double shooterTargetVelocity = 0;
 
-        private final MotionMagicTorqueCurrentFOC yawMM = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
-        private final VelocityTorqueCurrentFOC shooterMM = new VelocityTorqueCurrentFOC(0).withSlot(0);
+        private final MotionMagicTorqueCurrentFOC yawMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
+        private final VelocityTorqueCurrentFOC shooterSpeedControl = new VelocityTorqueCurrentFOC(0).withSlot(0);
+        private final VoltageOut shooterIdleControl = new VoltageOut(0);
+        private final CoastOut shooterOffControl = new CoastOut();
 
         private TalonFXSimState yawMotorSimState;
         private final SingleJointedArmSim yawMotorSim = new SingleJointedArmSim(
@@ -55,7 +61,6 @@ public class Shooter extends SubsystemBase {
         private final Mechanism2d yawMech = new Mechanism2d(1, 1);
         private final MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
         private MechanismLigament2d yawArmLigament;
-        private final double ARM_LENGTH = 1.0;
 
         private TalonFXSimState shooterMotorSimState;
         private final FlywheelSim shooterMotorSim = new FlywheelSim(
@@ -74,16 +79,16 @@ public class Shooter extends SubsystemBase {
 
         private Shooter() {
                 MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
-                                .withMotionMagicAcceleration(Constants.Turret.YAW_ACCELERATION)
-                                .withMotionMagicCruiseVelocity(Constants.Turret.YAW_CRUISE_VELOCITY);
+                                .withMotionMagicAcceleration(Constants.Shooter.YAW_ACCELERATION)
+                                .withMotionMagicCruiseVelocity(Constants.Shooter.YAW_CRUISE_VELOCITY);
 
                 Slot0Configs yawSlot0Configs = new Slot0Configs()
-                                .withKS(Constants.Turret.YAW_KS)
-                                .withKV(Constants.Turret.YAW_KV)
-                                .withKA(Constants.Turret.YAW_KA)
-                                .withKP(Constants.Turret.YAW_KP)
-                                .withKI(Constants.Turret.YAW_KI)
-                                .withKD(Constants.Turret.YAW_KD);
+                                .withKS(Constants.Shooter.YAW_KS)
+                                .withKV(Constants.Shooter.YAW_KV)
+                                .withKA(Constants.Shooter.YAW_KA)
+                                .withKP(Constants.Shooter.YAW_KP)
+                                .withKI(Constants.Shooter.YAW_KI)
+                                .withKD(Constants.Shooter.YAW_KD);
 
                 Slot0Configs shooterSlot0Configs = new Slot0Configs()
                                 .withKS(Constants.Shooter.SHOOTER_KS)
@@ -93,62 +98,73 @@ public class Shooter extends SubsystemBase {
                                 .withKI(Constants.Shooter.SHOOTER_KI)
                                 .withKD(Constants.Shooter.SHOOTER_KD);
 
+                TorqueCurrentConfigs shooterTorqueCurrentConfigs = new TorqueCurrentConfigs()
+                                .withPeakForwardTorqueCurrent(Constants.Shooter.PEAK_FORWARD_TORQUE)
+                                .withPeakReverseTorqueCurrent(0.0);
+
                 TalonFXConfiguration yawConfig = new TalonFXConfiguration()
                                 .withMotionMagic(yawMMConfigs)
                                 .withSlot0(yawSlot0Configs);
 
                 TalonFXConfiguration shooterConfig = new TalonFXConfiguration()
-                                .withSlot0(shooterSlot0Configs);
+                                .withSlot0(shooterSlot0Configs)
+                                .withTorqueCurrent(shooterTorqueCurrentConfigs); 
 
                 yawMotor.getConfigurator().apply(yawConfig);
                 shooterMotor.getConfigurator().apply(shooterConfig);
 
-                yawMotor.setControl(yawMM.withPosition(0));
-                shooterMotor.setControl(shooterMM.withVelocity(0));
+                yawMotor.setControl(yawMotorControl.withPosition(0));
+                shooterMotor.setControl(shooterOffControl);
 
                 yawArmLigament = yawRoot.append(new MechanismLigament2d(
                                 "yawArm",
-                                ARM_LENGTH,
+                                0.3,
                                 0,
                                 6,
                                 new Color8Bit(Color.kYellow)));
 
                 SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
-
         }
 
-        public Command moveYawToPos(double pos) {
+        public Command setYawAngle(double pos) {
                 return this.runOnce(() -> {
                         this.yawTargetPosition = pos - Math.floor(pos / 2.0 / Math.PI) * 2.0 * Math.PI - Math.PI;
-                        yawMotor.setControl(yawMM.withPosition(yawTargetPosition / 2.0 / Math.PI));
+                        yawMotor.setControl(yawMotorControl.withPosition(yawTargetPosition / 2.0 / Math.PI));
                 });
         }
 
-        public Command moveYawToPos(Supplier<Double> pos) {
+        public Command setYawAngle(Supplier<Double> pos) {
                 return this.runOnce(() -> {
                         this.yawTargetPosition = pos.get() - Math.floor(pos.get() / 2.0 / Math.PI) * 2.0 * Math.PI - Math.PI;
-                        yawMotor.setControl(yawMM.withPosition(yawTargetPosition / 2.0 / Math.PI));
+                        yawMotor.setControl(yawMotorControl.withPosition(yawTargetPosition / 2.0 / Math.PI));
                 });
         }
 
-        public Command runShooterMotor(double angularVelocity) {
+        public Command setSpeed(double angularVelocity) {
                 return this.runOnce(() -> {
                         this.shooterTargetVelocity = angularVelocity;
-                        shooterMotor.setControl(shooterMM.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
+                        shooterMotor.setControl(shooterSpeedControl.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
                 });
         }
 
-        public Command runShooterMotor(Supplier<Double> angularVelocity) {
+        public Command setSpeed(Supplier<Double> angularVelocity) {
                 return this.runOnce(() -> {
                         this.shooterTargetVelocity = angularVelocity.get();
-                        shooterMotor.setControl(shooterMM.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
+                        shooterMotor.setControl(shooterSpeedControl.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
                 });
         }
 
-        public Command stopShooterMotor() {
+        public Command idle() {
+                return this.runOnce(() -> {
+                        this.shooterTargetVelocity = Constants.Shooter.SPEED_AT_IDLE;
+                        shooterMotor.setControl(shooterIdleControl.withOutput(Constants.Shooter.IDLE_VOLTAGE));
+                });
+        }
+
+        public Command off() {
                 return this.runOnce(() -> {
                         this.shooterTargetVelocity = 0;
-                        shooterMotor.setControl(shooterMM.withVelocity(0));
+                        shooterMotor.setControl(shooterOffControl);
                 });
         }
 
