@@ -39,8 +39,8 @@ public class Shooter extends SubsystemBase {
         private double yawTargetPosition = 0;
         private double shooterTargetVelocity = 0;
 
-        private MotionMagicTorqueCurrentFOC yawMM = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
-        private VelocityTorqueCurrentFOC shooterMM = new VelocityTorqueCurrentFOC(0).withSlot(0);
+        private final MotionMagicTorqueCurrentFOC yawMM = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
+        private final VelocityTorqueCurrentFOC shooterMM = new VelocityTorqueCurrentFOC(0).withSlot(0);
 
         private TalonFXSimState yawMotorSimState;
         private final SingleJointedArmSim yawMotorSim = new SingleJointedArmSim(
@@ -52,10 +52,10 @@ public class Shooter extends SubsystemBase {
                         Math.PI,
                         false,
                         0);
-        private Mechanism2d yawMech = new Mechanism2d(1, 1);
-        private MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
+        private final Mechanism2d yawMech = new Mechanism2d(1, 1);
+        private final MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
         private MechanismLigament2d yawArmLigament;
-        private double ARM_LENGTH = 1.0;
+        private final double ARM_LENGTH = 1.0;
 
         private TalonFXSimState shooterMotorSimState;
         private final FlywheelSim shooterMotorSim = new FlywheelSim(
