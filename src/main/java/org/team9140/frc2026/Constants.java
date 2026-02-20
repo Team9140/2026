@@ -30,18 +30,30 @@ public class Constants {
     }
 
     public static class Shooter {
-        public static final double SHOOTER_ACCELERATION = 1;
-        public static final double SHOOTER_CRUISE_VELOCITY = 1;
+        public static final double PEAK_FORWARD_TORQUE = 1.0;
+        public static final double IDLE_VOLTAGE = 0.0;
+        public static final double SPEED_AT_IDLE = 0.0;
 
         public static final double SHOOTER_KS = 0;
         public static final double SHOOTER_KV = 0;
         public static final double SHOOTER_KA = 0;
-        public static final double SHOOTER_KP = 50.0;
+        public static final double SHOOTER_KP = 1000;
         public static final double SHOOTER_KI = 0;
-        public static final double SHOOTER_KD = 9.6;
+        public static final double SHOOTER_KD = 0;
 
-        public static final double SHOOT_VELOCITY_RATIO = 1;
+        public static final double YAW_ACCELERATION = 1;
+        public static final double YAW_CRUISE_VELOCITY = 1;
+
+        public static final double YAW_KS = 0;
+        public static final double YAW_KV = 0;
+        public static final double YAW_KA = 0;
+        public static final double YAW_KP = 1000;
+        public static final double YAW_KI = 0;
+        public static final double YAW_KD = 50;
+
+        public static final Pose2d HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
     }
+
     public static class Climber {
         public static final double GEAR_RATIO = 25;
         public static final double SPOOL_RADIUS = 1.0;
@@ -73,19 +85,6 @@ public class Constants {
         public static final double PINION_DP = 10;
         public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
     }
-    public static class Turret {
-        public static final double YAW_ACCELERATION = 1;
-        public static final double YAW_CRUISE_VELOCITY = 1;
-
-        public static final double YAW_KS = 0;
-        public static final double YAW_KV = 0;
-        public static final double YAW_KA = 0;
-        public static final double YAW_KP = 1000;
-        public static final double YAW_KI = 0;
-        public static final double YAW_KD = 50;
-
-        public static final Pose2d HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
-    }
 
     public static class Hopper {
         public static final double SPINNER_STATOR_CURRENT_LIMIT = 0;
@@ -94,5 +93,4 @@ public class Constants {
         public static final double SPINNER_VOLTAGE = 1;
         public static final double OUTAKE_VOLTAGE = 1;
     }
-
 }
