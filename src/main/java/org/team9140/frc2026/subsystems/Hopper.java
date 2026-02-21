@@ -50,19 +50,22 @@ public class Hopper extends SubsystemBase{
         return (instance == null) ? instance = new Hopper() : instance;
     }
 
-    public Command startSpinner() {
-        return this.runOnce(() -> spinnerMotor.setVoltage(Constants.Hopper.SPINNER_VOLTAGE));
+    public Command generateSetVoltageCommand(double volts, TalonFX motor) {
+        return this.runOnce(() -> motor.setVoltage(volts));
     }
 
-    public Command stopSpinner() {
-        return this.runOnce(() -> spinnerMotor.setVoltage(0));
+    public Command forward() {
+        return this.runOnce(() -> generateSetVoltageCommand(Constants.Hopper.SPINNER_VOLTAGE, spinnerMotor))
+                .alongWith(generateSetVoltageCommand(Constants.Hopper.OUTAKE_VOLTAGE, outakeMotor));
     }
 
-    public Command startOutake() {
-        return this.runOnce(() -> outakeMotor.setVoltage(Constants.Hopper.OUTAKE_VOLTAGE));
+    public Command backward() {
+        return this.runOnce(() -> generateSetVoltageCommand(Constants.Hopper.SPINNER_VOLTAGE, spinnerMotor))
+                .alongWith(generateSetVoltageCommand(Constants.Hopper.OUTAKE_VOLTAGE, outakeMotor));
     }
 
-    public Command stopOutake() {
-        return this.runOnce(() -> outakeMotor.setVoltage(0));
+    public Command hopperOff() {
+        return this.runOnce(() -> generateSetVoltageCommand(0, spinnerMotor))
+                .alongWith(generateSetVoltageCommand(0, outakeMotor));
     }
 }
