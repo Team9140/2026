@@ -17,9 +17,14 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
+
+import choreo.trajectory.SwerveSample;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -28,8 +33,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 
@@ -51,6 +58,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+
+    private final PhoenixPIDController m_pathXController = new PhoenixPIDController(Constants.Drive.X_CONTROLLER_P,
+            Constants.Drive.X_CONTROLLER_I, Constants.Drive.X_CONTROLLER_D);
+    private final PhoenixPIDController m_pathYController = new PhoenixPIDController(Constants.Drive.Y_CONTROLLER_P,
+            Constants.Drive.Y_CONTROLLER_I, Constants.Drive.Y_CONTROLLER_D);
+    private final PhoenixPIDController headingController = new PhoenixPIDController(
+            Constants.Drive.HEADING_CONTROLLER_P,
+            Constants.Drive.HEADING_CONTROLLER_I, Constants.Drive.HEADING_CONTROLLER_D);// 11.0, 0.0, 0.25
+
+    Field2d dashField2d = new Field2d();
+
+    private Pose2d targetPose = new Pose2d();
+    private final double[] targetPoseDecomposed = new double[] { 0, 0, 0 };
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -332,4 +352,75 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     .withRotationalRate(omega));
         }).withName("regular drive");
     }
+
+    private final SwerveRequest.FieldCentric auton = new SwerveRequest.FieldCentric()
+            .withDeadband(Constants.Drive.MIN_AUTON_VELOCITY)
+            .withRotationalDeadband(Constants.Drive.MIN_AUTON_ROTATION)
+            .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
+            .withDriveRequestType(DriveRequestType.Velocity);
+       
+    /**
+     * Follows the given field-centric path sample with PID and applies any
+     * velocities as feed forwards.
+     *
+     * @param sample Provides sample to execute.
+     */
+    public void followSample(SwerveSample sample) {
+        Pose2d currPose = getState().Pose;
+        Pose2d target = sample.getPose();
+
+        this.targetPose = currPose;
+
+        double currentTime = Utils.getCurrentTimeSeconds();
+
+        this.setControl(this.auton
+                .withRotationalRate(sample.omega + this.headingController.calculate(currPose.getRotation().getRadians(),
+                        target.getRotation().getRadians(), currentTime))
+                .withVelocityX(
+                        sample.vx + this.m_pathXController.calculate(currPose.getX(), target.getX(), currentTime))
+                .withVelocityY(
+                        sample.vy + this.m_pathYController.calculate(currPose.getY(), target.getY(), currentTime)));
+    }
+
+
+    /**
+     * Follows the given field-centric path sample with PID.
+     *
+     * @param poses Provides poses to go to at any given time.
+     */
+    public Command goToPose(Supplier<Pose2d> poses) {
+        return this.run(() -> {
+            this.targetPose = poses.get();
+
+            if (this.targetPose == null)
+                return;
+
+            Pose2d pose = getState().Pose;
+            double currentTime = Utils.getCurrentTimeSeconds();
+
+            double vx = 0.0, vy = 0.0, omega = 0.0;
+
+            if (!Util.epsilonEquals(pose.getX(), targetPose.getX(), 0.015)) {
+                vx = m_pathXController.calculate(pose.getX(), this.targetPose.getX(), currentTime);
+                vx = Util.clamp(vx, 1.75);
+            }
+            if (!Util.epsilonEquals(pose.getY(), targetPose.getY(), 0.015)) {
+                vy = m_pathYController.calculate(pose.getY(), this.targetPose.getY(), currentTime);
+                vy = Util.clamp(vy, 1.75);
+            }
+            if (!Util.epsilonEquals(pose.getRotation().getDegrees(), targetPose.getRotation().getDegrees(), 1.0)) {
+                omega = this.headingController.calculate(pose.getRotation().getRadians(),
+                        this.targetPose.getRotation().getRadians(), currentTime);
+                omega = Util.clamp(omega, Math.toRadians(270.0));
+            }
+
+            this.setControl(this.auton
+                    .withRotationalRate(omega)
+                    .withVelocityX(vx)
+                    .withVelocityY(vy));
+        });
+    }
+
+    public final Trigger reachedPose = new Trigger(() -> Util.epsilonEquals(this.targetPose, this.getState().Pose))
+            .debounce(0.25, DebounceType.kBoth);
 }
