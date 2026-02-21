@@ -9,7 +9,6 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -98,9 +97,6 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         this.extendMotor.getPosition().refresh();
-        SmartDashboard.putNumber("extend volts", this.extendMotor.getMotorVoltage().getValueAsDouble());
-        SmartDashboard.putNumber("target position", this.targetPosition);
-        SmartDashboard.putNumber("motor target", this.extendMotor.getClosedLoopReference().getValueAsDouble());
     }
 
     double targetPosition = 0;
@@ -119,7 +115,7 @@ public class Intake extends SubsystemBase {
     public Command setPosition(double position) {
         return this.runOnce(() -> {
             this.targetPosition = position;
-            this.extendMotor.setControl(this.motionMagic.withPosition(this.targetPosition));
+            this.extendMotor.setControl(this.motionMagic.withPosition(this.targetPosition / Constants.Intake.PINION_CIRCUMFERENCE));
         }).andThen(new WaitUntilCommand(atPosition));
     }
 
@@ -193,12 +189,13 @@ public class Intake extends SubsystemBase {
 
     private void updateSimState(double t, double volts) {
         double extendVolts = this.extendMotor.getSimState().getMotorVoltage();
-        SmartDashboard.putNumber("bla", extendVolts);
+        SmartDashboard.putNumber("extend volts", extendVolts);
         this.extensionSim.setInputVoltage(extendVolts);
         this.extensionSim.update(t);
 
         double pos = this.extensionSim.getPositionMeters();
         double vel = this.extensionSim.getVelocityMetersPerSecond();
+
 
         this.extendMotor.getSimState().setRawRotorPosition(pos / Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
         this.extendMotor.getSimState().setRotorVelocity(vel / Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
