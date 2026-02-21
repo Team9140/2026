@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
 
   private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandSwerveDrivetrain drivetrain = TunerConstants.getDrivetrain();
-  private final SwerveTelemetry logger = new SwerveTelemetry(Constants.Drive.MAX_TELEOP_VELOCITY);
+  private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  private final SwerveTelemetry logger = new SwerveTelemetry(drivetrain, Constants.Drive.MAX_TELEOP_VELOCITY);
 
   public RobotContainer() {
     configureBindings();

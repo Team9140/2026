@@ -1,8 +1,6 @@
 package org.team9140.frc2026;
 
 import edu.wpi.first.networktables.*;
-import org.team9140.frc2026.generated.TunerConstants;
-
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
@@ -25,7 +23,7 @@ public class SwerveTelemetry {
      *
      * @param maxSpeed Maximum speed in meters per second
      */
-    public SwerveTelemetry(double maxSpeed) {
+    public SwerveTelemetry(CommandSwerveDrivetrain drive, double maxSpeed) {
         MaxSpeed = maxSpeed;
         SignalLogger.start();
     }
@@ -78,8 +76,6 @@ public class SwerveTelemetry {
     private final double[] m_moduleStatesArray = new double[8];
     private final double[] m_moduleTargetsArray = new double[8];
 
-    private final CommandSwerveDrivetrain drivetrain = TunerConstants.getDrivetrain();
-
     /** Accept the swerve drive state and telemeterize it to SmartDashboard and SignalLogger. */
     public void telemeterize(SwerveDriveState state) {
 
@@ -112,13 +108,13 @@ public class SwerveTelemetry {
         fieldTypePub.set("Field2d");
         fieldPub.set(m_poseArray);
 
-//        /* Telemeterize the module states to a Mechanism2d */
-//        for (int i = 0; i < 4; ++i) {
-//            m_moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
-//            m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
-//            m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
-//
-//            SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
-//        }
+       /* Telemeterize the module states to a Mechanism2d */
+       for (int i = 0; i < 4; ++i) {
+           m_moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
+           m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
+           m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
+
+           SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
+       }
     }
 }
