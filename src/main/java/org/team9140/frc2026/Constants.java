@@ -18,8 +18,8 @@ public class Constants {
         public static final int INTAKE_SPIN_MOTOR = 96;
         public static final int INTAKE_EXTEND_MOTOR = 95;
         public static final int CLIMBER_MOTOR = 94;
-        public static final int HOPPER_SPINNER_MOTOR = 6;
-        public static final int HOPPER_OUTAKE_MOTOR = 7;
+        public static final int HOPPER_SPINNER_MOTOR = 10;
+        public static final int HOPPER_OUTAKE_MOTOR = 11;
     }
 
     public static class Cantdle {
