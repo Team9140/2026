@@ -51,7 +51,7 @@ public class AimAlign {
         double ry = robotPos.getY();
         Pose2d position;
         Pose2d b = Constants.Positions.BLUE_ALLIANCE_ZONE;
-        if (rx >= 0 && rx <= b.getX() && ry >= 0 && ry <= b.getY()) {
+        if (rx >= 0 && rx <= b.getX()) {
             position = Constants.Positions.HOOP_POSITION;
         } else if (ry <= Constants.Positions.Y_CENTER) {
             position = Constants.Positions.FEEDING_POS_LOWER;
