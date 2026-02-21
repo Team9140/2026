@@ -16,6 +16,8 @@ public class Constants {
         public static final int INTAKE_SPIN_MOTOR = 3;
         public static final int INTAKE_EXTEND_MOTOR = 4;
         public static final int CLIMBER_MOTOR = 5;
+        public static final int HOPPER_SPINNER_MOTOR = 6;
+        public static final int HOPPER_OUTAKE_MOTOR = 7;
     }
 
     public static class Cantdle {
@@ -94,4 +96,13 @@ public class Constants {
 
         public static final Pose2d HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
     }
+
+    public static class Hopper {
+        public static final double SPINNER_STATOR_CURRENT_LIMIT = 0;
+        public static final double OUTAKE_STATOR_CURRENT_LIMIT = 0;
+
+        public static final double SPINNER_VOLTAGE = 1;
+        public static final double OUTAKE_VOLTAGE = 1;
+    }
+
 }
