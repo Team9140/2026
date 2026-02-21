@@ -55,15 +55,14 @@ public class Constants {
 
     public static class Positions {
        public static final double Y_CENTER = 4.572;
-       public static final double X_CENTER = 8.270494;
-       public static final Pose2d HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
-       public static final Pose2d BLUE_ALLIANCE_ZONE = new Pose2d(4.625594, 8.069326, new Rotation2d());
+       public static final double BLUE_ALLIANCE_ZONE = 4.625594;
+       public static final double RED_ALLIANCE_ZONE = 11.915394;
+       public static final Pose2d BLUE_HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
+       public static final Pose2d RED_HOOP_POSITION = new Pose2d(11.915394, 4.03479, new Rotation2d());
        public static final Pose2d FEEDING_POS_LOWER = new Pose2d(2,2, new Rotation2d());
-       public static final Pose2d FEEDING_POS_UPPER = new Pose2d(
-           FEEDING_POS_LOWER.getX(),
-           2 * Y_CENTER - FEEDING_POS_LOWER.getY(),
-           new Rotation2d()
-       );
+       public static final Pose2d FEEDING_POS_UPPER = new Pose2d(2,6 , new Rotation2d());
+       public static final Pose2d FEEDING_POS_LOWER_RED = new Pose2d(14.540988,2, new Rotation2d());
+       public static final Pose2d FEEDING_POS_UPPER_RED = new Pose2d(14.540988,6 , new Rotation2d());
     }
 
     public static class Climber {
