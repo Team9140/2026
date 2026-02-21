@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import org.team9140.frc2026.Constants;
 import org.team9140.lib.Util;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -23,7 +22,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -48,7 +46,6 @@ public class Shooter extends SubsystemBase {
         private final VoltageOut shooterIdleControl = new VoltageOut(0);
         private final CoastOut shooterOffControl = new CoastOut();
 
-        private TalonFXSimState yawMotorSimState;
         private final SingleJointedArmSim yawMotorSim = new SingleJointedArmSim(
                         DCMotor.getKrakenX60Foc(1),
                         60,
@@ -58,18 +55,16 @@ public class Shooter extends SubsystemBase {
                         Math.PI,
                         false,
                         0);
-        private final Mechanism2d yawMech = new Mechanism2d(1, 1);
-        private final MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
-        private MechanismLigament2d yawArmLigament;
+        private final MechanismLigament2d yawArmLigament;
 
         private TalonFXSimState shooterMotorSimState;
         private final FlywheelSim shooterMotorSim = new FlywheelSim(
                         LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60Foc(2), 0.2, 60),
                         DCMotor.getKrakenX60Foc(2));
 
-        StructPublisher<Pose3d> publisher1 = NetworkTableInstance.getDefault()
-            .getStructTopic("shooter", Pose3d.struct).publish();
-        Pose3d shooterPos = new Pose3d();
+        private final StructPublisher<Pose3d> publisher1 = NetworkTableInstance.getDefault()
+                        .getStructTopic("shooter", Pose3d.struct).publish();
+        private Pose3d shooterPos = new Pose3d();
 
         private static Shooter instance;
 
@@ -108,7 +103,7 @@ public class Shooter extends SubsystemBase {
 
                 TalonFXConfiguration shooterConfig = new TalonFXConfiguration()
                                 .withSlot0(shooterSlot0Configs)
-                                .withTorqueCurrent(shooterTorqueCurrentConfigs); 
+                                .withTorqueCurrent(shooterTorqueCurrentConfigs);
 
                 yawMotor.getConfigurator().apply(yawConfig);
                 shooterMotor.getConfigurator().apply(shooterConfig);
@@ -116,6 +111,8 @@ public class Shooter extends SubsystemBase {
                 yawMotor.setControl(yawMotorControl.withPosition(0));
                 shooterMotor.setControl(shooterOffControl);
 
+                Mechanism2d yawMech = new Mechanism2d(1, 1);
+                MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
                 yawArmLigament = yawRoot.append(new MechanismLigament2d(
                                 "yawArm",
                                 0.3,
@@ -135,7 +132,8 @@ public class Shooter extends SubsystemBase {
 
         public Command setYawAngle(Supplier<Double> pos) {
                 return this.runOnce(() -> {
-                        this.yawTargetPosition = pos.get() - Math.floor(pos.get() / 2.0 / Math.PI) * 2.0 * Math.PI - Math.PI;
+                        this.yawTargetPosition = pos.get() - Math.floor(pos.get() / 2.0 / Math.PI) * 2.0 * Math.PI
+                                        - Math.PI;
                         yawMotor.setControl(yawMotorControl.withPosition(yawTargetPosition / 2.0 / Math.PI));
                 });
         }
@@ -143,14 +141,16 @@ public class Shooter extends SubsystemBase {
         public Command setSpeed(double angularVelocity) {
                 return this.runOnce(() -> {
                         this.shooterTargetVelocity = angularVelocity;
-                        shooterMotor.setControl(shooterSpeedControl.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
+                        shooterMotor.setControl(
+                                        shooterSpeedControl.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
                 });
         }
 
         public Command setSpeed(Supplier<Double> angularVelocity) {
                 return this.runOnce(() -> {
                         this.shooterTargetVelocity = angularVelocity.get();
-                        shooterMotor.setControl(shooterSpeedControl.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
+                        shooterMotor.setControl(
+                                        shooterSpeedControl.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
                 });
         }
 
@@ -170,7 +170,7 @@ public class Shooter extends SubsystemBase {
 
         @Override
         public void periodic() {
-                //all these are in rotations per second
+                // all these are in rotations per second
                 SmartDashboard.putNumber("Yaw Angle", yawMotor.getPosition(true).getValueAsDouble());
                 SmartDashboard.putNumber("Yaw Target Position", this.yawTargetPosition / Math.PI / 2.0);
                 SmartDashboard.putNumber("Shooter Velocity", shooterMotor.getVelocity(true).getValueAsDouble());
@@ -183,7 +183,7 @@ public class Shooter extends SubsystemBase {
         }
 
         public void updateSimState(double deltatime) {
-                yawMotorSimState = yawMotor.getSimState();
+                TalonFXSimState yawMotorSimState = yawMotor.getSimState();
                 double yawSimVolts = yawMotorSimState.getMotorVoltage();
                 yawMotorSim.setInputVoltage(yawSimVolts);
                 yawMotorSim.update(0.02);
@@ -193,10 +193,11 @@ public class Shooter extends SubsystemBase {
 
                 yawMotorSimState.setRawRotorPosition(yawMotorSim.getAngleRads() / 2.0 / Math.PI);
                 yawMotorSimState.setRotorVelocity(yawMotorSim.getVelocityRadPerSec() / 2.0 / Math.PI);
-                
-                shooterPos = new Pose3d(0, 0, 0, new Rotation3d(0, 0, yawMotor.getPosition().getValueAsDouble() * 2*Math.PI));;
+
+                shooterPos = new Pose3d(0, 0, 0,
+                                new Rotation3d(0, 0, yawMotor.getPosition().getValueAsDouble() * 2 * Math.PI));
                 publisher1.set(shooterPos);
-                
+
                 shooterMotorSimState = shooterMotor.getSimState();
                 double shooterSimVolts = shooterMotorSimState.getMotorVoltage();
                 shooterMotorSim.setInputVoltage(shooterSimVolts);
@@ -204,7 +205,8 @@ public class Shooter extends SubsystemBase {
                 shooterMotorSim.update(0.02);
 
                 shooterMotorSimState.setRotorVelocity(shooterMotorSim.getAngularVelocityRPM() / 60.0);
-                shooterMotorSimState.setRotorAcceleration(shooterMotorSim.getAngularAccelerationRadPerSecSq() / 2.0 / Math.PI);
+                shooterMotorSimState.setRotorAcceleration(
+                                shooterMotorSim.getAngularAccelerationRadPerSecSq() / 2.0 / Math.PI);
         }
 
         public final Trigger yawIsAtPosition = new Trigger(
