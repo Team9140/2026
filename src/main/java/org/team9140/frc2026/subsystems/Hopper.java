@@ -1,19 +1,15 @@
 package org.team9140.frc2026.subsystems;
 
+import org.team9140.frc2026.Constants;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import org.team9140.frc2026.Constants;
-import org.team9140.lib.Util;
 
 public class Hopper extends SubsystemBase{
     private final TalonFX spinnerMotor; // This is the spinny thingy
@@ -21,8 +17,8 @@ public class Hopper extends SubsystemBase{
     private static Hopper instance;
 
     private Hopper() {
-        this.spinnerMotor = new TalonFX(Constants.Ports.HOPPER_SPINNER_MOTOR);
-        this.outakeMotor = new TalonFX(Constants.Ports.HOPPER_OUTAKE_MOTOR);
+        this.spinnerMotor = new TalonFX(Constants.Ports.HOPPER_SPINNER_MOTOR, Constants.Ports.CANIVORE);
+        this.outakeMotor = new TalonFX(Constants.Ports.HOPPER_OUTAKE_MOTOR, Constants.Ports.CANIVORE);
         
         CurrentLimitsConfigs currentSpinnerLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Hopper.SPINNER_STATOR_CURRENT_LIMIT)
@@ -50,7 +46,7 @@ public class Hopper extends SubsystemBase{
         this.outakeMotor.getConfigurator().apply(outakeMotorConfigs);
     }
 
-    public Hopper getInstance() {
+    public static Hopper getInstance() {
         return (instance == null) ? instance = new Hopper() : instance;
     }
 

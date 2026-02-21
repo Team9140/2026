@@ -6,20 +6,22 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import org.team9140.frc2026.generated.TunerConstants;
 
+import com.ctre.phoenix6.CANBus;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class Constants {
     public static class Ports {
-        public static final String CANIVORE_NAME = "buzz"; // Buzz Aldrin
+        public static final CANBus CANIVORE = new CANBus("poop", "./logs/example.hoot");
         public static final int YAW_MOTOR = 9;
-        public static final int PITCH_MOTOR = 98;
-        public static final int SHOOTER_MOTOR = 19;
-        public static final int INTAKE_SPIN_MOTOR = 96;
-        public static final int INTAKE_EXTEND_MOTOR = 95;
-        public static final int CLIMBER_MOTOR = 94;
-        public static final int HOPPER_SPINNER_MOTOR = 10;
-        public static final int HOPPER_OUTAKE_MOTOR = 11;
+        public static final int PITCH_MOTOR = 10;
+        public static final int SHOOTER_MOTOR = 11;
+        public static final int INTAKE_SPIN_MOTOR = 12;
+        public static final int INTAKE_EXTEND_MOTOR = 13;
+        public static final int CLIMBER_MOTOR = 14;
+        public static final int HOPPER_SPINNER_MOTOR = 15;
+        public static final int HOPPER_OUTAKE_MOTOR = 16;
     }
 
     public static class Cantdle {

@@ -20,7 +20,7 @@ public class Climber extends SubsystemBase {
     private final TalonFX motor;
 
     private Climber() {
-        this.motor = new TalonFX(Constants.Ports.CLIMBER_MOTOR);
+        this.motor = new TalonFX(Constants.Ports.CLIMBER_MOTOR, Constants.Ports.CANIVORE);
 
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Climber.STATOR_CURRENT_LIMIT)

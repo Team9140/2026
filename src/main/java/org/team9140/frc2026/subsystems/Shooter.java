@@ -37,8 +37,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Shooter extends SubsystemBase {
-        private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR);
-        private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR);
+        private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR, Constants.Ports.CANIVORE);
+        private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR, Constants.Ports.CANIVORE);
 
         private double yawTargetPosition = 0;
         private double shooterTargetVelocity = 0;

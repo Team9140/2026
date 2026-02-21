@@ -25,8 +25,8 @@ public class Intake extends SubsystemBase {
     private final MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
 
     private Intake() {
-        this.spinMotor = new TalonFX(Constants.Ports.INTAKE_SPIN_MOTOR);
-        this.extendMotor = new TalonFX(Constants.Ports.INTAKE_EXTEND_MOTOR);
+        this.spinMotor = new TalonFX(Constants.Ports.INTAKE_SPIN_MOTOR, Constants.Ports.CANIVORE);
+        this.extendMotor = new TalonFX(Constants.Ports.INTAKE_EXTEND_MOTOR, Constants.Ports.CANIVORE);
 
         CurrentLimitsConfigs currentSpinLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Intake.SPIN_STATOR_CURRENT_LIMIT)

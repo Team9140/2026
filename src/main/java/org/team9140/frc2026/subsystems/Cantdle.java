@@ -5,6 +5,8 @@ import java.util.Optional;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.team9140.frc2026.Constants;
 import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.controls.SolidColor;
@@ -28,7 +30,7 @@ public class Cantdle extends SubsystemBase {
     private SolidColor colorcontrol;
 
     private Cantdle() {
-        this.candle = new CANdle(0);
+        this.candle = new CANdle(0, Constants.Ports.CANIVORE);
         colorcontrol = new SolidColor(0, 7);
 
         if (Optional.of(DriverStation.Alliance.Red).equals(Util.getAlliance()))
