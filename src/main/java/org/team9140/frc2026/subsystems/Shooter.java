@@ -6,6 +6,7 @@ import org.team9140.frc2026.Constants;
 import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
@@ -14,6 +15,7 @@ import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -84,6 +86,9 @@ public class Shooter extends SubsystemBase {
                                 .withKP(Constants.Shooter.YAW_KP)
                                 .withKI(Constants.Shooter.YAW_KI)
                                 .withKD(Constants.Shooter.YAW_KD);
+                
+                MotorOutputConfigs yawMotorOutputConfigs = new MotorOutputConfigs()
+                                .withInverted(InvertedValue.CounterClockwise_Positive);
 
                 Slot0Configs shooterSlot0Configs = new Slot0Configs()
                                 .withKS(Constants.Shooter.SHOOTER_KS)
@@ -93,16 +98,21 @@ public class Shooter extends SubsystemBase {
                                 .withKI(Constants.Shooter.SHOOTER_KI)
                                 .withKD(Constants.Shooter.SHOOTER_KD);
 
+                MotorOutputConfigs shooterMotorOutputConfigs = new MotorOutputConfigs()
+                                .withInverted(InvertedValue.Clockwise_Positive);
+
                 TorqueCurrentConfigs shooterTorqueCurrentConfigs = new TorqueCurrentConfigs()
                                 .withPeakForwardTorqueCurrent(Constants.Shooter.PEAK_FORWARD_TORQUE)
                                 .withPeakReverseTorqueCurrent(0.0);
 
                 TalonFXConfiguration yawConfig = new TalonFXConfiguration()
                                 .withMotionMagic(yawMMConfigs)
-                                .withSlot0(yawSlot0Configs);
+                                .withSlot0(yawSlot0Configs)
+                                .withMotorOutput(yawMotorOutputConfigs);
 
                 TalonFXConfiguration shooterConfig = new TalonFXConfiguration()
                                 .withSlot0(shooterSlot0Configs)
+                                .withMotorOutput(shooterMotorOutputConfigs)
                                 .withTorqueCurrent(shooterTorqueCurrentConfigs);
 
                 yawMotor.getConfigurator().apply(yawConfig);
