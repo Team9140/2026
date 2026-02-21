@@ -50,19 +50,25 @@ public class AimAlign {
         double rx = robotPos.getX();
         double ry = robotPos.getY();
         Pose2d position;
-        Pose2d b = Constants.Positions.BLUE_ALLIANCE_ZONE;
-        if (rx >= 0 && rx <= b.getX()) {
-            position = Constants.Positions.HOOP_POSITION;
-        } else if (ry <= Constants.Positions.Y_CENTER) {
-            position = Constants.Positions.FEEDING_POS_LOWER;
+        if (Optional.of(DriverStation.Alliance.Red).equals(Util.getAlliance())
+                && rx > Constants.Positions.RED_ALLIANCE_ZONE) {
+            position = Constants.Positions.RED_HOOP_POSITION;
+        } else if (Optional.of(DriverStation.Alliance.Blue).equals(Util.getAlliance())
+                && rx < Constants.Positions.BLUE_ALLIANCE_ZONE) {
+            position = Constants.Positions.BLUE_HOOP_POSITION;
+        } else if (Optional.of(DriverStation.Alliance.Red).equals(Util.getAlliance())) {
+            if (ry < Constants.Positions.Y_CENTER) {
+                position = Constants.Positions.FEEDING_POS_LOWER_RED;
+            } else {
+                position = Constants.Positions.FEEDING_POS_UPPER_RED;
+            }
         } else {
-            position = Constants.Positions.FEEDING_POS_UPPER;
+            if (ry < Constants.Positions.Y_CENTER) {
+                position = Constants.Positions.FEEDING_POS_LOWER;
+            } else {
+                position = Constants.Positions.FEEDING_POS_UPPER;
+            }
         }
-        if (Optional.of(DriverStation.Alliance.Red).equals(Util.getAlliance())) {
-            double reflectedX = 2 * Constants.Positions.X_CENTER - position.getX();
-            return new Pose2d(reflectedX, position.getY(), position.getRotation());
-        } else {
-            return position;
-        }
+        return position;
     }
 }
