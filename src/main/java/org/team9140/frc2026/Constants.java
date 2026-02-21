@@ -67,7 +67,6 @@ public class Constants {
 
     public static class Climber {
         public static final double GEAR_RATIO = 25;
-        public static final double SPOOL_RADIUS = 1.0;
 
         public static final double STATOR_CURRENT_LIMIT = 80;
         public static final double SUPPLY_CURRENT_LIMIT = 1.0;
@@ -75,26 +74,49 @@ public class Constants {
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
 
-        public static final double EXTENSION_VOLTAGE = 12.0;
+        public static final double EXTENSION_VOLTAGE = 22.0;
         public static final double EXTEND_POSITION = 1.0;
+
+        public static final double SIM_PERIOD = 0.004;
+        public static final double MIN_HEIGHT = Units.inchesToMeters(0);
+        public static final double MAX_HEIGHT = Units.inchesToMeters(8);
+
+        public static final double SPOOL_DIAMETER = Units.inchesToMeters(15);
+        public static final double SPOOL_CIRCUMFERENCE = Units.inchesToMeters(SPOOL_DIAMETER * Math.PI);
+
+        public static final double MECHANISM_WIDTH = 3;
+        public static final double MECHANISM_HEIGHT = 3;
     }
 
     public static class Intake {
         public static final double INTAKE_VOLTAGE = 0.7;
         public static final double INTAKE_OFF = 0;
-        public static final double SPIN_STATOR_CURRENT_LIMIT = 0;
-        public static final double EXTEND_STATOR_CURRENT_LIMIT = 0;
-        public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0;
-        public static final double MOTION_MAGIC_ACCELERATION = 0;
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0;
+
+        public static final double SPIN_STATOR_CURRENT_LIMIT = 40;
+        public static final double EXTEND_STATOR_CURRENT_LIMIT = 40;
+        public static final double MOTION_MAGIC_CRUISE_VELOCITY = 10;
+        public static final double MOTION_MAGIC_ACCELERATION = 20;
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 100;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
+
         public static final double ARM_IN_POSITION = 0;
-        public static final double ARM_OUT_POSITION = 0;
-        public static final double EXTENSION_GEAR_RATIO = 1;
-        public static final double TOLERANCE = 0.5;
+        public static final double ARM_OUT_POSITION = Units.inchesToMeters(12);
+
+        public static final double EXTENSION_GEAR_RATIO = 6;
+        public static final double TOLERANCE = Units.inchesToMeters(0.5);
+
         public static final int PINION_TEETH = 10;
         public static final double PINION_DP = 10;
         public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
+
+        public static final double MIN_HEIGHT = ARM_IN_POSITION;
+        public static final double MAX_HEIGHT = ARM_OUT_POSITION;
+
+        public static final double LIGAMENT_LENGTH = 12;
+        public static final double MECHANISM_LENGTH = 2;
+        public static final double MECHANISM_HEIGHT = 2;
+
+        public static final double SIM_PERIOD = 0.004;
     }
 
     public static class Hopper {

@@ -1,5 +1,6 @@
 package org.team9140.frc2026.subsystems;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
@@ -10,6 +11,14 @@ import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -18,6 +27,13 @@ import org.team9140.frc2026.Constants;
 public class Climber extends SubsystemBase {
     private static Climber instance;
     private final TalonFX motor;
+
+    // TODO: what are these numbers mean
+    // TODO: read this https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html
+    //pretend its meters
+    Mechanism2d climberMechanism = new Mechanism2d(Constants.Climber.MECHANISM_WIDTH, Constants.Climber.MECHANISM_HEIGHT);
+    MechanismRoot2d root = climberMechanism.getRoot("root", 32, 14);
+    MechanismLigament2d telescope = root.append(new MechanismLigament2d("telescope", 20, 0));
 
     private Climber() {
         this.motor = new TalonFX(Constants.Ports.CLIMBER_MOTOR);
@@ -46,6 +62,10 @@ public class Climber extends SubsystemBase {
                 .withSoftwareLimitSwitch(softwareLimitSwitchConfigs);
 
         this.motor.getConfigurator().apply(motorConfigs);
+
+        if (Utils.isSimulation()) {
+            startSimThread();
+        }
     }
 
     public static Climber getInstance() {
@@ -56,7 +76,7 @@ public class Climber extends SubsystemBase {
     }
 
     public double getPosition() {
-        return Constants.Climber.SPOOL_RADIUS*2*Math.PI*this.motor.getPosition().getValueAsDouble();
+        return Constants.Climber.SPOOL_CIRCUMFERENCE*this.motor.getPosition().getValueAsDouble();
     }
 
     public Command extend() {
@@ -67,7 +87,52 @@ public class Climber extends SubsystemBase {
 
     public Command retract() {
         return this.runOnce(() -> this.motor.setControl(new VoltageOut(-Constants.Climber.EXTENSION_VOLTAGE)))
-                .andThen(new WaitUntilCommand(() -> this.getPosition() <= Constants.Climber.EXTEND_POSITION))
+                .andThen(new WaitUntilCommand(() -> this.getPosition() <= 0))
                 .andThen(this.runOnce(() -> this.motor.setControl(new StaticBrake())));
+    }
+
+    private static final double kSimLoopPeriod = Constants.Climber.SIM_PERIOD; // 4 ms
+    private Notifier m_simNotifier = null;
+    private double m_lastSimTime;
+
+    private void startSimThread() {
+        m_lastSimTime = Utils.getCurrentTimeSeconds();
+
+        /* Run simulation at a faster rate so PID gains behave more reasonably */
+        m_simNotifier = new Notifier(() -> {
+            final double currentTime = Utils.getCurrentTimeSeconds();
+            double deltaTime = currentTime - m_lastSimTime;
+            m_lastSimTime = currentTime;
+
+            /* use the measured time delta, get battery voltage from WPILib */
+            updateSimState(deltaTime, RobotController.getBatteryVoltage());
+        });
+        m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    ElevatorSim elevatorSim = new ElevatorSim(DCMotor.getKrakenX44(1),
+            Constants.Climber.GEAR_RATIO,
+            1,
+            Constants.Climber.SPOOL_CIRCUMFERENCE / Math.PI / 2.0,
+            Constants.Climber.MIN_HEIGHT,
+            Constants.Climber.MAX_HEIGHT,
+            false,
+            0);
+
+    private void updateSimState(double t, double volts) {
+        double climberVolts = this.motor.getSimState().getMotorVoltage();
+        SmartDashboard.putNumber("climber volts", climberVolts);
+        this.elevatorSim.setInputVoltage(climberVolts);
+        this.elevatorSim.update(t);
+
+        double pos = this.elevatorSim.getPositionMeters();
+        double vel = this.elevatorSim.getVelocityMetersPerSecond();
+
+        SmartDashboard.putNumber("climber pos", pos);
+
+        this.motor.getSimState().setRawRotorPosition(pos / Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
+        this.motor.getSimState().setRotorVelocity(vel / Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
+
+        telescope.setLength(pos);
     }
 }
