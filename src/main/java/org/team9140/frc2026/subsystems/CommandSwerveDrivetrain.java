@@ -43,8 +43,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
 
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(Constants.Drive.MAX_TELEOP_VELOCITY * 0.1)
-            .withRotationalDeadband(Constants.Drive.MAX_TELEOP_ROTATION * 0.1)
+            .withDeadband(Constants.Drive.MIN_TELEOP_VELOCITY)
+            .withRotationalDeadband(Constants.Drive.MIN_TELEOP_ROTATION)
             .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
             .withDriveRequestType(DriveRequestType.Velocity);
 
