@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -61,6 +62,10 @@ public class Climber extends SubsystemBase {
                 .withSoftwareLimitSwitch(softwareLimitSwitchConfigs);
 
         this.motor.getConfigurator().apply(motorConfigs);
+
+        if (Utils.isSimulation()) {
+            startSimThread();
+        }
     }
 
     public static Climber getInstance() {
@@ -71,7 +76,7 @@ public class Climber extends SubsystemBase {
     }
 
     public double getPosition() {
-        return Constants.Climber.SPOOL_RADIUS*2*Math.PI*this.motor.getPosition().getValueAsDouble();
+        return Constants.Climber.SPOOL_CIRCUMFERENCE*this.motor.getPosition().getValueAsDouble();
     }
 
     public Command extend() {
@@ -82,7 +87,7 @@ public class Climber extends SubsystemBase {
 
     public Command retract() {
         return this.runOnce(() -> this.motor.setControl(new VoltageOut(-Constants.Climber.EXTENSION_VOLTAGE)))
-                .andThen(new WaitUntilCommand(() -> this.getPosition() <= Constants.Climber.EXTEND_POSITION))
+                .andThen(new WaitUntilCommand(() -> this.getPosition() <= 0))
                 .andThen(this.runOnce(() -> this.motor.setControl(new StaticBrake())));
     }
 
@@ -105,7 +110,7 @@ public class Climber extends SubsystemBase {
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    ElevatorSim extensionSim = new ElevatorSim(DCMotor.getKrakenX44(1),
+    ElevatorSim elevatorSim = new ElevatorSim(DCMotor.getKrakenX44(1),
             Constants.Climber.GEAR_RATIO,
             1,
             Constants.Climber.SPOOL_CIRCUMFERENCE / Math.PI / 2.0,
@@ -115,15 +120,18 @@ public class Climber extends SubsystemBase {
             0);
 
     private void updateSimState(double t, double volts) {
-        double extendVolts = this.motor.getSimState().getMotorVoltage();
-        this.extensionSim.setInputVoltage(extendVolts);
-        this.extensionSim.update(t);
+        double climberVolts = this.motor.getSimState().getMotorVoltage();
+        SmartDashboard.putNumber("climber volts", climberVolts);
+        this.elevatorSim.setInputVoltage(climberVolts);
+        this.elevatorSim.update(t);
 
-        double pos = this.extensionSim.getPositionMeters();
-        double vel = this.extensionSim.getVelocityMetersPerSecond();
+        double pos = this.elevatorSim.getPositionMeters();
+        double vel = this.elevatorSim.getVelocityMetersPerSecond();
 
-        this.motor.getSimState().setRawRotorPosition(pos * Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
-        this.motor.getSimState().setRotorVelocity(vel * Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
+        SmartDashboard.putNumber("climber pos", pos);
+
+        this.motor.getSimState().setRawRotorPosition(pos / Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
+        this.motor.getSimState().setRotorVelocity(vel / Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
 
         telescope.setLength(pos);
     }

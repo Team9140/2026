@@ -74,7 +74,6 @@ public class Constants {
 
     public static class Climber {
         public static final double GEAR_RATIO = 25;
-        public static final double SPOOL_RADIUS = 1.0;
 
         public static final double STATOR_CURRENT_LIMIT = 80;
         public static final double SUPPLY_CURRENT_LIMIT = 1.0;
@@ -82,7 +81,7 @@ public class Constants {
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
 
-        public static final double EXTENSION_VOLTAGE = 12.0;
+        public static final double EXTENSION_VOLTAGE = 22.0;
         public static final double EXTEND_POSITION = 1.0;
 
         public static final double SIM_PERIOD = 0.004;
