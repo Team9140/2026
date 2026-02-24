@@ -12,6 +12,7 @@ import org.team9140.frc2026.subsystems.Shooter;
 import org.team9140.lib.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -70,4 +71,35 @@ public class AutonomousRoutines {
             .andThen(climber.extend()).andThen(climber.retract());
     }
     
+    public Command shootFuelFromMiddleLeft() {
+        Pose2d goalPos;
+        Pose2d returnPos;
+        if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
+            goalPos = new Pose2d(Constants.Positions.X_CENTER, 5.189, new Rotation2d());
+            returnPos = new Pose2d(2.9, 5.189, new Rotation2d());
+        } else {
+            goalPos = new Pose2d(Constants.Positions.X_CENTER, 2.879, new Rotation2d());
+            returnPos = new Pose2d(13.7, 2.879, new Rotation2d());
+        }
+        return intake.intake().raceWith(this.drivetrain.goToPose(() -> goalPos)
+            .until(this.drivetrain.reachedPose)
+            .andThen(this.drivetrain.goToPose(() -> returnPos))
+            .until(this.drivetrain.reachedPose)).andThen(shootPreload(3));
+    }
+
+    public Command shootFuelFromMiddleRight() {
+        Pose2d goalPos;
+        Pose2d returnPos;
+        if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
+            goalPos = new Pose2d(Constants.Positions.X_CENTER, 2.879, new Rotation2d());
+            returnPos = new Pose2d(2.9, 2.879, new Rotation2d());
+        } else {
+            goalPos = new Pose2d(Constants.Positions.X_CENTER, 5.189, new Rotation2d());
+            returnPos = new Pose2d(13.7, 5.189, new Rotation2d());
+        }
+        return intake.intake().raceWith(this.drivetrain.goToPose(() -> goalPos)
+            .until(this.drivetrain.reachedPose)
+            .andThen(this.drivetrain.goToPose(() -> returnPos))
+            .until(this.drivetrain.reachedPose)).andThen(shootPreload(3));
+    }
 }
