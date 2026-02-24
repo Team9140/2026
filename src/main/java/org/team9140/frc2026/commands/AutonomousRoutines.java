@@ -1,14 +1,23 @@
 package org.team9140.frc2026.commands;
 
+import java.util.Optional;
+
+import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.frc2026.subsystems.Climber;
 import org.team9140.frc2026.subsystems.CommandSwerveDrivetrain;
+import org.team9140.frc2026.subsystems.Hopper;
 import org.team9140.frc2026.subsystems.Intake;
 import org.team9140.frc2026.subsystems.Shooter;
+import org.team9140.lib.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class AutonomousRoutines {
@@ -17,6 +26,7 @@ public class AutonomousRoutines {
     Shooter shooter = Shooter.getInstance();
     Intake intake = Intake.getInstance();
     Climber climber = Climber.getInstance();
+    Hopper hopper = Hopper.getInstance();
 
     public AutonomousRoutines(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
@@ -24,16 +34,40 @@ public class AutonomousRoutines {
 
     public Command shootPreload(double seconds) {
         Pose2d currPos = drivetrain.getState().Pose;
+        ChassisSpeeds currSpeed = drivetrain.getState().Speeds;
         Translation2d goalPos = AimAlign.getZone(currPos).getTranslation();
         return shooter.setYawAngle(AimAlign.yawAngleToPos(
             currPos, 
             goalPos
-            )).andThen(shooter.setSpeed(AimAlign.getRequiredSpeed(
-                currPos, 
-                goalPos, 
-                drivetrain.getState().Speeds
-            ))).andThen(new WaitCommand(seconds)
-            ).andThen(shooter.off());
+            )).andThen(Commands.deadline(
+                new WaitCommand(seconds),
+                new PrintCommand("Start Hopper Feed"), 
+                shooter.setSpeed(AimAlign.getRequiredSpeed(currPos, goalPos, currSpeed)
+                )));
+    }
+
+    public Command climbLeft() {
+        Pose2d goalPos;
+        if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
+            goalPos = Constants.Positions.CLIMB_LEFT_BLUE;
+        } else {
+            goalPos = Constants.Positions.CLIMB_LEFT_RED;
+        }
+        return this.drivetrain.goToPose(() -> goalPos)
+            .until(this.drivetrain.reachedPose)
+            .andThen(climber.extend()).andThen(climber.retract());
+    }
+
+    public Command climbRight() {
+        Pose2d goalPos;
+        if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
+            goalPos = Constants.Positions.CLIMB_RIGHT_BLUE;
+        } else {
+            goalPos = Constants.Positions.CLIMB_RIGHT_RED;
+        }
+        return this.drivetrain.goToPose(() -> goalPos)
+            .until(this.drivetrain.reachedPose)
+            .andThen(climber.extend()).andThen(climber.retract());
     }
     
 }
