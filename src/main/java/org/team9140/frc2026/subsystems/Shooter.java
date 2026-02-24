@@ -16,6 +16,7 @@ import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -117,6 +118,9 @@ public class Shooter extends SubsystemBase {
 
                 yawMotor.getConfigurator().apply(yawConfig);
                 shooterMotor.getConfigurator().apply(shooterConfig);
+
+                yawMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
+                shooterMotor.getSimState().Orientation = ChassisReference.Clockwise_Positive;
 
                 yawMotor.setControl(yawMotorControl.withPosition(0));
                 shooterMotor.setControl(shooterOffControl);
