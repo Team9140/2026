@@ -77,6 +77,7 @@ public class Constants {
 
     public static class Positions {
        public static final double Y_CENTER = 4.572;
+       public static final double X_CENTER = 8.257;
        public static final double BLUE_ALLIANCE_ZONE = 4.625594;
        public static final double RED_ALLIANCE_ZONE = 11.915394;
        public static final Pose2d BLUE_HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
