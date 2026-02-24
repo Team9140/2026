@@ -141,9 +141,9 @@ public class Intake extends SubsystemBase {
     }
 
     public Command off() {
-        return this.armIn().andThen(this.runOnce(() -> {
+        return this.runOnce(() -> {
             setRollerSpeed(Constants.Intake.INTAKE_OFF);
-        }));
+        });
     }
 
     public Command intake() {
@@ -156,6 +156,14 @@ public class Intake extends SubsystemBase {
         return this.armOut().andThen(this.runOnce(() -> {
             setRollerSpeed(-Constants.Intake.INTAKE_VOLTAGE);
         }));
+    }
+
+    public Command armInOutLoop() {
+        return this.run( () -> {
+            armIn().withTimeout(1)
+                    .andThen(armOut().withTimeout(1))
+                    .repeatedly();
+        });
     }
 
     private static final double kSimLoopPeriod = Constants.Intake.SIM_PERIOD; // 4 ms
