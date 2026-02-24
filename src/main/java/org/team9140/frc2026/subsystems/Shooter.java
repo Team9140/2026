@@ -135,6 +135,8 @@ public class Shooter extends SubsystemBase {
                                 new Color8Bit(Color.kYellow)));
 
                 SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
+
+                this.setDefaultCommand(this.idle());
         }
 
         public Command setYawAngle(double pos) {
