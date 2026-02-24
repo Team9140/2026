@@ -76,7 +76,7 @@ public class Constants {
     }
 
     public static class Positions {
-       public static final double Y_CENTER = 4.021;
+       public static final double Y_CENTER = 4.035;
        public static final double X_CENTER = 8.257;
        public static final double BLUE_ALLIANCE_ZONE = 4.625594;
        public static final double RED_ALLIANCE_ZONE = 11.915394;
