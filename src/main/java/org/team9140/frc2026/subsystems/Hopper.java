@@ -50,19 +50,16 @@ public class Hopper extends SubsystemBase{
         return (instance == null) ? instance = new Hopper() : instance;
     }
 
-    public Command startSpinner() {
-        return this.runOnce(() -> spinnerMotor.setVoltage(Constants.Hopper.SPINNER_VOLTAGE));
+    private Command setSpeeds(double spinnerVoltage, double feederVoltage) {
+        return this.runOnce(() -> this.spinnerMotor.setVoltage(spinnerVoltage))
+            .andThen(this.runOnce(() -> this.feederMotor.setVoltage(feederVoltage)));
     }
 
-    public Command stopSpinner() {
-        return this.runOnce(() -> spinnerMotor.setVoltage(0));
+    public Command hop() {
+        return this.setSpeeds(Constants.Hopper.SPINNER_VOLTAGE, Constants.Hopper.FEEDER_VOLTAGE);
     }
 
-    public Command startFeeder() {
-        return this.runOnce(() -> feederMotor.setVoltage(Constants.Hopper.FEEDER_VOLTAGE));
-    }
-
-    public Command stopFeeder() {
-        return this.runOnce(() -> feederMotor.setVoltage(0));
+    public Command quitHopping() {
+        return this.setSpeeds(0, 0);
     }
 }
