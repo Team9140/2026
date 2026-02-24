@@ -85,6 +85,10 @@ public class Constants {
        public static final Pose2d FEEDING_POS_UPPER = new Pose2d(2,6 , new Rotation2d());
        public static final Pose2d FEEDING_POS_LOWER_RED = new Pose2d(14.540988,2, new Rotation2d());
        public static final Pose2d FEEDING_POS_UPPER_RED = new Pose2d(14.540988,6 , new Rotation2d());
+       public static final Pose2d CLIMB_RIGHT_BLUE = new Pose2d(1.3, 3.2, new Rotation2d(-Math.PI));
+       public static final Pose2d CLIMB_LEFT_BLUE = new Pose2d(1.3, 4.3, new Rotation2d(-Math.PI));
+       public static final Pose2d CLIMB_RIGHT_RED = new Pose2d(15.2, 3.7, new Rotation2d());
+       public static final Pose2d CLIMB_LEFT_RED = new Pose2d(15.2, 4.8, new Rotation2d());
     }
 
     public static class Climber {
