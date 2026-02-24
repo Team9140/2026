@@ -13,37 +13,37 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hopper extends SubsystemBase{
     private final TalonFX spinnerMotor; // This is the spinny thingy
-    private final TalonFX outakeMotor; // This feeds to shooter
+    private final TalonFX feederMotor; // This feeds to shooter
     private static Hopper instance;
 
     private Hopper() {
         this.spinnerMotor = new TalonFX(Constants.Ports.HOPPER_SPINNER_MOTOR, Constants.Ports.CANIVORE);
-        this.outakeMotor = new TalonFX(Constants.Ports.HOPPER_OUTAKE_MOTOR, Constants.Ports.CANIVORE);
+        this.feederMotor = new TalonFX(Constants.Ports.HOPPER_FEEDER_MOTOR, Constants.Ports.CANIVORE);
         
         CurrentLimitsConfigs currentSpinnerLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Hopper.SPINNER_STATOR_CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true);
 
-        CurrentLimitsConfigs currentOutakeLimits = new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(Constants.Hopper.OUTAKE_STATOR_CURRENT_LIMIT)
+        CurrentLimitsConfigs currentFeederLimits = new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(Constants.Hopper.FEEDER_STATOR_CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true);
         
         MotorOutputConfigs spinnerMotorOutputConfig = new MotorOutputConfigs()
                 .withInverted(InvertedValue.CounterClockwise_Positive);
 
-        MotorOutputConfigs outakeMotorOutputConfig = new MotorOutputConfigs()
+        MotorOutputConfigs feederMotorOutputConfig = new MotorOutputConfigs()
                 .withInverted(InvertedValue.CounterClockwise_Positive);
 
         TalonFXConfiguration spinnerMotorConfigs = new TalonFXConfiguration()
                 .withCurrentLimits(currentSpinnerLimits)
                 .withMotorOutput(spinnerMotorOutputConfig);
 
-        TalonFXConfiguration outakeMotorConfigs = new TalonFXConfiguration()
-                .withCurrentLimits(currentOutakeLimits)
-                .withMotorOutput(outakeMotorOutputConfig);
+        TalonFXConfiguration feederMotorConfigs = new TalonFXConfiguration()
+                .withCurrentLimits(currentFeederLimits)
+                .withMotorOutput(feederMotorOutputConfig);
 
         this.spinnerMotor.getConfigurator().apply(spinnerMotorConfigs);
-        this.outakeMotor.getConfigurator().apply(outakeMotorConfigs);
+        this.feederMotor.getConfigurator().apply(feederMotorConfigs);
     }
 
     public static Hopper getInstance() {
@@ -58,11 +58,11 @@ public class Hopper extends SubsystemBase{
         return this.runOnce(() -> spinnerMotor.setVoltage(0));
     }
 
-    public Command startOutake() {
-        return this.runOnce(() -> outakeMotor.setVoltage(Constants.Hopper.OUTAKE_VOLTAGE));
+    public Command startFeeder() {
+        return this.runOnce(() -> feederMotor.setVoltage(Constants.Hopper.FEEDER_VOLTAGE));
     }
 
-    public Command stopOutake() {
-        return this.runOnce(() -> outakeMotor.setVoltage(0));
+    public Command stopFeeder() {
+        return this.runOnce(() -> feederMotor.setVoltage(0));
     }
 }

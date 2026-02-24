@@ -21,7 +21,7 @@ public class Constants {
         public static final int INTAKE_EXTEND_MOTOR = 13;
         public static final int CLIMBER_MOTOR = 14;
         public static final int HOPPER_SPINNER_MOTOR = 15;
-        public static final int HOPPER_OUTAKE_MOTOR = 16;
+        public static final int HOPPER_FEEDER_MOTOR = 16;
     }
 
     public static class Cantdle {
@@ -106,9 +106,9 @@ public class Constants {
 
     public static class Hopper {
         public static final double SPINNER_STATOR_CURRENT_LIMIT = 0;
-        public static final double OUTAKE_STATOR_CURRENT_LIMIT = 0;
+        public static final double FEEDER_STATOR_CURRENT_LIMIT = 0;
 
         public static final double SPINNER_VOLTAGE = 1;
-        public static final double OUTAKE_VOLTAGE = 1;
+        public static final double FEEDER_VOLTAGE = 1;
     }
 }
