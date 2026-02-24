@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.team9140.frc2026.Constants;
 import org.team9140.lib.Util;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -25,6 +26,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -40,6 +43,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class Shooter extends SubsystemBase {
         private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR, Constants.Ports.CANIVORE);
         private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR, Constants.Ports.CANIVORE);
+
+        private static final double kSimLoopPeriod = 0.004; // 4 ms
+        private Notifier m_simNotifier = null;
+        private double m_lastSimTime;
 
         private double yawTargetPosition = 0;
         private double shooterTargetVelocity = 0;
@@ -137,6 +144,25 @@ public class Shooter extends SubsystemBase {
                 SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
 
                 this.setDefaultCommand(this.idle());
+
+                if (Utils.isSimulation()) {
+                    startSimThread();
+                }
+        }
+
+        private void startSimThread() {
+            m_lastSimTime = Utils.getCurrentTimeSeconds();
+
+            /* Run simulation at a faster rate so PID gains behave more reasonably */
+            m_simNotifier = new Notifier(() -> {
+                final double currentTime = Utils.getCurrentTimeSeconds();
+                double deltaTime = currentTime - m_lastSimTime;
+                m_lastSimTime = currentTime;
+
+                /* use the measured time delta, get battery voltage from WPILib */
+                updateSimState(deltaTime);
+            });
+            m_simNotifier.startPeriodic(kSimLoopPeriod);
         }
 
         public Command setYawAngle(double pos) {
@@ -191,11 +217,6 @@ public class Shooter extends SubsystemBase {
                 SmartDashboard.putNumber("Yaw Target Position", this.yawTargetPosition / Math.PI / 2.0);
                 SmartDashboard.putNumber("Shooter Velocity", shooterMotor.getVelocity(true).getValueAsDouble());
                 SmartDashboard.putNumber("Shooter Target Velocity", this.shooterTargetVelocity / Math.PI / 2.0);
-        }
-
-        @Override
-        public void simulationPeriodic() {
-                updateSimState(0.02);
         }
 
         public void updateSimState(double deltatime) {
