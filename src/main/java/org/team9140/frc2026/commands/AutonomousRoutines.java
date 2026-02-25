@@ -16,22 +16,47 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class AutonomousRoutines {
-    CommandSwerveDrivetrain drivetrain;
+    private final CommandSwerveDrivetrain drivetrain;
 
-    Shooter shooter = Shooter.getInstance();
-    Intake intake = Intake.getInstance();
-    Climber climber = Climber.getInstance();
-    Hopper hopper = Hopper.getInstance();
+    private final Shooter shooter = Shooter.getInstance();
+    private final Intake intake = Intake.getInstance();
+    private final Climber climber = Climber.getInstance();
+    private final Hopper hopper = Hopper.getInstance();
 
-    public AutonomousRoutines(CommandSwerveDrivetrain drivetrain) {
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+    private static AutonomousRoutines instance;
+
+    public static AutonomousRoutines getInstance(CommandSwerveDrivetrain drivetrain) {
+        return (instance == null) ? instance = new AutonomousRoutines(drivetrain) : instance;
+    }
+
+    private AutonomousRoutines(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
-    }    
+        autoChooser.setDefaultOption("Do Nothing", doNothing());
+        autoChooser.addOption("Shoot Preload", shootPreload(3));
+        autoChooser.addOption("Climb Left", climbLeft());
+        autoChooser.addOption("Climb Right", climbRight());
+        autoChooser.addOption("Shoot Fuel from Middle Left", shootFuelFromMiddleLeft());
+        autoChooser.addOption("Shoot Fuel from Middle Right", shootFuelFromMiddleRight());
+        SmartDashboard.putData(autoChooser);
+    }
+
+    public SendableChooser<Command> getAutoChooser() {
+        return autoChooser;
+    }
+
+    public Command doNothing() {
+        return new PrintCommand("Doing Nothing");
+    }
 
     public Command shootPreload(double seconds) {
         Pose2d currPos = drivetrain.getState().Pose;
