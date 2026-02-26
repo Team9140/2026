@@ -97,6 +97,8 @@ public class Shooter extends SubsystemBase {
         MotorOutputConfigs yawMotorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(InvertedValue.CounterClockwise_Positive);
 
+        yawMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
+
         Slot0Configs shooterSlot0Configs = new Slot0Configs()
                 .withKS(Constants.Shooter.SHOOTER_KS)
                 .withKV(Constants.Shooter.SHOOTER_KV)
@@ -107,6 +109,8 @@ public class Shooter extends SubsystemBase {
 
         MotorOutputConfigs shooterMotorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(InvertedValue.Clockwise_Positive);
+
+        shooterMotor.getSimState().Orientation = ChassisReference.Clockwise_Positive;
 
         TorqueCurrentConfigs shooterTorqueCurrentConfigs = new TorqueCurrentConfigs()
                 .withPeakForwardTorqueCurrent(Constants.Shooter.PEAK_FORWARD_TORQUE)
@@ -124,9 +128,6 @@ public class Shooter extends SubsystemBase {
 
         yawMotor.getConfigurator().apply(yawConfig);
         shooterMotor.getConfigurator().apply(shooterConfig);
-
-        yawMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
-        shooterMotor.getSimState().Orientation = ChassisReference.Clockwise_Positive;
 
         yawMotor.setControl(yawMotorControl.withPosition(0));
         shooterMotor.setControl(shooterOffControl);

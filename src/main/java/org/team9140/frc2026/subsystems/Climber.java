@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.sim.ChassisReference;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Notifier;
@@ -29,9 +30,11 @@ public class Climber extends SubsystemBase {
     private final TalonFX motor;
 
     // TODO: what are these numbers mean
-    // TODO: read this https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html
-    //pretend its meters
-    Mechanism2d climberMechanism = new Mechanism2d(Constants.Climber.MECHANISM_WIDTH, Constants.Climber.MECHANISM_HEIGHT);
+    // TODO: read this
+    // https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html
+    // pretend its meters
+    Mechanism2d climberMechanism = new Mechanism2d(Constants.Climber.MECHANISM_WIDTH,
+            Constants.Climber.MECHANISM_HEIGHT);
     MechanismRoot2d root = climberMechanism.getRoot("root", 32, 14);
     MechanismLigament2d telescope = root.append(new MechanismLigament2d("telescope", 20, 0));
 
@@ -45,6 +48,8 @@ public class Climber extends SubsystemBase {
 
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(InvertedValue.Clockwise_Positive);
+
+        this.motor.getSimState().Orientation = ChassisReference.Clockwise_Positive;
 
         FeedbackConfigs feedbackConfigs = new FeedbackConfigs()
                 .withSensorToMechanismRatio(Constants.Climber.GEAR_RATIO);
@@ -76,7 +81,7 @@ public class Climber extends SubsystemBase {
     }
 
     public double getPosition() {
-        return Constants.Climber.SPOOL_CIRCUMFERENCE*this.motor.getPosition().getValueAsDouble();
+        return Constants.Climber.SPOOL_CIRCUMFERENCE * this.motor.getPosition().getValueAsDouble();
     }
 
     public Command extend() {
@@ -107,6 +112,7 @@ public class Climber extends SubsystemBase {
             /* use the measured time delta, get battery voltage from WPILib */
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
+
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
@@ -130,8 +136,10 @@ public class Climber extends SubsystemBase {
 
         SmartDashboard.putNumber("climber pos", pos);
 
-        this.motor.getSimState().setRawRotorPosition(pos / Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
-        this.motor.getSimState().setRotorVelocity(vel / Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
+        this.motor.getSimState()
+                .setRawRotorPosition(pos / Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
+        this.motor.getSimState()
+                .setRotorVelocity(vel / Constants.Climber.SPOOL_CIRCUMFERENCE * Constants.Climber.GEAR_RATIO);
 
         telescope.setLength(pos);
     }
