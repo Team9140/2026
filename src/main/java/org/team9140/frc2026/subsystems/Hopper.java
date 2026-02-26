@@ -55,11 +55,15 @@ public class Hopper extends SubsystemBase{
             .andThen(this.runOnce(() -> this.feederMotor.setVoltage(feederVoltage)));
     }
 
-    public Command hop() {
+    public Command feed() {
         return this.setSpeeds(Constants.Hopper.SPINNER_VOLTAGE, Constants.Hopper.FEEDER_VOLTAGE);
     }
 
-    public Command quitHopping() {
+    public Command unjam() {
+        return this.setSpeeds(-Constants.Hopper.SPINNER_VOLTAGE, -Constants.Hopper.FEEDER_VOLTAGE);
+    }
+
+    public Command off() {
         return this.setSpeeds(0, 0);
     }
 }
