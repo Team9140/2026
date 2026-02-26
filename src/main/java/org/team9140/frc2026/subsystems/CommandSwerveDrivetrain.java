@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -71,6 +72,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private Pose2d targetPose = new Pose2d();
     private final double[] targetPoseDecomposed = new double[] { 0, 0, 0 };
+    private final double[] currentPoseDecomposed = new double[] { 0, 0, 0 };
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -273,6 +275,31 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        if (this.targetPose != null) {
+            targetPoseDecomposed[0] = this.targetPose.getX();
+            targetPoseDecomposed[1] = this.targetPose.getY();
+            targetPoseDecomposed[2] = this.targetPose.getRotation().getRadians();
+        } else {
+            targetPoseDecomposed[0] = -1;
+            targetPoseDecomposed[1] = -1;
+            targetPoseDecomposed[2] = -1;
+        }
+
+        if (this.targetPose != null) {
+            currentPoseDecomposed[0] = getState().Pose.getX();
+            currentPoseDecomposed[1] = getState().Pose.getY();
+            currentPoseDecomposed[2] = getState().Pose.getRotation().getRadians();
+        } else {
+            currentPoseDecomposed[0] = -1;
+            currentPoseDecomposed[1] = -1;
+            currentPoseDecomposed[2] = -1;
+        }
+
+        SmartDashboard.putNumberArray("drive target pose", targetPoseDecomposed);
+        SignalLogger.writeDoubleArray("drive target pose", targetPoseDecomposed);
+        
+        SmartDashboard.putNumberArray("drive current pose", currentPoseDecomposed);
     }
 
     private void startSimThread() {
@@ -400,14 +427,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
             double vx = 0.0, vy = 0.0, omega = 0.0;
 
-            if (!Util.epsilonEquals(pose.getX(), targetPose.getX(), 0.015)) {
+            if (!Util.epsilonEquals(pose.getX(), targetPose.getX(), 0.01)) {
                 vx = m_pathXController.calculate(pose.getX(), this.targetPose.getX(), currentTime);
-                vx = Util.clamp(vx, 1.75);
+                // vx = Util.clamp(vx, 1.625);
             }
-            if (!Util.epsilonEquals(pose.getY(), targetPose.getY(), 0.015)) {
+
+            if (!Util.epsilonEquals(pose.getY(), targetPose.getY(), 0.01)) {
                 vy = m_pathYController.calculate(pose.getY(), this.targetPose.getY(), currentTime);
-                vy = Util.clamp(vy, 1.75);
+                // vy = Util.clamp(vy, 1.625);
             }
+
+            double v = Math.hypot(vx, vy);
+
+            if (v >= 2.25) {
+                vx *= 2.25 / v;
+                vy *= 2.25 / v;
+            }
+
             if (!Util.epsilonEquals(pose.getRotation().getDegrees(), targetPose.getRotation().getDegrees(), 1.0)) {
                 omega = this.headingController.calculate(pose.getRotation().getRadians(),
                         this.targetPose.getRotation().getRadians(), currentTime);
@@ -416,8 +452,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
             this.setControl(this.auton
                     .withRotationalRate(omega)
-                    .withVelocityX(vx)
-                    .withVelocityY(vy));
+                    .withVelocityX(-vx)
+                    .withVelocityY(-vy));
         });
     }
 
