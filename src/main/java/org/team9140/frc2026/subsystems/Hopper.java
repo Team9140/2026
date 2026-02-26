@@ -20,13 +20,17 @@ public class Hopper extends SubsystemBase{
         this.spinnerMotor = new TalonFX(Constants.Ports.HOPPER_SPINNER_MOTOR, Constants.Ports.CANIVORE);
         this.feederMotor = new TalonFX(Constants.Ports.HOPPER_FEEDER_MOTOR, Constants.Ports.CANIVORE);
         
-        CurrentLimitsConfigs currentSpinnerLimits = new CurrentLimitsConfigs()
+        CurrentLimitsConfigs spinnerCurrentLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Hopper.SPINNER_STATOR_CURRENT_LIMIT)
-                .withStatorCurrentLimitEnable(true);
+                .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(Constants.Hopper.SPINNER_SUPPLY_CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true);
 
-        CurrentLimitsConfigs currentFeederLimits = new CurrentLimitsConfigs()
+        CurrentLimitsConfigs feederCurrentLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Hopper.FEEDER_STATOR_CURRENT_LIMIT)
-                .withStatorCurrentLimitEnable(true);
+                .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(Constants.Hopper.FEEDER_SUPPLY_CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true);
         
         MotorOutputConfigs spinnerMotorOutputConfig = new MotorOutputConfigs()
                 .withInverted(InvertedValue.CounterClockwise_Positive);
@@ -35,11 +39,11 @@ public class Hopper extends SubsystemBase{
                 .withInverted(InvertedValue.CounterClockwise_Positive);
 
         TalonFXConfiguration spinnerMotorConfigs = new TalonFXConfiguration()
-                .withCurrentLimits(currentSpinnerLimits)
+                .withCurrentLimits(spinnerCurrentLimits)
                 .withMotorOutput(spinnerMotorOutputConfig);
 
         TalonFXConfiguration feederMotorConfigs = new TalonFXConfiguration()
-                .withCurrentLimits(currentFeederLimits)
+                .withCurrentLimits(feederCurrentLimits)
                 .withMotorOutput(feederMotorOutputConfig);
 
         this.spinnerMotor.getConfigurator().apply(spinnerMotorConfigs);

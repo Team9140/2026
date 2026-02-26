@@ -44,7 +44,8 @@ public class Climber extends SubsystemBase {
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Climber.STATOR_CURRENT_LIMIT)
                 .withStatorCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(Constants.Climber.SUPPLY_CURRENT_LIMIT);
+                .withSupplyCurrentLimit(Constants.Climber.SUPPLY_CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true);
 
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(InvertedValue.Clockwise_Positive);

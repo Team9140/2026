@@ -95,13 +95,13 @@ public class Constants {
     public static class Climber {
         public static final double GEAR_RATIO = 25;
 
-        public static final double STATOR_CURRENT_LIMIT = 80;
-        public static final double SUPPLY_CURRENT_LIMIT = 1.0;
+        public static final double STATOR_CURRENT_LIMIT = 80.0;
+        public static final double SUPPLY_CURRENT_LIMIT = 40.0;
 
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
 
-        public static final double EXTENSION_VOLTAGE = 22.0;
+        public static final double EXTENSION_VOLTAGE = 12.0;
         public static final double EXTEND_POSITION = 1.0;
 
         public static final double SIM_PERIOD = 0.004;
@@ -116,11 +116,15 @@ public class Constants {
     }
 
     public static class Intake {
-        public static final double INTAKE_VOLTAGE = 0.7;
-        public static final double INTAKE_OFF = 0;
+        public static final double INTAKE_VOLTAGE = 10.0;
+        public static final double INTAKE_OFF = 0.0;
 
-        public static final double SPIN_STATOR_CURRENT_LIMIT = 40;
-        public static final double EXTEND_STATOR_CURRENT_LIMIT = 40;
+        public static final double ROLLER_STATOR_CURRENT_LIMIT = 80.0;
+        public static final double EXTEND_STATOR_CURRENT_LIMIT = 80.0;
+
+        public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 40.0;
+        public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 40.0;
+
         public static final double MOTION_MAGIC_CRUISE_VELOCITY = 10;
         public static final double MOTION_MAGIC_ACCELERATION = 20;
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 100;
@@ -147,10 +151,12 @@ public class Constants {
     }
 
     public static class Hopper {
-        public static final double SPINNER_STATOR_CURRENT_LIMIT = 0;
-        public static final double FEEDER_STATOR_CURRENT_LIMIT = 0;
+        public static final double SPINNER_STATOR_CURRENT_LIMIT = 80;
+        public static final double FEEDER_STATOR_CURRENT_LIMIT = 80;
+        public static final double SPINNER_SUPPLY_CURRENT_LIMIT = 40;
+        public static final double FEEDER_SUPPLY_CURRENT_LIMIT = 40;
 
-        public static final double SPINNER_VOLTAGE = 1;
-        public static final double FEEDER_VOLTAGE = 1;
+        public static final double SPINNER_VOLTAGE = 8;
+        public static final double FEEDER_VOLTAGE = 8;
     }
 }

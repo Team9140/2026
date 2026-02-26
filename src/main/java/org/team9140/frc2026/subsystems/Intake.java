@@ -30,31 +30,31 @@ import org.team9140.frc2026.Constants;
 import org.team9140.lib.Util;
 
 public class Intake extends SubsystemBase {
-    private final TalonFX spinMotor;
+    private final TalonFX rollerMotor;
     private final TalonFX extendMotor;
     private static Intake instance;
     private final MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
 
-    // TODO: what are these numbers mean
-    // TODO: read this
-    // https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/mech2d-widget.html
-    // pretend its meters
     Mechanism2d intakeMechanism = new Mechanism2d(Constants.Intake.MECHANISM_LENGTH, Constants.Intake.MECHANISM_HEIGHT);
     MechanismRoot2d root = intakeMechanism.getRoot("root", 1, 1);
     MechanismLigament2d intakeSlide = root
             .append(new MechanismLigament2d("intakeSlide", Constants.Intake.LIGAMENT_LENGTH, 0));
 
     private Intake() {
-        this.spinMotor = new TalonFX(Constants.Ports.INTAKE_SPIN_MOTOR, Constants.Ports.CANIVORE);
+        this.rollerMotor = new TalonFX(Constants.Ports.INTAKE_SPIN_MOTOR, Constants.Ports.CANIVORE);
         this.extendMotor = new TalonFX(Constants.Ports.INTAKE_EXTEND_MOTOR, Constants.Ports.CANIVORE);
 
-        CurrentLimitsConfigs currentSpinLimits = new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(Constants.Intake.SPIN_STATOR_CURRENT_LIMIT)
-                .withStatorCurrentLimitEnable(true);
+        CurrentLimitsConfigs rollerCurrentLimits = new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(Constants.Intake.ROLLER_STATOR_CURRENT_LIMIT)
+                .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(Constants.Intake.ROLLER_SUPPLY_CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true);
 
-        CurrentLimitsConfigs currentExtendLimits = new CurrentLimitsConfigs()
+        CurrentLimitsConfigs extendCurrentLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Constants.Intake.EXTEND_STATOR_CURRENT_LIMIT)
-                .withStatorCurrentLimitEnable(true);
+                .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(Constants.Intake.EXTEND_SUPPLY_CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true);
 
         MotorOutputConfigs spinMotorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(InvertedValue.Clockwise_Positive);
@@ -75,18 +75,18 @@ public class Intake extends SubsystemBase {
                 .withReverseSoftLimitEnable(true);
 
         TalonFXConfiguration spinMotorConfigs = new TalonFXConfiguration()
-                .withCurrentLimits(currentSpinLimits)
+                .withCurrentLimits(rollerCurrentLimits)
                 .withMotorOutput(spinMotorOutputConfigs);
 
         TalonFXConfiguration extendMotorConfigs = new TalonFXConfiguration()
-                .withCurrentLimits(currentExtendLimits)
+                .withCurrentLimits(extendCurrentLimits)
                 .withMotorOutput(extendMotorOutputConfigs)
                 .withMotionMagic(motionMagicConfigs)
                 .withSoftwareLimitSwitch(softwareLimitSwitchConfigs)
                 .withSlot0(new Slot0Configs().withKP(0.5))
                 .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(Constants.Intake.EXTENSION_GEAR_RATIO));
 
-        this.spinMotor.getConfigurator().apply(spinMotorConfigs);
+        this.rollerMotor.getConfigurator().apply(spinMotorConfigs);
         this.extendMotor.getConfigurator().apply(extendMotorConfigs);
 
         if (Utils.isSimulation()) {
@@ -143,7 +143,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command setRollerSpeed(double speed) {
-        return this.runOnce(() -> spinMotor.set(speed));
+        return this.runOnce(() -> rollerMotor.set(speed));
     }
 
     public Command off() {
