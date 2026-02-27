@@ -73,6 +73,7 @@ public class Constants {
         public static final double YAW_KI = 0;
         public static final double YAW_KD = 50;
 
+        public static final double ADJUST_VOLTAGE = 2.0;
     }
 
     public static class Positions {
