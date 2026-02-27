@@ -88,13 +88,15 @@ public class Climber extends SubsystemBase {
     public Command extend() {
         return this.runOnce(() -> this.motor.setControl(new VoltageOut(Constants.Climber.EXTENSION_VOLTAGE)))
                 .andThen(new WaitUntilCommand(() -> this.getPosition() > Constants.Climber.EXTEND_POSITION))
-                .andThen(this.runOnce(() -> this.motor.setControl(new StaticBrake())));
+                .andThen(this.runOnce(() -> this.motor.setControl(new StaticBrake())))
+                .withName("Climber extend");
     }
 
     public Command retract() {
         return this.runOnce(() -> this.motor.setControl(new VoltageOut(-Constants.Climber.EXTENSION_VOLTAGE)))
                 .andThen(new WaitUntilCommand(() -> this.getPosition() <= 0))
-                .andThen(this.runOnce(() -> this.motor.setControl(new StaticBrake())));
+                .andThen(this.runOnce(() -> this.motor.setControl(new StaticBrake())))
+                .withName("Climber retract");
     }
 
     private static final double kSimLoopPeriod = Constants.Climber.SIM_PERIOD; // 4 ms

@@ -158,15 +158,18 @@ public class Shooter extends SubsystemBase {
             System.out.println("adjust " + (left ? "left" : "right"));
         })).finallyDo(() -> {
             System.out.println("hold still stop");
-        });
+        })
+                .withName("Adjust Manually");
     }
 
     public Command manualLeft() {
-        return manualAdjust(true);
+        return manualAdjust(true)
+                .withName("Manually Adjust to Left");
     }
 
     public Command manualRight() {
-        return manualAdjust(false);
+        return manualAdjust(false)
+                .withName("Manually Adjust to Right");
     }
 
     public Command aim(Supplier<Pose2d> targetSupplier, Supplier<SwerveDriveState> chassisStateSupplier) {
@@ -180,7 +183,8 @@ public class Shooter extends SubsystemBase {
              */
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(0));
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
-        });
+        })
+                .withName("Manually Adjust to Aim");
     }
 
     public Command idle() {
@@ -188,7 +192,8 @@ public class Shooter extends SubsystemBase {
             if (this.isManual) return;
             // point turret forward / starting orientation / whatever
             this.shooterMotor.setControl(new VoltageOut(Constants.Shooter.IDLE_VOLTAGE));
-        });
+        })
+                .withName("Idle");
     }
 
     // make this default command
@@ -196,7 +201,8 @@ public class Shooter extends SubsystemBase {
         return this.runOnce(() -> {
             this.shooterMotor.setControl(new CoastOut());
             this.yawMotor.setControl(new StaticBrake());
-        });
+        })
+                .withName("Shooter Off");
     }
 
     @Override
