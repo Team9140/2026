@@ -3,6 +3,7 @@ package org.team9140.frc2026.subsystems;
 import java.util.function.Supplier;
 
 import org.team9140.frc2026.Constants;
+import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.Utils;
@@ -25,6 +26,8 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -46,35 +49,11 @@ public class Shooter extends SubsystemBase {
     private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR, Constants.Ports.CANIVORE);
     private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR, Constants.Ports.CANIVORE);
 
-    private static final double kSimLoopPeriod = 0.004; // 4 ms
-    private Notifier m_simNotifier = null;
-    private double m_lastSimTime;
-
     private double yawTargetPosition = 0;
     private double shooterTargetVelocity = 0;
 
     private final MotionMagicTorqueCurrentFOC yawMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
     private final VelocityTorqueCurrentFOC shooterSpeedControl = new VelocityTorqueCurrentFOC(0).withSlot(0);
-
-    private final SingleJointedArmSim yawMotorSim = new SingleJointedArmSim(
-            DCMotor.getKrakenX60Foc(1),
-            60,
-            1,
-            0.2,
-            -Math.PI,
-            Math.PI,
-            false,
-            0);
-    private final MechanismLigament2d yawArmLigament;
-
-    private TalonFXSimState shooterMotorSimState;
-    private final FlywheelSim shooterMotorSim = new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60Foc(2), 0.2, 60),
-            DCMotor.getKrakenX60Foc(2));
-
-    private final StructPublisher<Pose3d> publisher1 = NetworkTableInstance.getDefault()
-            .getStructTopic("shooter", Pose3d.struct).publish();
-    private Pose3d shooterPos = new Pose3d();
 
     private static Shooter instance;
 
@@ -155,11 +134,13 @@ public class Shooter extends SubsystemBase {
             this.isManual = true;
             this.shooterMotor.setControl(new VoltageOut(12.0));
         }).andThen(this.run(() -> {
-            System.out.println("adjust " + (left ? "left" : "right"));
+            this.shooterMotor.setControl(new VoltageOut(
+                left ? Constants.Shooter.ADJUST_VOLTAGE : -Constants.Shooter.ADJUST_VOLTAGE
+                ));
         })).finallyDo(() -> {
-            System.out.println("hold still stop");
-        })
-                .withName("Adjust Manually");
+            this.shooterMotor.setControl(new CoastOut());
+            this.yawMotor.setControl(new StaticBrake());
+        }).withName("Adjust Manually");
     }
 
     public Command manualLeft() {
@@ -181,19 +162,25 @@ public class Shooter extends SubsystemBase {
              * 3. calculate turret angle to make it to spot
              * 4. set yaw and flywheel motors
              */
-            this.shooterMotor.setControl(shooterSpeedControl.withVelocity(0));
-            this.yawMotor.setControl(yawMotorControl.withPosition(0));
-        })
-                .withName("Manually Adjust to Aim");
+            Translation2d targetPose = targetSupplier.get().getTranslation();
+            Pose2d chassisPose = chassisStateSupplier.get().Pose;
+            ChassisSpeeds chassisSpeed = chassisStateSupplier.get().Speeds;
+            this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
+                AimAlign.getRequiredSpeed(chassisPose, targetPose, chassisSpeed)
+            ));
+            this.yawMotor.setControl(yawMotorControl.withPosition(
+                AimAlign.yawAngleToPos(chassisPose, targetPose)
+            ));
+        }).withName("Manually Adjust to Aim");
     }
 
     public Command idle() {
         return this.runOnce(() -> {
             if (this.isManual) return;
             // point turret forward / starting orientation / whatever
+            this.yawMotor.setControl(yawMotorControl.withPosition(0));
             this.shooterMotor.setControl(new VoltageOut(Constants.Shooter.IDLE_VOLTAGE));
-        })
-                .withName("Idle");
+        }).withName("Idle");
     }
 
     // make this default command
@@ -201,8 +188,7 @@ public class Shooter extends SubsystemBase {
         return this.runOnce(() -> {
             this.shooterMotor.setControl(new CoastOut());
             this.yawMotor.setControl(new StaticBrake());
-        })
-                .withName("Shooter Off");
+        }).withName("Shooter Off");
     }
 
     @Override
@@ -213,6 +199,30 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Shooter Velocity", shooterMotor.getVelocity(true).getValueAsDouble());
         SmartDashboard.putNumber("Shooter Target Velocity", this.shooterTargetVelocity / Math.PI / 2.0);
     }
+    
+    private static final double kSimLoopPeriod = 0.004; // 4 ms
+    private Notifier m_simNotifier = null;
+    private double m_lastSimTime;
+
+    private final SingleJointedArmSim yawMotorSim = new SingleJointedArmSim(
+            DCMotor.getKrakenX60Foc(1),
+            60,
+            1,
+            0.2,
+            -Math.PI,
+            Math.PI,
+            false,
+            0);
+    private final MechanismLigament2d yawArmLigament;
+
+    private TalonFXSimState shooterMotorSimState;
+    private final FlywheelSim shooterMotorSim = new FlywheelSim(
+            LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60Foc(2), 0.2, 60),
+            DCMotor.getKrakenX60Foc(2));
+
+    private final StructPublisher<Pose3d> publisher1 = NetworkTableInstance.getDefault()
+            .getStructTopic("shooter", Pose3d.struct).publish();
+    private Pose3d shooterPos = new Pose3d();
 
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
