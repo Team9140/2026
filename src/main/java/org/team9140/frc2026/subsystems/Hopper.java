@@ -56,18 +56,22 @@ public class Hopper extends SubsystemBase{
 
     private Command setSpeeds(double spinnerVoltage, double feederVoltage) {
         return this.runOnce(() -> this.spinnerMotor.setVoltage(spinnerVoltage))
-            .andThen(this.runOnce(() -> this.feederMotor.setVoltage(feederVoltage)));
+            .andThen(this.runOnce(() -> this.feederMotor.setVoltage(feederVoltage)))
+                .withName("Set Speed to Hopper");
     }
 
     public Command feed() {
-        return this.setSpeeds(Constants.Hopper.SPINNER_VOLTAGE, Constants.Hopper.FEEDER_VOLTAGE);
+        return this.setSpeeds(Constants.Hopper.SPINNER_VOLTAGE, Constants.Hopper.FEEDER_VOLTAGE)
+                .withName("Hopper Feeder");
     }
 
     public Command unjam() {
-        return this.setSpeeds(-Constants.Hopper.SPINNER_VOLTAGE, -Constants.Hopper.FEEDER_VOLTAGE);
+        return this.setSpeeds(-Constants.Hopper.SPINNER_VOLTAGE, -Constants.Hopper.FEEDER_VOLTAGE)
+                .withName("Unjam Hopper");
     }
 
     public Command off() {
-        return this.setSpeeds(0, 0);
+        return this.setSpeeds(0, 0)
+                .withName("Hopper Off");
     }
 }

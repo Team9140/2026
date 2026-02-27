@@ -121,7 +121,8 @@ public class Intake extends SubsystemBase {
             this.targetPosition = position;
             this.extendMotor.setControl(
                     this.motionMagic.withPosition(this.targetPosition / Constants.Intake.PINION_CIRCUMFERENCE));
-        }).andThen(new WaitUntilCommand(atPosition));
+        }).andThen(new WaitUntilCommand(atPosition))
+                .withName("Set Intake Position");
     }
 
     public final Trigger atPosition = new Trigger(
@@ -132,36 +133,42 @@ public class Intake extends SubsystemBase {
      * @return command that moves the arm to the "in" position (meters)
      */
     public Command armIn() {
-        return this.setPosition(Constants.Intake.ARM_IN_POSITION);
+        return this.setPosition(Constants.Intake.ARM_IN_POSITION)
+                .withName("Set Intake position to Arm In");
     }
 
     /**
      * @return command that moves the arm to the "out" position (meters)
      */
     public Command armOut() {
-        return this.setPosition(Constants.Intake.ARM_OUT_POSITION);
+        return this.setPosition(Constants.Intake.ARM_OUT_POSITION)
+                .withName("Set Intake position to Arm Out");
     }
 
     public Command setRollerSpeed(double speed) {
-        return this.runOnce(() -> rollerMotor.set(speed));
+        return this.runOnce(() -> rollerMotor.set(speed))
+                .withName("Set Intake Arm Roller Speed");
     }
 
     public Command off() {
         return this.runOnce(() -> {
             setRollerSpeed(Constants.Intake.INTAKE_OFF);
-        });
+        })
+                .withName("Set Intake Arm Roller Speed to Off");
     }
 
     public Command intake() {
         return this.armOut().andThen(this.runOnce(() -> {
             setRollerSpeed(Constants.Intake.INTAKE_VOLTAGE);
-        }));
+        }))
+                .withName("Intake");
     }
 
     public Command reverse() {
         return this.armOut().andThen(this.runOnce(() -> {
             setRollerSpeed(-Constants.Intake.INTAKE_VOLTAGE);
-        }));
+        }))
+                .withName("Reverse intake");
     }
 
     public Command armInOutLoop() {
@@ -169,7 +176,8 @@ public class Intake extends SubsystemBase {
             armIn().withTimeout(1)
                     .andThen(armOut().withTimeout(1))
                     .repeatedly();
-        });
+        })
+                .withName("Intake Arm In and Out position repeatedly");
     }
 
     private static final double kSimLoopPeriod = Constants.Intake.SIM_PERIOD; // 4 ms

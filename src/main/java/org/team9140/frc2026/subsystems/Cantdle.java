@@ -47,7 +47,7 @@ public class Cantdle extends SubsystemBase {
         return this.runOnce(() -> {
             this.candle.setControl(colorcontrol.withColor(color));
             this.current = color;
-        });
+        }).withName(color.toString());
     }
 
     public RGBWColor getAllianceColor() {
