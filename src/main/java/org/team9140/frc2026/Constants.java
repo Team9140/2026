@@ -53,7 +53,7 @@ public class Constants {
 
     public static class Shooter {
         public static final double PEAK_FORWARD_TORQUE = 1.0;
-        public static final double IDLE_VOLTAGE = 0.0;
+        public static final double IDLE_VOLTAGE = 6.7;
         public static final double SPEED_AT_IDLE = 0.0;
 
         public static final double SHOOTER_KS = 0;

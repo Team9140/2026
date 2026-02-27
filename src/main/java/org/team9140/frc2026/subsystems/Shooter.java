@@ -13,13 +13,16 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -52,8 +55,6 @@ public class Shooter extends SubsystemBase {
 
     private final MotionMagicTorqueCurrentFOC yawMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
     private final VelocityTorqueCurrentFOC shooterSpeedControl = new VelocityTorqueCurrentFOC(0).withSlot(0);
-    private final VoltageOut shooterIdleControl = new VoltageOut(0);
-    private final CoastOut shooterOffControl = new CoastOut();
 
     private final SingleJointedArmSim yawMotorSim = new SingleJointedArmSim(
             DCMotor.getKrakenX60Foc(1),
@@ -129,9 +130,6 @@ public class Shooter extends SubsystemBase {
         yawMotor.getConfigurator().apply(yawConfig);
         shooterMotor.getConfigurator().apply(shooterConfig);
 
-        yawMotor.setControl(yawMotorControl.withPosition(0));
-        shooterMotor.setControl(shooterOffControl);
-
         Mechanism2d yawMech = new Mechanism2d(1, 1);
         MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
         yawArmLigament = yawRoot.append(new MechanismLigament2d(
@@ -143,11 +141,71 @@ public class Shooter extends SubsystemBase {
 
         SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
 
-        this.setDefaultCommand(this.idle());
+        this.setDefaultCommand(this.off());
 
         if (Utils.isSimulation()) {
             startSimThread();
         }
+    }
+
+    private boolean isManual = false;
+
+    public Command manualAdjust(boolean left) {
+        return this.runOnce(() -> {
+            this.isManual = true;
+            this.shooterMotor.setControl(new VoltageOut(12.0));
+        }).andThen(this.run(() -> {
+            System.out.println("adjust " + (left ? "left" : "right"));
+        })).finallyDo(() -> {
+            System.out.println("hold still stop");
+        });
+    }
+
+    public Command manualLeft() {
+        return manualAdjust(true);
+    }
+
+    public Command manualRight() {
+        return manualAdjust(false);
+    }
+
+    public Command aim(Supplier<Pose2d> targetSupplier, Supplier<SwerveDriveState> chassisStateSupplier) {
+        return this.run(() -> {
+            if (this.isManual) return;
+            /*
+             * 1. get target and chassis state from suppliers
+             * 2. calculate distance for required flywheel speed
+             * 3. calculate turret angle to make it to spot
+             * 4. set yaw and flywheel motors
+             */
+            this.shooterMotor.setControl(shooterSpeedControl.withVelocity(0));
+            this.yawMotor.setControl(yawMotorControl.withPosition(0));
+        });
+    }
+
+    public Command idle() {
+        return this.runOnce(() -> {
+            if (this.isManual) return;
+            // point turret forward / starting orientation / whatever
+            this.shooterMotor.setControl(new VoltageOut(Constants.Shooter.IDLE_VOLTAGE));
+        });
+    }
+
+    // make this default command
+    public Command off() {
+        return this.runOnce(() -> {
+            this.shooterMotor.setControl(new CoastOut());
+            this.yawMotor.setControl(new StaticBrake());
+        });
+    }
+
+    @Override
+    public void periodic() {
+        // all these are in rotations per second
+        SmartDashboard.putNumber("Yaw Angle", yawMotor.getPosition(true).getValueAsDouble());
+        SmartDashboard.putNumber("Yaw Target Position", this.yawTargetPosition / Math.PI / 2.0);
+        SmartDashboard.putNumber("Shooter Velocity", shooterMotor.getVelocity(true).getValueAsDouble());
+        SmartDashboard.putNumber("Shooter Target Velocity", this.shooterTargetVelocity / Math.PI / 2.0);
     }
 
     private void startSimThread() {
@@ -163,60 +221,6 @@ public class Shooter extends SubsystemBase {
             updateSimState(deltaTime);
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
-    }
-
-    public Command setYawAngle(double pos) {
-        return this.runOnce(() -> {
-            this.yawTargetPosition = pos - Math.floor(pos / 2.0 / Math.PI) * 2.0 * Math.PI - Math.PI;
-            yawMotor.setControl(yawMotorControl.withPosition(yawTargetPosition / 2.0 / Math.PI));
-        });
-    }
-
-    public Command setYawAngle(Supplier<Double> pos) {
-        return this.runOnce(() -> {
-            this.yawTargetPosition = pos.get() - Math.floor(pos.get() / 2.0 / Math.PI) * 2.0 * Math.PI
-                    - Math.PI;
-            yawMotor.setControl(yawMotorControl.withPosition(yawTargetPosition / 2.0 / Math.PI));
-        });
-    }
-
-    public Command setSpeed(double angularVelocity) {
-        return this.runOnce(() -> {
-            this.shooterTargetVelocity = angularVelocity;
-            shooterMotor.setControl(
-                    shooterSpeedControl.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
-        });
-    }
-
-    public Command setSpeed(Supplier<Double> angularVelocity) {
-        return this.runOnce(() -> {
-            this.shooterTargetVelocity = angularVelocity.get();
-            shooterMotor.setControl(
-                    shooterSpeedControl.withVelocity(shooterTargetVelocity / 2.0 / Math.PI));
-        });
-    }
-
-    public Command idle() {
-        return this.runOnce(() -> {
-            this.shooterTargetVelocity = Constants.Shooter.SPEED_AT_IDLE;
-            shooterMotor.setControl(shooterIdleControl.withOutput(Constants.Shooter.IDLE_VOLTAGE));
-        });
-    }
-
-    public Command off() {
-        return this.runOnce(() -> {
-            this.shooterTargetVelocity = 0;
-            shooterMotor.setControl(shooterOffControl);
-        });
-    }
-
-    @Override
-    public void periodic() {
-        // all these are in rotations per second
-        SmartDashboard.putNumber("Yaw Angle", yawMotor.getPosition(true).getValueAsDouble());
-        SmartDashboard.putNumber("Yaw Target Position", this.yawTargetPosition / Math.PI / 2.0);
-        SmartDashboard.putNumber("Shooter Velocity", shooterMotor.getVelocity(true).getValueAsDouble());
-        SmartDashboard.putNumber("Shooter Target Velocity", this.shooterTargetVelocity / Math.PI / 2.0);
     }
 
     public void updateSimState(double deltatime) {

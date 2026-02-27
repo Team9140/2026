@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.generated.TunerConstants.TunerSwerveDrivetrain;
+import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -276,6 +277,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
+        targetPose = AimAlign.getZone(this.getState().Pose);
         if (this.targetPose != null) {
             targetPoseDecomposed[0] = this.targetPose.getX();
             targetPoseDecomposed[1] = this.targetPose.getY();
