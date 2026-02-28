@@ -58,20 +58,6 @@ public class AutonomousRoutines {
         return new PrintCommand("Doing Nothing");
     }
 
-    // public Command shootPreload(double seconds) {
-    //     Pose2d currPos = drivetrain.getState().Pose;
-    //     ChassisSpeeds currSpeed = drivetrain.getState().Speeds;
-    //     Translation2d goalPos = AimAlign.getZone(currPos).getTranslation();
-    //     return shooter.setYawAngle(AimAlign.yawAngleToPos(
-    //         currPos, 
-    //         goalPos
-    //         )).andThen(Commands.deadline(
-    //             new WaitCommand(seconds),
-    //             new PrintCommand("Start Hopper Feed"), 
-    //             shooter.setSpeed(AimAlign.getRequiredSpeed(currPos, goalPos, currSpeed)
-    //             )));
-    // }
-
     public Command shootPreload(double seconds) {
         return Commands.deadline(
             new WaitCommand(seconds),
@@ -83,29 +69,25 @@ public class AutonomousRoutines {
         );
     }
 
-    // public Command climbLeft() {
-    //     Pose2d goalPos;
-    //     if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
-    //         goalPos = Constants.Positions.CLIMB_LEFT_BLUE;
-    //     } else {
-    //         goalPos = Constants.Positions.CLIMB_LEFT_RED;
-    //     }
-    //     return this.drivetrain.goToPose(() -> goalPos)
-    //         .until(this.drivetrain.reachedPose)
-    //         .andThen(climber.extend()).andThen(climber.retract());
-    // }
-
-    // public Command climbRight() {
-    //     Pose2d goalPos;
-    //     if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
-    //         goalPos = Constants.Positions.CLIMB_RIGHT_BLUE;
-    //     } else {
-    //         goalPos = Constants.Positions.CLIMB_RIGHT_RED;
-    //     }
-    //     return this.drivetrain.goToPose(() -> goalPos)
-    //         .until(this.drivetrain.reachedPose)
-    //         .andThen(climber.extend()).andThen(climber.retract());
-    // }
+    public Command climb(boolean left) {
+        Pose2d goalPos;
+        if(left) {
+            if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
+                goalPos = Constants.Positions.CLIMB_LEFT_BLUE;
+            } else {
+                goalPos = Constants.Positions.CLIMB_LEFT_RED;
+            }
+        } else {
+            if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
+                goalPos = Constants.Positions.CLIMB_RIGHT_BLUE;
+            } else {
+                goalPos = Constants.Positions.CLIMB_RIGHT_RED;
+            }
+        }
+        return this.drivetrain.goToPose(() -> goalPos)
+            .until(this.drivetrain.reachedPose)
+            .andThen(climber.extend()).andThen(climber.retract());
+    }
     
     // public Command shootFuelFromMiddleLeft() {
     //     Pose2d goalPos;
