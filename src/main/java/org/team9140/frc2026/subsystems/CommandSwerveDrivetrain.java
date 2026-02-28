@@ -383,11 +383,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         omega = sample.omega + this.headingController.calculate(currPose.getRotation().getRadians(),
                 target.getRotation().getRadians(), currentTime);
         
-        if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
-            vx = -1 * vx;
-            vy = -1 * vy;
-        }
-        
         this.setControl(this.auton
                 .withRotationalRate(omega)
                 .withVelocityX(vx)
@@ -433,11 +428,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 omega = this.headingController.calculate(pose.getRotation().getRadians(),
                         this.targetPose.getRotation().getRadians(), currentTime);
                 omega = Util.clamp(omega, Math.toRadians(270.0));
-            }
-
-            if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
-                vx = -1 * vx;
-                vy = -1 * vy;
             }
 
             this.setControl(this.auton
