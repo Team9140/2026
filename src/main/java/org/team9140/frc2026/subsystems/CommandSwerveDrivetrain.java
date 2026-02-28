@@ -377,13 +377,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         double currentTime = Utils.getCurrentTimeSeconds();
 
+        double vx = 0.0, vy = 0.0, omega = 0.0;
+        vx = sample.vx + this.m_pathXController.calculate(currPose.getX(), target.getX(), currentTime);
+        vy = sample.vy + this.m_pathYController.calculate(currPose.getY(), target.getY(), currentTime);
+        omega = sample.omega + this.headingController.calculate(currPose.getRotation().getRadians(),
+                target.getRotation().getRadians(), currentTime);
+        
+        if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
+            vx = -1 * vx;
+            vy = -1 * vy;
+        }
+        
         this.setControl(this.auton
-                .withRotationalRate(sample.omega + this.headingController.calculate(currPose.getRotation().getRadians(),
-                        target.getRotation().getRadians(), currentTime))
-                .withVelocityX(
-                        sample.vx + this.m_pathXController.calculate(currPose.getX(), target.getX(), currentTime))
-                .withVelocityY(
-                        sample.vy + this.m_pathYController.calculate(currPose.getY(), target.getY(), currentTime)));
+                .withRotationalRate(omega)
+                .withVelocityX(vx)
+                .withVelocityY(vy));
     }
 
 
@@ -427,10 +435,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 omega = Util.clamp(omega, Math.toRadians(270.0));
             }
 
+            if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
+                vx = -1 * vx;
+                vy = -1 * vy;
+            }
+
             this.setControl(this.auton
                     .withRotationalRate(omega)
-                    .withVelocityX(-vx)
-                    .withVelocityY(-vy));
+                    .withVelocityX(vx)
+                    .withVelocityY(vy));
         });
     }
 
