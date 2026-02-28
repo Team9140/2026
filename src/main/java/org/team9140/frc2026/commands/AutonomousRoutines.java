@@ -72,6 +72,17 @@ public class AutonomousRoutines {
     //             )));
     // }
 
+    public Command shootPreload(double seconds) {
+        return Commands.deadline(
+            new WaitCommand(seconds),
+            shooter.aim(
+                () -> AimAlign.getZone(this.drivetrain.getState().Pose),
+                () -> this.drivetrain.getState()
+            ),
+            hopper.feed() 
+        );
+    }
+
     // public Command climbLeft() {
     //     Pose2d goalPos;
     //     if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
