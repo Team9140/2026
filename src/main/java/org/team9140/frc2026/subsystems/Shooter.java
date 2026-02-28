@@ -165,11 +165,12 @@ public class Shooter extends SubsystemBase {
             Translation2d targetPose = targetSupplier.get().getTranslation();
             Pose2d chassisPose = chassisStateSupplier.get().Pose;
             ChassisSpeeds chassisSpeed = chassisStateSupplier.get().Speeds;
+            Translation2d effectivePose = AimAlign.getEffectivePose(chassisPose, targetPose, chassisSpeed);
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
-                AimAlign.getRequiredSpeed(chassisPose, targetPose, chassisSpeed)
+                AimAlign.getRequiredSpeed(chassisPose, effectivePose)
             ));
             this.yawMotor.setControl(yawMotorControl.withPosition(
-                AimAlign.yawAngleToPos(chassisPose, targetPose)
+                AimAlign.yawAngleToPos(chassisPose, effectivePose)
             ));
         }).withName("Manually Adjust to Aim");
     }
