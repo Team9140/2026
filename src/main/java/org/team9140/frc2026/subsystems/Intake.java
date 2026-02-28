@@ -121,8 +121,7 @@ public class Intake extends SubsystemBase {
             this.targetPosition = position;
             this.extendMotor.setControl(
                     this.motionMagic.withPosition(this.targetPosition / Constants.Intake.PINION_CIRCUMFERENCE));
-        }).andThen(new WaitUntilCommand(atPosition))
-                .withName("Set Intake Position");
+        }).withName("Set Intake Position");
     }
 
     public final Trigger atPosition = new Trigger(
