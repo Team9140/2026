@@ -4,6 +4,7 @@
 
 package org.team9140.frc2026;
 
+import org.team9140.frc2026.commands.AutonomousRoutines;
 import org.team9140.frc2026.generated.TunerConstants;
 import org.team9140.frc2026.subsystems.Climber;
 import org.team9140.frc2026.subsystems.CommandSwerveDrivetrain;
@@ -32,7 +33,7 @@ public class RobotContainer {
   private void configureBindings() {
     this.controller.rightBumper().whileTrue(this.intake.intake());
     this.controller.leftBumper().whileTrue(this.intake.reverse().alongWith(this.hopper.unjam()));
-    this.controller.a().onTrue(this.shooter.aim(null, null));
+    this.controller.a().onTrue(this.shooter.aim(() -> this.drivetrain.getState()));
     this.controller.x().onTrue(this.shooter.idle());
     this.controller.rightTrigger().onTrue(this.hopper.feed()).onFalse(this.hopper.off());
     this.controller.back().whileTrue(this.shooter.manualLeft());
@@ -48,6 +49,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return AutonomousRoutines.getInstance(drivetrain).getAutoChooser().getSelected();
   }
 }

@@ -58,7 +58,6 @@ public class AutonomousRoutines {
         return Commands.deadline(
             new WaitCommand(seconds),
             shooter.aim(
-                () -> AimAlign.getZone(this.drivetrain.getState().Pose),
                 () -> this.drivetrain.getState()
             ),
             hopper.feed() 
