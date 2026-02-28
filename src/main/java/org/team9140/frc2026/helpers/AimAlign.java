@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.team9140.frc2026.Constants;
 import org.team9140.lib.Util;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -43,9 +44,9 @@ public class AimAlign {
     }
 
     public static double yawAngleToPos(Pose2d robotPose, Translation2d endPose) {
-        return Math.atan2(
+        return MathUtil.angleModulus(Math.atan2(
                 (endPose.getY() - robotPose.getY()), (endPose.getX() - robotPose.getX()))
-                - robotPose.getRotation().getRadians();
+                - robotPose.getRotation().getRadians());
     }
 
     public static Pose2d getZone(Pose2d robotPos) {
