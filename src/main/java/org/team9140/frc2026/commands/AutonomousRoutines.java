@@ -40,9 +40,10 @@ public class AutonomousRoutines {
     private AutonomousRoutines(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
         autoChooser.setDefaultOption("Do Nothing", doNothing());
-        // autoChooser.addOption("Shoot Preload", shootPreload(3));
-        // autoChooser.addOption("Climb Left", climbLeft());
-        // autoChooser.addOption("Climb Right", climbRight());
+        autoChooser.addOption("Shoot Preload", shootPreload(3));
+        autoChooser.addOption("Climb Left", climb(true));
+        autoChooser.addOption("Climb Right", climb(false));
+        autoChooser.addOption("Sweep Middle From Left", sweepMiddleFromLeft());
         // autoChooser.addOption("Shoot Fuel from Middle Left", shootFuelFromMiddleLeft());
         // autoChooser.addOption("Shoot Fuel from Middle Right", shootFuelFromMiddleRight());
         SmartDashboard.putData(autoChooser);
