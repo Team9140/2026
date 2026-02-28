@@ -7,7 +7,6 @@ import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.frc2026.subsystems.Climber;
 import org.team9140.frc2026.subsystems.CommandSwerveDrivetrain;
 import org.team9140.frc2026.subsystems.Hopper;
-import org.team9140.frc2026.subsystems.Intake;
 import org.team9140.frc2026.subsystems.Shooter;
 import org.team9140.lib.FollowPath;
 import org.team9140.lib.Util;
@@ -25,7 +24,6 @@ public class AutonomousRoutines {
     private final CommandSwerveDrivetrain drivetrain;
 
     private final Shooter shooter = Shooter.getInstance();
-    private final Intake intake = Intake.getInstance();
     private final Climber climber = Climber.getInstance();
     private final Hopper hopper = Hopper.getInstance();
 
