@@ -42,6 +42,7 @@ public class AutonomousRoutines {
         autoChooser.addOption("Climb Left", climb(true));
         autoChooser.addOption("Climb Right", climb(false));
         autoChooser.addOption("Sweep Middle From Left", sweepMiddleFromLeft());
+        autoChooser.addOption("Sweep Middle From Right", sweepMiddleFromRight());
         SmartDashboard.putData(autoChooser);
     }
 
@@ -84,8 +85,14 @@ public class AutonomousRoutines {
             .andThen(climber.extend()).andThen(climber.retract());
     }
 
-    public Command sweepMiddleFromLeft() {
+    public Command sweepMiddleFromRight() {
         FollowPath path = new FollowPath("crossandsweep_Blue_Right", () -> this.drivetrain.getState().Pose,
+                this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
+        return path.gimmeCommand();
+    }
+
+    public Command sweepMiddleFromLeft() {
+        FollowPath path = new FollowPath("crossandsweep_Blue_Left", () -> this.drivetrain.getState().Pose,
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
         return path.gimmeCommand();
     }
