@@ -153,24 +153,22 @@ public class Shooter extends SubsystemBase {
                 .withName("Manually Adjust to Right");
     }
 
+    /*
+    * 1. get target and chassis state from suppliers
+    * 2. calculate distance for required flywheel speed
+    * 3. calculate turret angle to make it to spot
+    * 4. set yaw and flywheel motors
+    */
     public Command aim(Supplier<SwerveDriveState> chassisStateSupplier) {
         return this.run(() -> {
             if (this.isManual) return;
-            /*
-             * 1. get target and chassis state from suppliers
-             * 2. calculate distance for required flywheel speed
-             * 3. calculate turret angle to make it to spot
-             * 4. set yaw and flywheel motors
-             */
             Pose2d chassisPose = chassisStateSupplier.get().Pose;
             Translation2d targetPose = AimAlign.getZone(chassisPose).getTranslation();
-            ChassisSpeeds chassisSpeed = chassisStateSupplier.get().Speeds;
-            Translation2d effectivePose = AimAlign.getEffectivePose(chassisPose, targetPose, chassisSpeed);
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
-                AimAlign.getRequiredSpeed(chassisPose, effectivePose)
+                AimAlign.getRequiredSpeed(chassisPose, targetPose)
             ));
             this.yawMotor.setControl(yawMotorControl.withPosition(
-                AimAlign.yawAngleToPos(chassisPose, effectivePose)
+                AimAlign.yawAngleToPos(chassisPose, targetPose)
             ));
         }).withName("Manually Adjust to Aim");
     }
