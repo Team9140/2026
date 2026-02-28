@@ -21,12 +21,15 @@ public class RobotContainer {
   private final Hopper hopper = Hopper.getInstance();
   private final Intake intake = Intake.getInstance();
   private final Shooter shooter = Shooter.getInstance();
+  private final Vision vision = new Vision(Constants.Vision.CAMERA_NAME, drivetrain::addVisionMeasurement, () -> drivetrain.getState().Pose);
 
   private final CommandXboxController controller = new CommandXboxController(0);
   private final SwerveTelemetry logger = new SwerveTelemetry(drivetrain, Constants.Drive.MAX_TELEOP_VELOCITY);
 
   public RobotContainer() {
     configureBindings();
+
+    vision.start();
   }
 
   private void configureBindings() {
