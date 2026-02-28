@@ -6,7 +6,6 @@ import org.team9140.frc2026.Constants;
 import org.team9140.lib.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -15,9 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class AimAlign {
     private static InterpolatingDoubleTreeMap lookupMotorSpeedFromDistance = new InterpolatingDoubleTreeMap();
     private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap();
-
-    private static double latency = 0;
-    private static double pitchAngle = 46;
 
     static {
         lookupMotorSpeedFromDistance.put(Double.valueOf(14.85), Double.valueOf(-0.11));
