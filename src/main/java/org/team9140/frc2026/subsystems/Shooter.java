@@ -27,7 +27,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -134,9 +133,8 @@ public class Shooter extends SubsystemBase {
             this.isManual = true;
             this.shooterMotor.setControl(new VoltageOut(12.0));
         }).andThen(this.run(() -> {
-            this.shooterMotor.setControl(new VoltageOut(
-                left ? Constants.Shooter.ADJUST_VOLTAGE : -Constants.Shooter.ADJUST_VOLTAGE
-                ));
+            this.yawMotor.setControl(new VoltageOut(
+                    left ? Constants.Shooter.ADJUST_VOLTAGE : -Constants.Shooter.ADJUST_VOLTAGE));
         })).finallyDo(() -> {
             this.shooterMotor.setControl(new CoastOut());
             this.yawMotor.setControl(new StaticBrake());
@@ -154,28 +152,28 @@ public class Shooter extends SubsystemBase {
     }
 
     /*
-    * 1. get target and chassis state from suppliers
-    * 2. calculate distance for required flywheel speed
-    * 3. calculate turret angle to make it to spot
-    * 4. set yaw and flywheel motors
-    */
+     * 1. get target and chassis state from suppliers
+     * 2. calculate distance for required flywheel speed
+     * 3. calculate turret angle to make it to spot
+     * 4. set yaw and flywheel motors
+     */
     public Command aim(Supplier<SwerveDriveState> chassisStateSupplier) {
         return this.run(() -> {
-            if (this.isManual) return;
+            if (this.isManual)
+                return;
             Pose2d chassisPose = chassisStateSupplier.get().Pose;
             Translation2d targetPose = AimAlign.getZone(chassisPose).getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
-                AimAlign.getRequiredSpeed(chassisPose, targetPose)
-            ));
+                    AimAlign.getRequiredSpeed(chassisPose, targetPose)));
             this.yawMotor.setControl(yawMotorControl.withPosition(
-                AimAlign.yawAngleToPos(chassisPose, targetPose)
-            ));
-        }).withName("Manually Adjust to Aim");
+                    AimAlign.yawAngleToPos(chassisPose, targetPose) / (2.0 * Math.PI)));
+        }).withName("Continuously Aim Automatically");
     }
 
     public Command idle() {
         return this.runOnce(() -> {
-            if (this.isManual) return;
+            if (this.isManual)
+                return;
             // point turret forward / starting orientation / whatever
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
             this.shooterMotor.setControl(new VoltageOut(Constants.Shooter.IDLE_VOLTAGE));
@@ -198,7 +196,7 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Shooter Velocity", shooterMotor.getVelocity(true).getValueAsDouble());
         SmartDashboard.putNumber("Shooter Target Velocity", this.shooterTargetVelocity / Math.PI / 2.0);
     }
-    
+
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -242,7 +240,7 @@ public class Shooter extends SubsystemBase {
         TalonFXSimState yawMotorSimState = yawMotor.getSimState();
         double yawSimVolts = yawMotorSimState.getMotorVoltage();
         yawMotorSim.setInputVoltage(yawSimVolts);
-        yawMotorSim.update(0.02);
+        yawMotorSim.update(deltatime);
 
         yawMotor.getPosition().refresh();
         yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
@@ -258,7 +256,7 @@ public class Shooter extends SubsystemBase {
         double shooterSimVolts = shooterMotorSimState.getMotorVoltage();
         shooterMotorSim.setInputVoltage(shooterSimVolts);
 
-        shooterMotorSim.update(0.02);
+        shooterMotorSim.update(deltatime);
 
         shooterMotorSimState.setRotorVelocity(shooterMotorSim.getAngularVelocityRPM() / 60.0);
         shooterMotorSimState.setRotorAcceleration(
