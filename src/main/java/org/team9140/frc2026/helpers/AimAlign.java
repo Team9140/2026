@@ -3,6 +3,7 @@ package org.team9140.frc2026.helpers;
 import java.util.Optional;
 
 import org.team9140.frc2026.Constants;
+import org.team9140.frc2026.FieldConstants;
 import org.team9140.lib.Util;
 
 import edu.wpi.first.math.MathUtil;
@@ -60,13 +61,13 @@ public class AimAlign {
                 && rx < Constants.Positions.BLUE_ALLIANCE_ZONE) {
             position = Constants.Positions.BLUE_HOOP_POSITION;
         } else if (Optional.of(DriverStation.Alliance.Red).equals(Util.getAlliance())) {
-            if (ry < Constants.Positions.Y_CENTER) {
+            if (ry < FieldConstants.fieldWidth/2) {
                 position = Constants.Positions.FEEDING_POS_LOWER_RED;
             } else {
                 position = Constants.Positions.FEEDING_POS_UPPER_RED;
             }
         } else {
-            if (ry < Constants.Positions.Y_CENTER) {
+            if (ry < FieldConstants.fieldWidth/2) {
                 position = Constants.Positions.FEEDING_POS_LOWER;
             } else {
                 position = Constants.Positions.FEEDING_POS_UPPER;
