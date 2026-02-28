@@ -9,12 +9,10 @@ import org.team9140.frc2026.subsystems.CommandSwerveDrivetrain;
 import org.team9140.frc2026.subsystems.Hopper;
 import org.team9140.frc2026.subsystems.Intake;
 import org.team9140.frc2026.subsystems.Shooter;
+import org.team9140.lib.FollowPath;
 import org.team9140.lib.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -87,6 +85,12 @@ public class AutonomousRoutines {
         return this.drivetrain.goToPose(() -> goalPos)
             .until(this.drivetrain.reachedPose)
             .andThen(climber.extend()).andThen(climber.retract());
+    }
+
+    public Command sweepMiddleFromLeft() {
+        FollowPath path = new FollowPath("crossandsweep_Blue_Right", () -> this.drivetrain.getState().Pose,
+                this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
+        return path.gimmeCommand();
     }
     
     // public Command shootFuelFromMiddleLeft() {
