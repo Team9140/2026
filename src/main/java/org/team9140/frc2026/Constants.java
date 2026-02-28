@@ -1,13 +1,11 @@
 package org.team9140.frc2026;
 
 import edu.wpi.first.math.util.Units;
-
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import org.team9140.frc2026.generated.TunerConstants;
 
 import com.ctre.phoenix6.CANBus;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
@@ -46,7 +44,6 @@ public class Constants {
         public static final double HEADING_CONTROLLER_I = 0.0;
         public static final double HEADING_CONTROLLER_D = 0.03; // 0.04
 
-
         public static final double REACHEDPOSE_DEBOUNCE = 0.5;
 
     }
@@ -77,20 +74,18 @@ public class Constants {
     }
 
     public static class Positions {
-       public static final double Y_CENTER = 4.035;
-       public static final double X_CENTER = 8.257;
-       public static final double BLUE_ALLIANCE_ZONE = 4.625594;
-       public static final double RED_ALLIANCE_ZONE = 11.915394;
-       public static final Pose2d BLUE_HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
-       public static final Pose2d RED_HOOP_POSITION = new Pose2d(11.915394, 4.03479, new Rotation2d());
-       public static final Pose2d FEEDING_POS_LOWER = new Pose2d(2,2, new Rotation2d());
-       public static final Pose2d FEEDING_POS_UPPER = new Pose2d(2,6 , new Rotation2d());
-       public static final Pose2d FEEDING_POS_LOWER_RED = new Pose2d(14.540988,2, new Rotation2d());
-       public static final Pose2d FEEDING_POS_UPPER_RED = new Pose2d(14.540988,6 , new Rotation2d());
-       public static final Pose2d CLIMB_RIGHT_BLUE = new Pose2d(1.3, 3.2, new Rotation2d(-Math.PI));
-       public static final Pose2d CLIMB_LEFT_BLUE = new Pose2d(1.3, 4.3, new Rotation2d(-Math.PI));
-       public static final Pose2d CLIMB_LEFT_RED = new Pose2d(15.2, 3.7, new Rotation2d());
-       public static final Pose2d CLIMB_RIGHT_RED = new Pose2d(15.2, 4.8, new Rotation2d());
+        public static final double BLUE_ALLIANCE_ZONE = 4.625594;
+        public static final double RED_ALLIANCE_ZONE = 11.915394;
+        public static final Pose2d BLUE_HOOP_POSITION = new Pose2d(4.62534, 4.03479, new Rotation2d());
+        public static final Pose2d RED_HOOP_POSITION = new Pose2d(11.915394, 4.03479, new Rotation2d());
+        public static final Pose2d FEEDING_POS_LOWER = new Pose2d(2, 2, new Rotation2d());
+        public static final Pose2d FEEDING_POS_UPPER = new Pose2d(2, 6, new Rotation2d());
+        public static final Pose2d FEEDING_POS_LOWER_RED = new Pose2d(14.540988, 2, new Rotation2d());
+        public static final Pose2d FEEDING_POS_UPPER_RED = new Pose2d(14.540988, 6, new Rotation2d());
+        public static final Pose2d CLIMB_RIGHT_BLUE = new Pose2d(1.3, 3.2, new Rotation2d(-Math.PI));
+        public static final Pose2d CLIMB_LEFT_BLUE = new Pose2d(1.3, 4.3, new Rotation2d(-Math.PI));
+        public static final Pose2d CLIMB_LEFT_RED = new Pose2d(15.2, 3.7, new Rotation2d());
+        public static final Pose2d CLIMB_RIGHT_RED = new Pose2d(15.2, 4.8, new Rotation2d());
     }
 
     public static class Climber {

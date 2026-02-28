@@ -1,0 +1,75 @@
+package org.team9140.frc2026;
+
+import java.io.IOException;
+import java.nio.file.Path;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.wpilibj.Filesystem;
+
+public class FieldConstants {
+
+    public static final FieldType fieldType = FieldType.ANDYMARK;
+    public static final double fieldLength = AprilTagLayoutType.OFFICIAL.getLayout().getFieldLength();
+    public static final double fieldWidth = AprilTagLayoutType.OFFICIAL.getLayout().getFieldWidth();
+
+    public enum FieldType {
+        ANDYMARK("andymark"),
+        WELDED("welded");
+
+        private final String jsonFolder;
+
+        FieldType(String jsonFolder) {
+            this.jsonFolder = jsonFolder;
+        }
+
+        public String getJsonFolder() {
+            return jsonFolder;
+        }
+    }
+
+    public enum AprilTagLayoutType {
+        OFFICIAL("2026-official"),
+        NONE("2026-none"),
+        HUB("2026-hub"),
+        OUTPOST("2026-outpost"),
+        TOWER("2026-tower");
+
+        private final String name;
+        private volatile AprilTagFieldLayout layout;
+        private volatile String layoutString;
+
+        AprilTagLayoutType(String name) {
+            this.name = name;
+        }
+
+        public AprilTagFieldLayout getLayout() {
+            if (layout == null) {
+                synchronized (this) {
+                    if (layout == null) {
+                        try {
+                            Path p = Path.of(
+                                    Filesystem.getDeployDirectory().getPath(),
+                                    "apriltags",
+                                    fieldType.getJsonFolder(),
+                                    name + ".json");
+                            layout = new AprilTagFieldLayout(p);
+                            layoutString = new ObjectMapper().writeValueAsString(layout);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
+            return layout;
+        }
+
+        public String getLayoutString() {
+            if (layoutString == null) {
+                getLayout();
+            }
+            return layoutString;
+        }
+    }
+}
