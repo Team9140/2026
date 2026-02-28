@@ -44,8 +44,6 @@ public class AutonomousRoutines {
         autoChooser.addOption("Climb Left", climb(true));
         autoChooser.addOption("Climb Right", climb(false));
         autoChooser.addOption("Sweep Middle From Left", sweepMiddleFromLeft());
-        // autoChooser.addOption("Shoot Fuel from Middle Left", shootFuelFromMiddleLeft());
-        // autoChooser.addOption("Shoot Fuel from Middle Right", shootFuelFromMiddleRight());
         SmartDashboard.putData(autoChooser);
     }
 
@@ -93,36 +91,4 @@ public class AutonomousRoutines {
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
         return path.gimmeCommand();
     }
-    
-    // public Command shootFuelFromMiddleLeft() {
-    //     Pose2d goalPos;
-    //     Pose2d returnPos;
-    //     if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
-    //         goalPos = new Pose2d(Constants.Positions.X_CENTER, 5.189, new Rotation2d());
-    //         returnPos = new Pose2d(2.9, 5.189, new Rotation2d());
-    //     } else {
-    //         goalPos = new Pose2d(Constants.Positions.X_CENTER, 2.879, new Rotation2d());
-    //         returnPos = new Pose2d(13.7, 2.879, new Rotation2d());
-    //     }
-    //     return intake.intake().raceWith(this.drivetrain.goToPose(() -> goalPos)
-    //         .until(this.drivetrain.reachedPose)
-    //         .andThen(this.drivetrain.goToPose(() -> returnPos))
-    //         .until(this.drivetrain.reachedPose)).andThen(shootPreload(3));
-    // }
-
-    // public Command shootFuelFromMiddleRight() {
-    //     Pose2d goalPos;
-    //     Pose2d returnPos;
-    //     if(Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Blue))) {
-    //         goalPos = new Pose2d(Constants.Positions.X_CENTER, 2.879, new Rotation2d());
-    //         returnPos = new Pose2d(2.9, 2.879, new Rotation2d());
-    //     } else {
-    //         goalPos = new Pose2d(Constants.Positions.X_CENTER, 5.189, new Rotation2d());
-    //         returnPos = new Pose2d(13.7, 5.189, new Rotation2d());
-    //     }
-    //     return intake.intake().raceWith(this.drivetrain.goToPose(() -> goalPos)
-    //         .until(this.drivetrain.reachedPose)
-    //         .andThen(this.drivetrain.goToPose(() -> returnPos))
-    //         .until(this.drivetrain.reachedPose)).andThen(shootPreload(3));
-    // }
 }
