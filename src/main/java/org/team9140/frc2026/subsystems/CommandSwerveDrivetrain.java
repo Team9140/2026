@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.team9140.frc2026.Constants;
+import org.team9140.frc2026.FieldConstants;
 import org.team9140.frc2026.generated.TunerConstants.TunerSwerveDrivetrain;
 import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
@@ -348,6 +349,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
                 vX = -1 * vX;
                 vY = -1 * vY;
+            }
+
+            double y_prime = getState().Pose.getY() + vY * Constants.Drive.SECONDS_LATER;
+            double x_prime = getState().Pose.getX() + vX * Constants.Drive.SECONDS_LATER;
+            if (y_prime < FieldConstants.Trench.TRENCH_DOWN || y_prime > FieldConstants.Trench.TRENCH_UP) {
+                if (x_prime > FieldConstants.Trench.BLUE_TRENCH_X1 && x_prime < FieldConstants.Trench.BLUE_TRENCH_X2
+                    || x_prime > FieldConstants.Trench.RED_TRENCH_X1 && x_prime < FieldConstants.Trench.RED_TRENCH_X2) {
+                    vX = 0;
+                }
             }
 
             this.setControl(this.drive

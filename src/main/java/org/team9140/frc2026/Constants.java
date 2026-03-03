@@ -53,6 +53,7 @@ public class Constants {
 
         public static final double REACHEDPOSE_DEBOUNCE = 0.5;
 
+        public static final double SECONDS_LATER = 0.15;
     }
 
     public static class Shooter {
