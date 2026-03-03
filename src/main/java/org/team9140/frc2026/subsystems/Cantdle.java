@@ -50,6 +50,18 @@ public class Cantdle extends SubsystemBase {
         }).withName("Set to blinking " + color.toString());
     }
 
+    public Command setNotAimingLights() {
+        return this.setToBlinkingColor(getAllianceColor());
+    }
+
+    public Command setAimingLights() {
+        return this.setToBlinkingColor(Constants.Cantdle.GREEN);
+    }
+
+    public Command setDisabledLights() {
+        return this.setToSolidColor(getAllianceColor());
+    }
+
     public RGBWColor getAllianceColor() {
         if (Optional.of(DriverStation.Alliance.Blue).equals(Util.getAlliance())) {
             return Constants.Cantdle.BLUE;
