@@ -57,26 +57,26 @@ public class Constants {
     }
 
     public static class Shooter {
-        public static final double PEAK_FORWARD_TORQUE = 1.0;
+        public static final double PEAK_FORWARD_TORQUE = 40.0;
         public static final double IDLE_VOLTAGE = 6.7;
         public static final double SPEED_AT_IDLE = 0.0;
 
         public static final double SHOOTER_KS = 0;
         public static final double SHOOTER_KV = 0;
         public static final double SHOOTER_KA = 0;
-        public static final double SHOOTER_KP = 1000;
+        public static final double SHOOTER_KP = 100;
         public static final double SHOOTER_KI = 0;
         public static final double SHOOTER_KD = 0;
 
-        public static final double YAW_ACCELERATION = 1;
-        public static final double YAW_CRUISE_VELOCITY = 1;
+        public static final double YAW_ACCELERATION = 0;
+        public static final double YAW_CRUISE_VELOCITY = 0;
 
         public static final double YAW_KS = 0;
         public static final double YAW_KV = 0;
         public static final double YAW_KA = 0;
-        public static final double YAW_KP = 1000;
+        public static final double YAW_KP = 0;
         public static final double YAW_KI = 0;
-        public static final double YAW_KD = 50;
+        public static final double YAW_KD = 0;
 
         public static final double ADJUST_VOLTAGE = 2.0;
     }

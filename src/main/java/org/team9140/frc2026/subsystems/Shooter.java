@@ -1,5 +1,6 @@
 package org.team9140.frc2026.subsystems;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.team9140.frc2026.Constants;
@@ -7,6 +8,7 @@ import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -49,7 +51,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class Shooter extends SubsystemBase {
     private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR, Constants.Ports.CANIVORE);
     private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR, Constants.Ports.CANIVORE);
-    private final TalonFX shooterFollower = new TalonFX(Constants.Ports.SHOOTER_FOLLOWER_MOTOR, Constants.Ports.CANIVORE);
+    private final TalonFX shooterFollower = new TalonFX(Constants.Ports.SHOOTER_FOLLOWER_MOTOR,
+            Constants.Ports.CANIVORE);
 
     private double yawTargetPosition = 0;
     private double shooterTargetVelocity = 0;
@@ -98,6 +101,12 @@ public class Shooter extends SubsystemBase {
                 .withPeakForwardTorqueCurrent(Constants.Shooter.PEAK_FORWARD_TORQUE)
                 .withPeakReverseTorqueCurrent(0.0);
 
+        CurrentLimitsConfigs shooterCurrentLimits = new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(80)
+                .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(40)
+                .withSupplyCurrentLimitEnable(true);
+
         TalonFXConfiguration yawConfig = new TalonFXConfiguration()
                 .withMotionMagic(yawMMConfigs)
                 .withSlot0(yawSlot0Configs)
@@ -106,7 +115,8 @@ public class Shooter extends SubsystemBase {
         TalonFXConfiguration shooterConfig = new TalonFXConfiguration()
                 .withSlot0(shooterSlot0Configs)
                 .withMotorOutput(shooterMotorOutputConfigs)
-                .withTorqueCurrent(shooterTorqueCurrentConfigs);
+                .withTorqueCurrent(shooterTorqueCurrentConfigs)
+                .withCurrentLimits(shooterCurrentLimits);
 
         yawMotor.getConfigurator().apply(yawConfig);
         shooterMotor.getConfigurator().apply(shooterConfig);
@@ -199,6 +209,14 @@ public class Shooter extends SubsystemBase {
             this.shooterMotor.setControl(new CoastOut());
             this.yawMotor.setControl(new StaticBrake());
         }).withName("Shooter Off");
+    }
+
+    public Command tuningSpeed(DoubleSupplier RPM) {
+        return this.runOnce(() -> {
+            shooterFollower.setControl(new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Aligned));
+            this.shooterMotor.setControl(shooterSpeedControl.withVelocity(RPM.getAsDouble() / 60.0));
+        }).andThen(this.run(() -> {
+        }));
     }
 
     @Override
