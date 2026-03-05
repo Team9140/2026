@@ -12,6 +12,7 @@ import org.team9140.frc2026.subsystems.Hopper;
 import org.team9140.frc2026.subsystems.Intake;
 import org.team9140.frc2026.subsystems.Shooter;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -30,9 +31,10 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    SmartDashboard.putNumber("RPM", 2500);
     this.controller.rightBumper().whileTrue(this.intake.intake());
     this.controller.leftBumper().whileTrue(this.intake.reverse().alongWith(this.hopper.unjam()));
-    this.controller.a().onTrue(this.shooter.aim(() -> this.drivetrain.getState()));
+    this.controller.a().whileTrue(this.shooter.tuningSpeed(() -> SmartDashboard.getNumber("RPM", 3500)));
     this.controller.x().onTrue(this.shooter.idle());
     this.controller.rightTrigger().onTrue(this.hopper.feed()).onFalse(this.hopper.off());
     this.controller.back().whileTrue(this.shooter.manualLeft());
