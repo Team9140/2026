@@ -14,6 +14,7 @@ import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.swerve.SwerveRequest.SwerveDriveBrake;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -32,6 +33,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -277,6 +279,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SignalLogger.writeDoubleArray("drive target pose", targetPoseDecomposed);
         
         SmartDashboard.putNumberArray("drive current pose", currentPoseDecomposed);
+        SmartDashboard.putNumber("idle start time", startTime);
     }
 
     private void startSimThread() {
@@ -339,22 +342,34 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
 
+    SwerveDriveBrake brake = new SwerveDriveBrake();
+    double startTime = 0.0;
+
     public Command teleopDrive(DoubleSupplier leftStickX, DoubleSupplier leftStickY, DoubleSupplier rightStickX) {
-        return this.run(() -> {
+        return this.runOnce(() -> {
+            startTime = Utils.getSystemTimeSeconds();
+            System.out.println(startTime);
+        }).andThen(this.run(() -> {
             double vX = Constants.Drive.MAX_TELEOP_VELOCITY * Util.applyDeadband(-leftStickY.getAsDouble());
             double vY = Constants.Drive.MAX_TELEOP_VELOCITY * Util.applyDeadband(-leftStickX.getAsDouble());
             double omega = Constants.Drive.MAX_TELEOP_ROTATION * Util.applyDeadband(-rightStickX.getAsDouble());
             
-            if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
-                vX = -1 * vX;
-                vY = -1 * vY;
+            if (vX == 0.0 && vY == 0.0 && omega == 0 && Utils.getSystemTimeSeconds() - startTime >= 6) {
+                this.setControl(brake);
             }
+            else {
+                startTime = Utils.getSystemTimeSeconds();
+                if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
+                    vX = -1 * vX;
+                        vY = -1 * vY;
+                }
 
-            this.setControl(this.drive
-                    .withVelocityX(vX)
-                    .withVelocityY(vY)
-                    .withRotationalRate(omega));
-        }).withName("regular drive");
+                this.setControl(this.drive
+                        .withVelocityX(vX)
+                        .withVelocityY(vY)
+                        .withRotationalRate(omega));
+            }
+        })).withName("regular drive");
     }
 
     private final SwerveRequest.FieldCentric auton = new SwerveRequest.FieldCentric()
