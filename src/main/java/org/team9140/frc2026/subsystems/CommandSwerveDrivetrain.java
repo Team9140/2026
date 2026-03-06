@@ -366,8 +366,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             double vY = Constants.Drive.MAX_TELEOP_VELOCITY * Util.applyDeadband(-leftStickX.getAsDouble());
             double omega = Constants.Drive.MAX_TELEOP_ROTATION * Util.applyDeadband(-rightStickX.getAsDouble());
             
-            if (vX == 0.0 && vY == 0.0 && omega == 0 && Utils.getSystemTimeSeconds() - startTime >= 6) {
-                this.setControl(brake);
+            if (vX == 0.0 && vY == 0.0 && omega == 0) {
+                if (Utils.getSystemTimeSeconds() - startTime >= Constants.Drive.BRAKE_IDLE_TIME) {
+                    this.setControl(brake);
+                }
             }
             else {
                 startTime = Utils.getSystemTimeSeconds();
