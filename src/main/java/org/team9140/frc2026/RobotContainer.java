@@ -25,9 +25,11 @@ public class RobotContainer {
 
   private final CommandXboxController controller = new CommandXboxController(0);
   private final SwerveTelemetry logger = new SwerveTelemetry(drivetrain, Constants.Drive.MAX_TELEOP_VELOCITY);
+  private final AutonomousRoutines autoRoutines;
 
   public RobotContainer() {
     configureBindings();
+    autoRoutines = AutonomousRoutines.getInstance(drivetrain);
   }
 
   private void configureBindings() {
@@ -50,6 +52,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return AutonomousRoutines.getInstance(drivetrain).getAutoChooser().getSelected();
+    return autoRoutines.getCommand();
   }
 }
