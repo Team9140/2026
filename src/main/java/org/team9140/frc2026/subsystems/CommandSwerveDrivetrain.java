@@ -8,27 +8,32 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.team9140.frc2026.Constants;
+import org.team9140.frc2026.Vision;
 import org.team9140.frc2026.generated.TunerConstants.TunerSwerveDrivetrain;
 import org.team9140.frc2026.helpers.AimAlign;
+import org.team9140.frc2026.helpers.LimelightHelpers.PoseEstimate;
+import org.team9140.frc2026.helpers.LimelightHelpers.RawFiducial;
 import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import choreo.trajectory.SwerveSample;
-
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -292,6 +297,91 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    public void acceptVisionMeasurement(Vision.EstimateType kind, double timestamp, PoseEstimate measurement) {
+        double xyStdDev = 9999;
+        double thetaStdDev = 9999;
+        boolean reject = false;
+        ChassisSpeeds speeds = this.getState().Speeds;
+        double poseDiff = measurement.pose.getTranslation().getDistance(this.getState().Pose.getTranslation());
+
+        reject |= Math.abs(Units.degreesToRotations(this.getPigeon2().getAngularVelocityZWorld().getValueAsDouble())) >= 0.5;
+        reject |= measurement.avgTagArea <= 0.05;
+        reject |= poseDiff <= 0.01; // ignore updates smaller than 1cm to reduce jitter??
+
+        if (reject) {
+            return;
+        }
+
+        double highestAmbiguity = 0.0;
+        for (RawFiducial tag : measurement.rawFiducials) {
+            if (tag.ambiguity >= highestAmbiguity) {
+                highestAmbiguity = tag.ambiguity;
+            }
+        }
+
+        if (highestAmbiguity >= 0.5) {
+            return;
+        }
+
+        if (DriverStation.isEnabled()) {
+            // if (vm.kind.equals(VisionMeasurement.Kind.MT2)) {
+                // if (vm.measurement.tagCount >= 2 && vm.measurement.avgTagArea >= 1.0) {
+                // xyStdDev = 0.1;
+                // } else if (vm.measurement.tagCount >= 2 && vm.measurement.avgTagArea >= 0.5)
+                // {
+                // xyStdDev = 0.25;
+                // } else if (vm.measurement.tagCount >= 2) {
+                // xyStdDev = 0.5;
+                // } else if (Math.abs(speeds.vxMetersPerSecond) +
+                // Math.abs(speeds.vxMetersPerSecond) <= 0.1
+                // && vm.measurement.avgTagArea >= 2.0) {
+                // // close, stationary
+                // xyStdDev = 1.0;
+                // }
+            if (kind.equals(Vision.EstimateType.MT1)) {
+                if (measurement.tagCount >= 2 && measurement.avgTagArea >= 0.25) {
+                    xyStdDev = 0.5;
+                    thetaStdDev = 90.0;
+                } else if (measurement.tagCount >= 2 && measurement.avgTagArea >= 1.0) {
+                    xyStdDev = 0.2;
+                    thetaStdDev = 10.0;
+                } else if (measurement.avgTagArea >= 0.4) {
+                    xyStdDev = 1.5;
+                    thetaStdDev = 20.0;
+                } else if (measurement.avgTagArea > 1.0
+                        && speeds.omegaRadiansPerSecond <= Math.toRadians(10)
+                        && Math.abs(speeds.vxMetersPerSecond) + Math.abs(speeds.vxMetersPerSecond) <= 0.5
+                        && highestAmbiguity < 0.1) {
+                    xyStdDev = 1.0;
+                    thetaStdDev = 10.0;
+                }
+            }
+
+        } else {
+            if (kind.equals(Vision.EstimateType.MT1)) {
+
+                // if (vm.measurement.avgTagArea > 0.5) {
+                // xyStdDev = 2.0;
+                // thetaStdDev = 2.0;
+                // } else if (vm.measurement.tagCount >= 2 && vm.measurement.avgTagArea >= 0.2)
+                // {
+                // xyStdDev = 0.5;
+                // thetaStdDev = 1.0;
+                // } else if (highestAmbiguity <= 0.2 && vm.measurement.avgTagArea >= 0.05) {
+                // xyStdDev = 5.0;
+                // }
+
+                if (highestAmbiguity <= 0.5) {
+                    xyStdDev = 5.0;
+                    thetaStdDev = 5.0;
+                }
+            }
+        }
+
+        this.addVisionMeasurement(measurement.pose, timestamp,
+                VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev));
     }
 
     /**

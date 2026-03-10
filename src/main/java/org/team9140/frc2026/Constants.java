@@ -1,12 +1,14 @@
 package org.team9140.frc2026;
 
-import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import org.team9140.frc2026.generated.TunerConstants;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.RGBWColor;
+
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 
 public class Constants {
     public static class Ports {
@@ -148,5 +150,10 @@ public class Constants {
 
         public static final double SPINNER_VOLTAGE = 8;
         public static final double FEEDER_VOLTAGE = 8;
+    }
+
+    public static class Vision {
+        public static final String[] CAMERA_NAMES = {"Urjith Mishra", "Limelight B", "Limelight C"};
+        public static Transform3d ROBOT_TO_CAM = new Transform3d();
     }
 }
