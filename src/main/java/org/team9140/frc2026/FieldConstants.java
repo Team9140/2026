@@ -70,6 +70,17 @@ public class FieldConstants {
                 new Rotation2d(0));
     }
 
+    public static class Trench {
+        public static final double BLUE_TRENCH_X1 = 4.028694;
+        public static final double BLUE_TRENCH_X2 = 5.222494;
+
+        public static final double RED_TRENCH_X1 = FIELD_LENGTH - 5.222494;
+        public static final double RED_TRENCH_X2 = FIELD_LENGTH - 4.028694;
+
+        public static final double TRENCH_DOWN = 1.287018;
+        public static final double TRENCH_UP = FIELD_WIDTH - 1.287018;
+    }
+
     public static class Lines {
         public static final double BLUE_ALLIANCE_ZONE = AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(26).get()
                 .getX();
