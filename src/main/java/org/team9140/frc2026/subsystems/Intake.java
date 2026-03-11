@@ -150,23 +150,19 @@ public class Intake extends SubsystemBase {
     }
 
     public Command off() {
-        return this.runOnce(() -> {
-            setRollerSpeed(Constants.Intake.INTAKE_OFF);
-        })
+        return this.setRollerSpeed(Constants.Intake.INTAKE_OFF)
                 .withName("Set Intake Arm Roller Speed to Off");
     }
 
     public Command intake() {
-        return this.armOut().andThen(this.runOnce(() -> {
-            setRollerSpeed(Constants.Intake.INTAKE_VOLTAGE);
-        }))
+        return this.armOut().andThen(
+                setRollerSpeed(Constants.Intake.INTAKE_VOLTAGE))
                 .withName("Intake");
     }
 
     public Command reverse() {
-        return this.armOut().andThen(this.runOnce(() -> {
-            setRollerSpeed(-Constants.Intake.INTAKE_VOLTAGE);
-        }))
+        return this.armOut().andThen(
+                setRollerSpeed(-Constants.Intake.INTAKE_VOLTAGE))
                 .withName("Reverse intake");
     }
 
@@ -211,6 +207,8 @@ public class Intake extends SubsystemBase {
     private void updateSimState(double t, double volts) {
         double extendVolts = this.extendMotor.getSimState().getMotorVoltage();
         SmartDashboard.putNumber("extend volts", extendVolts);
+        double rollerVolts = this.rollerMotor.getSimState().getMotorVoltage();
+        SmartDashboard.putNumber("roller volts", rollerVolts);
         this.extensionSim.setInputVoltage(extendVolts);
         this.extensionSim.update(t);
 
