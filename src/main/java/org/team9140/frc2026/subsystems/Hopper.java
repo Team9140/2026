@@ -48,6 +48,8 @@ public class Hopper extends SubsystemBase{
 
         this.spinnerMotor.getConfigurator().apply(spinnerMotorConfigs);
         this.feederMotor.getConfigurator().apply(feederMotorConfigs);
+
+        this.setDefaultCommand(off());
     }
 
     public static Hopper getInstance() {
@@ -61,12 +63,12 @@ public class Hopper extends SubsystemBase{
     }
 
     public Command feed() {
-        return this.setSpeeds(Constants.Hopper.SPINNER_VOLTAGE, Constants.Hopper.FEEDER_VOLTAGE)
+        return this.setSpeeds(Constants.Hopper.SPINNER_VOLTAGE, Constants.Hopper.FEEDER_VOLTAGE).andThen(this.run(()->{}))
                 .withName("Hopper Feeder");
     }
 
     public Command unjam() {
-        return this.setSpeeds(-Constants.Hopper.SPINNER_VOLTAGE, -Constants.Hopper.FEEDER_VOLTAGE)
+        return this.setSpeeds(-Constants.Hopper.SPINNER_VOLTAGE, -Constants.Hopper.FEEDER_VOLTAGE).andThen(this.run(()->{}))
                 .withName("Unjam Hopper");
     }
 

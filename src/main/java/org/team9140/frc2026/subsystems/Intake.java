@@ -92,6 +92,8 @@ public class Intake extends SubsystemBase {
         if (Utils.isSimulation()) {
             startSimThread();
         }
+
+        this.setDefaultCommand(off());
     }
 
     public static Intake getInstance() {
