@@ -32,8 +32,9 @@ public class RobotContainer {
 
   private void configureBindings() {
     SmartDashboard.putNumber("RPM", 2500);
-    this.controller.rightBumper().whileTrue(this.intake.intake());
-    this.controller.leftBumper().whileTrue(this.intake.reverse().alongWith(this.hopper.unjam()));
+    this.controller.rightBumper().onTrue(this.intake.intake()).onFalse(this.intake.off());
+    this.controller.a().onTrue(this.intake.reverse().alongWith(this.hopper.unjam()))
+        .onFalse(this.intake.off().alongWith(this.hopper.off()));
     this.controller.a().whileTrue(this.shooter.tuningSpeed(() -> SmartDashboard.getNumber("RPM", 3500)));
     this.controller.x().onTrue(this.shooter.idle());
     this.controller.rightTrigger().onTrue(this.hopper.feed()).onFalse(this.hopper.off());
