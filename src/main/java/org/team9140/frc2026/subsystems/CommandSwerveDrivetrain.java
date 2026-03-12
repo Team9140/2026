@@ -57,8 +57,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(Constants.Drive.MIN_TELEOP_VELOCITY)
             .withRotationalDeadband(Constants.Drive.MIN_TELEOP_ROTATION)
-            .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
-            .withDriveRequestType(DriveRequestType.Velocity);
+            .withSteerRequestType(SwerveModule.SteerRequestType.Position)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
