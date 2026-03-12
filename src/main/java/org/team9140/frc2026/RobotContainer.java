@@ -43,17 +43,21 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    SmartDashboard.putNumber("RPM", 2500);
     this.controller.rightBumper().onTrue(this.intake.intake()).onFalse(this.intake.off());
     this.controller.a().onTrue(this.intake.reverse().alongWith(this.hopper.unjam()))
         .onFalse(this.intake.off().alongWith(this.hopper.off()));
+    SmartDashboard.putNumber("RPM", 2750);
+    // this.controller.leftBumper().onTrue(this.intake.armIn());
+    // this.controller.rightBumper().onTrue(this.intake.armOut());
+    // this.controller.rightBumper().whileTrue(this.intake.intake());
+    // this.controller.leftBumper().whileTrue(this.intake.reverse().alongWith(this.hopper.unjam()));
     this.controller.a().whileTrue(this.shooter.tuningSpeed(() -> SmartDashboard.getNumber("RPM", 3500)));
-    this.controller.x().onTrue(this.shooter.idle());
+    // this.controller.x().onTrue(this.shooter.idle());
     this.controller.rightTrigger().onTrue(this.hopper.feed()).onFalse(this.hopper.off());
     this.controller.back().whileTrue(this.shooter.manualLeft());
     this.controller.start().whileTrue(this.shooter.manualRight());
-    this.controller.y().onTrue(this.climber.extend());
-    this.controller.b().onTrue(this.climber.retract());
+    // this.controller.y().onTrue(this.climber.extend());
+    // this.controller.b().onTrue(this.climber.retract());
 
     drivetrain.setDefaultCommand(
         drivetrain.teleopDrive(controller::getLeftX, controller::getLeftY,

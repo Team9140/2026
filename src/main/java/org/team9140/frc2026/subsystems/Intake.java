@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
@@ -78,13 +79,19 @@ public class Intake extends SubsystemBase {
                 .withCurrentLimits(rollerCurrentLimits)
                 .withMotorOutput(spinMotorOutputConfigs);
 
+        TorqueCurrentConfigs extendTorqueCurrentConfigs = new TorqueCurrentConfigs()
+        .withPeakForwardTorqueCurrent(Constants.Intake.EXTEND_STATOR_CURRENT_LIMIT)
+        .withPeakReverseTorqueCurrent(-Constants.Intake.EXTEND_STATOR_CURRENT_LIMIT)
+        .withTorqueNeutralDeadband(1.0);
+
         TalonFXConfiguration extendMotorConfigs = new TalonFXConfiguration()
                 .withCurrentLimits(extendCurrentLimits)
                 .withMotorOutput(extendMotorOutputConfigs)
                 .withMotionMagic(motionMagicConfigs)
                 .withSoftwareLimitSwitch(softwareLimitSwitchConfigs)
                 .withSlot0(new Slot0Configs().withKP(Constants.Intake.EXTEND_KP))
-                .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(Constants.Intake.EXTENSION_GEAR_RATIO));
+                .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(Constants.Intake.EXTENSION_GEAR_RATIO))
+                .withTorqueCurrent(extendTorqueCurrentConfigs);
 
         this.rollerMotor.getConfigurator().apply(spinMotorConfigs);
         this.extendMotor.getConfigurator().apply(extendMotorConfigs);
@@ -101,6 +108,7 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         this.extendMotor.getPosition().refresh();
+        SmartDashboard.putNumber("INT_position", this.getPosition());
     }
 
     double targetPosition = 0;

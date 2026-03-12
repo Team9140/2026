@@ -3,12 +3,19 @@ package org.team9140.frc2026.subsystems;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import com.ctre.phoenix6.configs.*;
 import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
@@ -18,6 +25,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -59,22 +67,57 @@ public class Shooter extends SubsystemBase {
     }
 
     private Shooter() {
-        MotionMagicConfigs yawMMConfigs = new MotionMagicConfigs()
-                .withMotionMagicAcceleration(Constants.Shooter.YAW_ACCELERATION)
-                .withMotionMagicCruiseVelocity(Constants.Shooter.YAW_CRUISE_VELOCITY);
+        // START TURRET CONFIG
 
-        Slot0Configs yawSlot0Configs = new Slot0Configs()
-                .withKS(Constants.Shooter.YAW_KS)
-                .withKV(Constants.Shooter.YAW_KV)
-                .withKA(Constants.Shooter.YAW_KA)
-                .withKP(Constants.Shooter.YAW_KP)
-                .withKI(Constants.Shooter.YAW_KI)
-                .withKD(Constants.Shooter.YAW_KD);
+        MotionMagicConfigs turretMotionMagicConfig = new MotionMagicConfigs()
+                .withMotionMagicAcceleration(Constants.Turret.MM_ACCELERATION)
+                .withMotionMagicCruiseVelocity(Constants.Turret.MM_CRUISE_VELOCITY);
 
-        MotorOutputConfigs yawMotorOutputConfigs = new MotorOutputConfigs()
-                .withInverted(InvertedValue.CounterClockwise_Positive);
+        Slot0Configs turretSlot0Configs = new Slot0Configs()
+                .withKS(Constants.Turret.KS)
+                .withKV(Constants.Turret.KV)
+                .withKA(Constants.Turret.KA)
+                .withKP(Constants.Turret.KP)
+                .withKI(Constants.Turret.KI)
+                .withKD(Constants.Turret.KD);
+
+        MotorOutputConfigs turretMotorOutputConfigs = new MotorOutputConfigs()
+                .withInverted(InvertedValue.CounterClockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Brake);
+
+        TorqueCurrentConfigs turretTorqueCurrentConfigs = new TorqueCurrentConfigs()
+                .withPeakForwardTorqueCurrent(Constants.Turret.STATOR_CURRENT_LIMIT)
+                .withPeakReverseTorqueCurrent(-Constants.Turret.STATOR_CURRENT_LIMIT);
+
+        CurrentLimitsConfigs turretCurrentLimitsConfigs = new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(Constants.Turret.STATOR_CURRENT_LIMIT)
+                .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(Constants.Turret.SUPPLY_CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true);
+
+        SoftwareLimitSwitchConfigs turretSoftwareLimitSwitchConfigs = new SoftwareLimitSwitchConfigs()
+                .withForwardSoftLimitThreshold(Constants.Turret.FORWARD_SOFT_LIMIT_THRESHOLD)
+                .withForwardSoftLimitEnable(true)
+                .withReverseSoftLimitThreshold(Constants.Turret.REVERSE_SOFT_LIMIT_THRESHOLD)
+                .withReverseSoftLimitEnable(true);
+
+        FeedbackConfigs turretFeedbackConfigs = new FeedbackConfigs()
+                .withSensorToMechanismRatio(Constants.Turret.GEAR_RATIO);
 
         yawMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
+
+        TalonFXConfiguration yawConfig = new TalonFXConfiguration()
+                .withMotionMagic(turretMotionMagicConfig)
+                .withSlot0(turretSlot0Configs)
+                .withMotorOutput(turretMotorOutputConfigs)
+                .withCurrentLimits(turretCurrentLimitsConfigs)
+                .withTorqueCurrent(turretTorqueCurrentConfigs)
+                .withSoftwareLimitSwitch(turretSoftwareLimitSwitchConfigs)
+                .withFeedback(turretFeedbackConfigs);
+
+        // END TURRET CONFIG
+
+        // START FLYWHEEL CONFIG
 
         Slot0Configs shooterSlot0Configs = new Slot0Configs()
                 .withKS(Constants.Shooter.SHOOTER_KS)
@@ -93,23 +136,11 @@ public class Shooter extends SubsystemBase {
                 .withPeakForwardTorqueCurrent(Constants.Shooter.PEAK_FORWARD_TORQUE)
                 .withPeakReverseTorqueCurrent(0.0);
 
-        SoftwareLimitSwitchConfigs yawSoftwareLimitSwitchConfigs = new SoftwareLimitSwitchConfigs()
-                .withForwardSoftLimitThreshold(Constants.Shooter.FORWARD_SOFT_LIMIT_THRESHOLD)
-                .withForwardSoftLimitEnable(true)
-                .withReverseSoftLimitThreshold(Constants.Shooter.REVERSE_SOFT_LIMIT_THRESHOLD)
-                .withReverseSoftLimitEnable(true);
-
         CurrentLimitsConfigs shooterCurrentLimits = new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(80)
                 .withStatorCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(40)
                 .withSupplyCurrentLimitEnable(true);
-
-        TalonFXConfiguration yawConfig = new TalonFXConfiguration()
-                .withMotionMagic(yawMMConfigs)
-                .withSlot0(yawSlot0Configs)
-                .withMotorOutput(yawMotorOutputConfigs)
-                .withSoftwareLimitSwitch(yawSoftwareLimitSwitchConfigs);
 
         TalonFXConfiguration shooterConfig = new TalonFXConfiguration()
                 .withSlot0(shooterSlot0Configs)
@@ -146,8 +177,9 @@ public class Shooter extends SubsystemBase {
             this.isManual = true;
             this.shooterMotor.setControl(new VoltageOut(12.0));
             this.yawMotor.setControl(new VoltageOut(
-                    left ? Constants.Shooter.ADJUST_VOLTAGE : -Constants.Shooter.ADJUST_VOLTAGE));
-        }).andThen(this.run(() -> {})).finallyDo(() -> {
+                    left ? Constants.Turret.ADJUST_VOLTAGE : -Constants.Turret.ADJUST_VOLTAGE));
+        }).andThen(this.run(() -> {
+        })).finallyDo(() -> {
             this.yawMotor.setControl(new StaticBrake());
         }).withName("Adjust Manually");
     }
@@ -197,13 +229,14 @@ public class Shooter extends SubsystemBase {
             // point turret forward / starting orientation / whatever
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
             this.shooterMotor.setControl(new VoltageOut(Constants.Shooter.IDLE_VOLTAGE));
-        }).andThen(this.run(() -> {})).withName("Idle");
+        }).andThen(this.run(() -> {
+        })).withName("Idle");
     }
 
     // make this default command
     public Command off() {
         return this.runOnce(() -> {
-            if (this.isManual) 
+            if (this.isManual)
                 return;
             this.shooterMotor.setControl(new CoastOut());
             this.yawMotor.setControl(new StaticBrake());

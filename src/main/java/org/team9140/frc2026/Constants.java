@@ -13,15 +13,16 @@ import edu.wpi.first.math.util.Units;
 public class Constants {
     public static class Ports {
         public static final CANBus CANIVORE = new CANBus("poop", "./logs/example.hoot");
-        public static final int YAW_MOTOR = 9;
-        public static final int PITCH_MOTOR = 10;
-        public static final int SHOOTER_MOTOR = 11;
-        public static final int INTAKE_SPIN_MOTOR = 12;
-        public static final int INTAKE_EXTEND_MOTOR = 13;
-        public static final int CLIMBER_MOTOR = 14;
-        public static final int HOPPER_SPINNER_MOTOR = 15;
-        public static final int HOPPER_FEEDER_MOTOR = 16;
+        public static final int YAW_MOTOR = 12;
+        public static final int PITCH_MOTOR = 0;
+        public static final int SHOOTER_MOTOR = 16;
         public static final int SHOOTER_FOLLOWER_MOTOR = 17;
+        public static final int INTAKE_SPIN_MOTOR = 24;
+        public static final int INTAKE_EXTEND_MOTOR = 9;
+        public static final int CLIMBER_MOTOR = 14;
+        public static final int HOPPER_SPINNER_MOTOR = 10;
+        public static final int HOPPER_FEEDER_MOTOR = 13;
+
     }
 
     public static class Cantdle {
@@ -111,30 +112,30 @@ public class Constants {
     }
 
     public static class Intake {
-        public static final double INTAKE_VOLTAGE = 10.0;
-        public static final double INTAKE_OFF = 0.0;
-
-        public static final double ROLLER_STATOR_CURRENT_LIMIT = 80.0;
-        public static final double EXTEND_STATOR_CURRENT_LIMIT = 80.0;
-
-        public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 40.0;
-        public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 40.0;
-
-        public static final double MOTION_MAGIC_CRUISE_VELOCITY = 10;
-        public static final double MOTION_MAGIC_ACCELERATION = 20;
-        public static final double EXTEND_KP = 0.5;
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 100;
-        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
-
-        public static final double ARM_IN_POSITION = 0;
-        public static final double ARM_OUT_POSITION = Units.inchesToMeters(12);
-
-        public static final double EXTENSION_GEAR_RATIO = 6;
+        public static final double EXTENSION_GEAR_RATIO = 50.0 / 11.0;
         public static final double TOLERANCE = Units.inchesToMeters(0.5);
 
         public static final int PINION_TEETH = 10;
         public static final double PINION_DP = 10;
         public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
+        public static final double INTAKE_VOLTAGE = 10.0;
+        public static final double INTAKE_OFF = 0.0;
+
+        public static final double ROLLER_STATOR_CURRENT_LIMIT = 80.0;
+        public static final double EXTEND_STATOR_CURRENT_LIMIT = 10.0;
+
+        public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 40.0;
+        public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 40.0;
+
+        public static final double MOTION_MAGIC_CRUISE_VELOCITY = 64;
+        public static final double MOTION_MAGIC_ACCELERATION = 64;
+        public static final double EXTEND_KP = 500;
+
+        public static final double ARM_IN_POSITION = 0.0;
+        public static final double ARM_OUT_POSITION = 0.305;
+
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = ARM_OUT_POSITION / PINION_CIRCUMFERENCE;
+        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
 
         public static final double MIN_HEIGHT = ARM_IN_POSITION;
         public static final double MAX_HEIGHT = ARM_OUT_POSITION;
@@ -152,8 +153,29 @@ public class Constants {
         public static final double SPINNER_SUPPLY_CURRENT_LIMIT = 40;
         public static final double FEEDER_SUPPLY_CURRENT_LIMIT = 40;
 
-        public static final double SPINNER_VOLTAGE = 8;
-        public static final double FEEDER_VOLTAGE = 8;
+        public static final double SPINNER_VOLTAGE = 12;
+
+        public static final double FEEDER_VOLTAGE = 12;
+    }
+
+    public static class Turret {
+        public static final double STATOR_CURRENT_LIMIT = 60.0;
+        public static final double SUPPLY_CURRENT_LIMIT = 40.0;
+
+        public static final double MM_ACCELERATION = 12;
+        public static final double MM_CRUISE_VELOCITY = 8;
+
+        public static final double KS = 0;
+        public static final double KV = 0;
+        public static final double KA = 0;
+        public static final double KP = 1000;
+        public static final double KI = 0;
+        public static final double KD = 50;
+
+        public static final double ADJUST_VOLTAGE = 2.0;
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.5;
+        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -0.5;
+        public static final double GEAR_RATIO = 98.0 / 10.0 * 50.0 / 11.0;
     }
 
     public static class Vision {
