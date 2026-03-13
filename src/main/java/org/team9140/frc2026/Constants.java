@@ -7,6 +7,8 @@ import org.team9140.frc2026.generated.TunerConstants;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.RGBWColor;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 
@@ -162,6 +164,7 @@ public class Constants {
         public static final double GEAR_RATIO = 98.0 / 10.0 * 50.0 / 11.0;
 
         public static final double OVERTURN_LOOKAHEAD_TIME = 1.5;
+        public static final Transform2d POSITION_TO_ROBOT = new Transform2d(-0.15, 0.2, new Rotation2d());
     }
 
     public static class Vision {

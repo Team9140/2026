@@ -42,12 +42,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -206,21 +201,21 @@ public class Shooter extends SubsystemBase {
         return this.run(() -> {
             if (this.isManual)
                 return;
-            Pose2d chassisPose = chassisStateSupplier.get().Pose;
-            Translation2d targetPose = AimAlign.getZone(chassisPose).getTranslation();
+            Pose2d turretPose = chassisStateSupplier.get().Pose.plus(Constants.Turret.POSITION_TO_ROBOT);
+            Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
-                    AimAlign.getRequiredSpeed(chassisPose, targetPose)));
+                    AimAlign.getRequiredSpeed(turretPose, targetPose)));
             this.yawMotor.setControl(yawMotorControl.withPosition(
-                    AimAlign.yawAngleToPos(chassisPose, targetPose) / (2.0 * Math.PI)));
+                    AimAlign.yawAngleToPos(turretPose, targetPose) / (2.0 * Math.PI)));
         }).withName("Continuously Aim Automatically");
     }
 
     public Command shoot(Supplier<SwerveDriveState> chassisStateSupplier) {
         return this.run(() -> {
-            Pose2d chassisPose = chassisStateSupplier.get().Pose;
-            Translation2d targetPose = AimAlign.getZone(chassisPose).getTranslation();
+            Pose2d turretPose = chassisStateSupplier.get().Pose.plus(Constants.Turret.POSITION_TO_ROBOT);
+            Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
-                    AimAlign.getRequiredSpeed(chassisPose, targetPose)));
+                    AimAlign.getRequiredSpeed(turretPose, targetPose)));
         }).withName("Shoot without aiming");
     }
 
