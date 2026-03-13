@@ -13,6 +13,7 @@ import org.team9140.frc2026.subsystems.Shooter;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
@@ -68,6 +69,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoRoutines.getCommand();
+    return autoRoutines.getCommand().finallyDo((interrupted) -> CommandScheduler.getInstance().schedule(hopper.off().andThen(shooter.off())));
   }
 }

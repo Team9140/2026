@@ -243,7 +243,8 @@ public class Shooter extends SubsystemBase {
 
     public Command tuningSpeed(DoubleSupplier RPM) {
         return this.runOnce(() -> {
-            shooterFollower.setControl(
+            this.yawMotor.setControl(yawMotorControl.withPosition(0));
+            this.shooterFollower.setControl(
                     new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Aligned));
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(RPM.getAsDouble() / 60.0));
         }).andThen(this.run(() -> {

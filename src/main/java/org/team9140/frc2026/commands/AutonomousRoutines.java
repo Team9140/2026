@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.team9140.frc2026.FieldConstants;
+import org.team9140.frc2026.Robot;
 import org.team9140.frc2026.subsystems.Climber;
 import org.team9140.frc2026.subsystems.CommandSwerveDrivetrain;
 import org.team9140.frc2026.subsystems.Hopper;
@@ -57,8 +58,7 @@ public class AutonomousRoutines {
 
     private Command getShootCommand() {
         return shooter.aim(() -> this.drivetrain.getState())
-                .until(shooter.yawIsAtPosition.and(shooter.shooterIsAtVelocity)).andThen(hopper.feed())
-                .andThen(new WaitCommand(3)).andThen(hopper.off()).andThen(shooter.idle());
+                .until(shooter.yawIsAtPosition.and(shooter.shooterIsAtVelocity)).andThen(hopper.feed());
     }
 
     public Command getCommand() {
@@ -124,10 +124,11 @@ public class AutonomousRoutines {
         }
     }
 
+    // this one is good
     public Command sweepMiddleFromRight() {
         FollowPath path = new FollowPath("crossandsweep_Blue_Right", () -> this.drivetrain.getState().Pose,
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
-        drivetrain.resetPose(path.getInitialPose());
+        if (Robot.isSimulation()) drivetrain.resetPose(path.getInitialPose());
         bindEventCommands(path);
         return path.gimmeCommand();
     }
@@ -135,7 +136,7 @@ public class AutonomousRoutines {
     public Command sweepMiddleFromLeft() {
         FollowPath path = new FollowPath("crossandsweep_Blue_Left", () -> this.drivetrain.getState().Pose,
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
-        drivetrain.resetPose(path.getInitialPose());
+        if (Robot.isSimulation()) drivetrain.resetPose(path.getInitialPose());
         bindEventCommands(path);
         return path.gimmeCommand();
     }
