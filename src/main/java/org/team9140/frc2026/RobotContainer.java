@@ -25,6 +25,7 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final SwerveTelemetry logger = new SwerveTelemetry(drivetrain, Constants.Drive.MAX_TELEOP_VELOCITY);
   private final AutonomousRoutines autoRoutines;
+  private final Command driveCommand;
 
   private final Vision limeA = new Vision(Constants.Vision.CAMERA_NAMES[0], this.drivetrain::acceptVisionMeasurement,
       Constants.Vision.ROBOT_TO_CAM[0]);
@@ -34,10 +35,12 @@ public class RobotContainer {
   public RobotContainer() {
     limeA.setIMUMode(1);
     limeB.setIMUMode(1);
+    driveCommand = drivetrain.teleopDrive(controller::getLeftX, controller::getLeftY,
+            controller::getRightX);
 
     configureBindings();
 
-    limeA.start();
+    // limeA.start();
     limeB.start();
     
     autoRoutines = AutonomousRoutines.getInstance(drivetrain);
@@ -59,9 +62,7 @@ public class RobotContainer {
         .onFalse(this.hopper.off());
     this.controller.back().whileTrue(this.shooter.manualLeft());
     this.controller.start().whileTrue(this.shooter.manualRight());
-    drivetrain.setDefaultCommand(
-        drivetrain.teleopDrive(controller::getLeftX, controller::getLeftY,
-            controller::getRightX));
+    drivetrain.setDefaultCommand(driveCommand);
 
     this.drivetrain.registerTelemetry(logger::telemeterize);
   }
