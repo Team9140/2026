@@ -47,8 +47,8 @@ public class AutonomousRoutines {
         autoChooser.addOption("Shoot Preload", "preload");
         autoChooser.addOption("Climb Left", "climb_left");
         autoChooser.addOption("Climb Right", "climb_right");
-        autoChooser.addOption("Sweep Middle From Left", "sweep_middle_left");
-        autoChooser.addOption("Sweep Middle From Right", "sweep_middle_right");
+        autoChooser.addOption("Sweep Middle From Depot", "sweep_middle_left");
+        autoChooser.addOption("Sweep Middle From Outpost", "sweep_middle_right");
         SmartDashboard.putData(autoChooser);
         namedCommands.put("shoot",
                 shooter.aim(() -> this.drivetrain.getState())
@@ -126,7 +126,7 @@ public class AutonomousRoutines {
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
         bindEventCommands(path);
         drivetrain.resetPose(path.getInitialPose());
-        return path.gimmeCommand();
+        return namedCommands.get("shoot").andThen(path.gimmeCommand());
     }
 
     public Command sweepMiddleFromLeft() {
@@ -134,6 +134,6 @@ public class AutonomousRoutines {
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
         bindEventCommands(path);
         drivetrain.resetPose(path.getInitialPose());
-        return path.gimmeCommand();
+        return namedCommands.get("shoot").andThen(path.gimmeCommand());
     }
 }
