@@ -70,22 +70,6 @@ public class Constants {
         public static final double SHOOTER_KP = 100;
         public static final double SHOOTER_KI = 0;
         public static final double SHOOTER_KD = 0;
-
-        public static final double YAW_ACCELERATION = 0;
-        public static final double YAW_CRUISE_VELOCITY = 0;
-
-        public static final double YAW_KS = 0;
-        public static final double YAW_KV = 0;
-        public static final double YAW_KA = 0;
-        public static final double YAW_KP = 0;
-        public static final double YAW_KI = 0;
-        public static final double YAW_KD = 0;
-
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.25;
-        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -0.25;
-
-        public static final double ADJUST_VOLTAGE = 2.0;
-        public static final double OVERTURN_LOOKAHEAD_TIME = 2.0;
     }
 
     public static class Climber {
@@ -118,14 +102,14 @@ public class Constants {
         public static final int PINION_TEETH = 10;
         public static final double PINION_DP = 10;
         public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
-        public static final double INTAKE_VOLTAGE = 10.0;
+        public static final double INTAKE_VOLTAGE = 12.0;
         public static final double INTAKE_OFF = 0.0;
 
         public static final double ROLLER_STATOR_CURRENT_LIMIT = 80.0;
-        public static final double EXTEND_STATOR_CURRENT_LIMIT = 10.0;
+        public static final double EXTEND_STATOR_CURRENT_LIMIT = 30.0;
 
         public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 40.0;
-        public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 40.0;
+        public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 60.0;
 
         public static final double MOTION_MAGIC_CRUISE_VELOCITY = 64;
         public static final double MOTION_MAGIC_ACCELERATION = 64;
@@ -173,13 +157,15 @@ public class Constants {
         public static final double KD = 50;
 
         public static final double ADJUST_VOLTAGE = 2.0;
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.5;
-        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -0.5;
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.25; // rot
+        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -0.25; // rot
         public static final double GEAR_RATIO = 98.0 / 10.0 * 50.0 / 11.0;
+
+        public static final double OVERTURN_LOOKAHEAD_TIME = 1.5;
     }
 
     public static class Vision {
         public static final String[] CAMERA_NAMES = {"limelight-a", "limelight-b"};
-        public static Transform3d[] ROBOT_TO_CAM = {new Transform3d(), new Transform3d()};
+        public static Transform3d[] ROBOT_TO_CAM = {null, null};
     }
 }

@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import org.team9140.lib.Util;
 
+import com.ctre.phoenix6.SignalLogger;
+
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
@@ -17,6 +19,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+    SignalLogger.enableAutoLogging(false);
   }
 
   @Override

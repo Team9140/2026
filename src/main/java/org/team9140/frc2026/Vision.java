@@ -52,7 +52,11 @@ public class Vision {
         this.cameraName = camera_name;
         this.estConsumer = estConsumer;
 
-        LimelightHelpers.setCameraPose_RobotSpace(this.cameraName, robotToCamera.getX(), robotToCamera.getY(), robotToCamera.getZ(), Units.radiansToDegrees(robotToCamera.getRotation().getX()), Units.radiansToDegrees(robotToCamera.getRotation().getY()), Units.radiansToDegrees(robotToCamera.getRotation().getZ()));
+        if (robotToCamera != null)
+            LimelightHelpers.setCameraPose_RobotSpace(this.cameraName, robotToCamera.getX(), robotToCamera.getY(),
+                    robotToCamera.getZ(), Units.radiansToDegrees(robotToCamera.getRotation().getX()),
+                    Units.radiansToDegrees(robotToCamera.getRotation().getY()),
+                    Units.radiansToDegrees(robotToCamera.getRotation().getZ()));
     }
 
     private class Listener implements TableEventListener {
@@ -98,6 +102,7 @@ public class Vision {
         if (m_listenerID < 0) {
             m_listenerID = NetworkTableInstance.getDefault().getTable(this.cameraName).addListener("json",
                     EnumSet.of(Kind.kValueAll), new Listener());
+            System.out.println("new listener ID" + m_listenerID);
         }
     }
 }

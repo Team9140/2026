@@ -6,7 +6,6 @@ package org.team9140.frc2026;
 
 import org.team9140.frc2026.commands.AutonomousRoutines;
 import org.team9140.frc2026.generated.TunerConstants;
-import org.team9140.frc2026.subsystems.Climber;
 import org.team9140.frc2026.subsystems.CommandSwerveDrivetrain;
 import org.team9140.frc2026.subsystems.Hopper;
 import org.team9140.frc2026.subsystems.Intake;
@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-  private final Climber climber = Climber.getInstance();
+  // private final Climber climber = Climber.getInstance();
   private final Hopper hopper = Hopper.getInstance();
   private final Intake intake = Intake.getInstance();
   private final Shooter shooter = Shooter.getInstance();
@@ -27,8 +26,10 @@ public class RobotContainer {
   private final SwerveTelemetry logger = new SwerveTelemetry(drivetrain, Constants.Drive.MAX_TELEOP_VELOCITY);
   private final AutonomousRoutines autoRoutines;
 
-  private final Vision limeA = new Vision(Constants.Vision.CAMERA_NAMES[0], this.drivetrain::acceptVisionMeasurement, Constants.Vision.ROBOT_TO_CAM[0]);
-  private final Vision limeB = new Vision(Constants.Vision.CAMERA_NAMES[1], this.drivetrain::acceptVisionMeasurement, Constants.Vision.ROBOT_TO_CAM[1]);
+  private final Vision limeA = new Vision(Constants.Vision.CAMERA_NAMES[0], this.drivetrain::acceptVisionMeasurement,
+      Constants.Vision.ROBOT_TO_CAM[0]);
+  private final Vision limeB = new Vision(Constants.Vision.CAMERA_NAMES[1], this.drivetrain::acceptVisionMeasurement,
+      Constants.Vision.ROBOT_TO_CAM[1]);
 
   public RobotContainer() {
     limeA.setIMUMode(1);
@@ -43,25 +44,24 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    this.controller.rightBumper().onTrue(this.intake.intake()).onFalse(this.intake.off());
-    this.controller.a().onTrue(this.intake.reverse().alongWith(this.hopper.unjam()))
+    SmartDashboard.putNumber("tuning RPM", 2500);
+    this.controller.rightBumper()
+        .onTrue(this.intake.intake())
+        .onFalse(this.intake.off());
+    this.controller.leftBumper()
+        .onTrue(this.intake.reverse().alongWith(this.hopper.unjam()))
         .onFalse(this.intake.off().alongWith(this.hopper.off()));
-    SmartDashboard.putNumber("RPM", 2750);
-    // this.controller.leftBumper().onTrue(this.intake.armIn());
-    // this.controller.rightBumper().onTrue(this.intake.armOut());
-    // this.controller.rightBumper().whileTrue(this.intake.intake());
-    // this.controller.leftBumper().whileTrue(this.intake.reverse().alongWith(this.hopper.unjam()));
-    this.controller.a().whileTrue(this.shooter.tuningSpeed(() -> SmartDashboard.getNumber("RPM", 3500)));
-    // this.controller.x().onTrue(this.shooter.idle());
-    this.controller.rightTrigger().onTrue(this.hopper.feed()).onFalse(this.hopper.off());
+    this.controller.y().onTrue(this.shooter.tuningSpeed(() -> SmartDashboard.getNumber("tuning RPM", 3500)));
+    this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getState));
+    this.controller.x().onTrue(this.shooter.off());
+    this.controller.rightTrigger()
+        .onTrue(this.hopper.feed())
+        .onFalse(this.hopper.off());
     this.controller.back().whileTrue(this.shooter.manualLeft());
     this.controller.start().whileTrue(this.shooter.manualRight());
-    // this.controller.y().onTrue(this.climber.extend());
-    // this.controller.b().onTrue(this.climber.retract());
-
     drivetrain.setDefaultCommand(
         drivetrain.teleopDrive(controller::getLeftX, controller::getLeftY,
-            controller::getRightX).ignoringDisable(true));
+            controller::getRightX));
 
     this.drivetrain.registerTelemetry(logger::telemeterize);
   }

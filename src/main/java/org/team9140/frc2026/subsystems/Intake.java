@@ -109,6 +109,7 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         this.extendMotor.getPosition().refresh();
         SmartDashboard.putNumber("INT_position", this.getPosition());
+        SmartDashboard.putNumber("INT_roller", this.rollerMotor.getMotorVoltage().getValueAsDouble());
     }
 
     double targetPosition = 0;
@@ -152,25 +153,25 @@ public class Intake extends SubsystemBase {
                 .withName("Set Intake position to Arm Out");
     }
 
-    public Command setRollerSpeed(double speed) {
-        return this.runOnce(() -> rollerMotor.set(speed))
+    public Command setRollerVolts(double speed) {
+        return this.runOnce(() -> rollerMotor.setVoltage(speed))
                 .withName("Set Intake Arm Roller Speed");
     }
 
     public Command off() {
-        return this.setRollerSpeed(Constants.Intake.INTAKE_OFF)
+        return this.setRollerVolts(Constants.Intake.INTAKE_OFF)
                 .withName("Set Intake Arm Roller Speed to Off");
     }
 
     public Command intake() {
         return this.armOut().andThen(
-                setRollerSpeed(Constants.Intake.INTAKE_VOLTAGE))
+                setRollerVolts(Constants.Intake.INTAKE_VOLTAGE))
                 .withName("Intake");
     }
 
     public Command reverse() {
         return this.armOut().andThen(
-                setRollerSpeed(-Constants.Intake.INTAKE_VOLTAGE))
+                setRollerVolts(-Constants.Intake.INTAKE_VOLTAGE))
                 .withName("Reverse intake");
     }
 
