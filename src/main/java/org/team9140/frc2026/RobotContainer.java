@@ -26,20 +26,17 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final SwerveTelemetry logger = new SwerveTelemetry(drivetrain, Constants.Drive.MAX_TELEOP_VELOCITY);
 
-  private final Vision limeA = new Vision(Constants.Vision.CAMERA_NAMES[0], this.drivetrain::acceptVisionMeasurement, () -> this.drivetrain.getState().Pose);
-  private final Vision limeB = new Vision(Constants.Vision.CAMERA_NAMES[1], this.drivetrain::acceptVisionMeasurement, () -> this.drivetrain.getState().Pose);
-  private final Vision limeC = new Vision(Constants.Vision.CAMERA_NAMES[2], this.drivetrain::acceptVisionMeasurement, () -> this.drivetrain.getState().Pose);
+  private final Vision limeA = new Vision(Constants.Vision.CAMERA_NAMES[0], this.drivetrain::acceptVisionMeasurement, Constants.Vision.ROBOT_TO_CAM[0]);
+  private final Vision limeB = new Vision(Constants.Vision.CAMERA_NAMES[1], this.drivetrain::acceptVisionMeasurement, Constants.Vision.ROBOT_TO_CAM[1]);
 
   public RobotContainer() {
     limeA.setIMUMode(1);
     limeB.setIMUMode(1);
-    limeC.setIMUMode(1);
 
     configureBindings();
 
     limeA.start();
     limeB.start();
-    limeC.start();
   }
 
   private void configureBindings() {

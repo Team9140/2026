@@ -157,7 +157,7 @@ public class Constants {
     }
 
     public static class Vision {
-        public static final String[] CAMERA_NAMES = {"Urjith Mishra", "Limelight B", "Limelight C"};
-        public static Transform3d ROBOT_TO_CAM = new Transform3d();
+        public static final String[] CAMERA_NAMES = {"limelight-a", "limelight-b"};
+        public static Transform3d[] ROBOT_TO_CAM = {new Transform3d(), new Transform3d()};
     }
 }
