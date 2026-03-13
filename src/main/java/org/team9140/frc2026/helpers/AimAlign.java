@@ -12,19 +12,20 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AimAlign {
     private static InterpolatingDoubleTreeMap lookupMotorSpeedFromDistance = new InterpolatingDoubleTreeMap();
     private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap();
 
     static {
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(7)), Double.valueOf(2250));
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(8)), Double.valueOf(2300));
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(9)), Double.valueOf(2400));
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(10)), Double.valueOf(2500));
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(11)), Double.valueOf(2600));
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(12)), Double.valueOf(2700));
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(13)), Double.valueOf(2825));
+        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(7)), 2250.0 / 60);
+        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(8)), 2300.0 / 60);
+        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(9)),  2400.0 / 60);
+        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(10)), 2500.0 / 60);
+        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(11)), 2600.0 / 60);
+        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(12)), 2700.0 / 60);
+        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(13)), 2825.0 / 60);
 
         lookupAirtimeFromDistance.put(Double.valueOf(14.85), Double.valueOf(0.2));
         lookupMotorSpeedFromDistance.put(Double.valueOf(9.74), Double.valueOf(-0.119));
@@ -46,7 +47,9 @@ public class AimAlign {
     }
 
     public static double getRequiredSpeed(Pose2d turretPose, Translation2d effectivePose) {
-        return lookupMotorSpeedFromDistance.get(turretPose.getTranslation().minus(effectivePose).getNorm());
+        double distance = turretPose.getTranslation().minus(effectivePose).getNorm();
+        SmartDashboard.putNumber("estimatedDistance", distance);
+        return lookupMotorSpeedFromDistance.get(distance);
     }
 
     public static double yawAngleToPos(Pose2d turretPose, Translation2d endPose) {

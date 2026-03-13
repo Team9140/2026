@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.Vision;
 import org.team9140.frc2026.generated.TunerConstants.TunerSwerveDrivetrain;
-import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.frc2026.helpers.LimelightHelpers.PoseEstimate;
 import org.team9140.frc2026.helpers.LimelightHelpers.RawFiducial;
 import org.team9140.lib.Util;
@@ -354,8 +353,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 }
             }
         }
-SmartDashboard.putNumber("vision measurement T", timestamp);
-SmartDashboard.putNumber("xyStdDev", xyStdDev);
+        SmartDashboard.putNumber("vision measurement T", timestamp);
+        SmartDashboard.putNumber("xyStdDev", xyStdDev);
         this.addVisionMeasurement(measurement.pose, timestamp,
                 VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev));
     }

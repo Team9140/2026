@@ -40,7 +40,7 @@ public class RobotContainer {
 
     configureBindings();
 
-    // limeA.start();
+    limeA.start();
     limeB.start();
     
     autoRoutines = AutonomousRoutines.getInstance(drivetrain);

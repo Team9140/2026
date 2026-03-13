@@ -129,7 +129,7 @@ public class AutonomousRoutines {
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
         drivetrain.resetPose(path.getInitialPose());
         bindEventCommands(path);
-        return getShootCommand().andThen(path.gimmeCommand());
+        return path.gimmeCommand();
     }
 
     public Command sweepMiddleFromLeft() {
@@ -137,6 +137,6 @@ public class AutonomousRoutines {
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
         drivetrain.resetPose(path.getInitialPose());
         bindEventCommands(path);
-        return getShootCommand().andThen(path.gimmeCommand());
+        return path.gimmeCommand();
     }
 }
