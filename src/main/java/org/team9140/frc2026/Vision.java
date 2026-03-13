@@ -77,7 +77,7 @@ public class Vision {
         double timestamp = Utils.getCurrentTimeSeconds();
         LimelightHelpers.LimelightResults llResult = LimelightHelpers.getLatestResults(this.cameraName);
 
-        timestamp = Timer.getFPGATimestamp() - llResult.latency_capture - llResult.latency_pipeline;
+        timestamp = Timer.getFPGATimestamp() - llResult.latency_capture / 1000 - llResult.latency_pipeline / 1000;
 
         LimelightHelpers.PoseEstimate mt1 = LimelightHelpers
                 .getBotPoseEstimate_wpiBlue(this.cameraName);

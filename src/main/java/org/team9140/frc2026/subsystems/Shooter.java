@@ -202,6 +202,7 @@ public class Shooter extends SubsystemBase {
             if (this.isManual)
                 return;
             Pose2d turretPose = chassisStateSupplier.get().Pose.plus(Constants.Turret.POSITION_TO_ROBOT);
+            
             Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
                     AimAlign.getRequiredSpeed(turretPose, targetPose)));
