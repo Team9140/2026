@@ -74,8 +74,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Field2d dashField2d = new Field2d();
 
     private Pose2d targetPose = new Pose2d();
-    private final double[] targetPoseDecomposed = new double[] { 0, 0, 0 };
-    private final double[] currentPoseDecomposed = new double[] { 0, 0, 0 };
 
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
