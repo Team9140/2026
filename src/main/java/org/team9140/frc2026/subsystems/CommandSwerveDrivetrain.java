@@ -57,8 +57,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(Constants.Drive.MIN_TELEOP_VELOCITY)
             .withRotationalDeadband(Constants.Drive.MIN_TELEOP_ROTATION)
-            .withSteerRequestType(SwerveModule.SteerRequestType.Position)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+            .withSteerRequestType(SwerveModule.SteerRequestType.MotionMagicExpo)
+            .withDriveRequestType(DriveRequestType.Velocity);
 
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
@@ -300,6 +300,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void acceptVisionMeasurement(Vision.EstimateType kind, double timestamp, PoseEstimate measurement) {
+        SmartDashboard.putNumber("vision measurement T", timestamp);
         double xyStdDev = 9999;
         double thetaStdDev = 9999;
         boolean reject = false;
@@ -326,20 +327,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         if (DriverStation.isEnabled()) {
-            // if (vm.kind.equals(VisionMeasurement.Kind.MT2)) {
-                // if (vm.measurement.tagCount >= 2 && vm.measurement.avgTagArea >= 1.0) {
-                // xyStdDev = 0.1;
-                // } else if (vm.measurement.tagCount >= 2 && vm.measurement.avgTagArea >= 0.5)
-                // {
-                // xyStdDev = 0.25;
-                // } else if (vm.measurement.tagCount >= 2) {
-                // xyStdDev = 0.5;
-                // } else if (Math.abs(speeds.vxMetersPerSecond) +
-                // Math.abs(speeds.vxMetersPerSecond) <= 0.1
-                // && vm.measurement.avgTagArea >= 2.0) {
-                // // close, stationary
-                // xyStdDev = 1.0;
-                // }
             if (kind.equals(Vision.EstimateType.MT1)) {
                 if (measurement.tagCount >= 2 && measurement.avgTagArea >= 0.25) {
                     xyStdDev = 0.5;
@@ -358,21 +345,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     thetaStdDev = 10.0;
                 }
             }
-
         } else {
             if (kind.equals(Vision.EstimateType.MT1)) {
-
-                // if (vm.measurement.avgTagArea > 0.5) {
-                // xyStdDev = 2.0;
-                // thetaStdDev = 2.0;
-                // } else if (vm.measurement.tagCount >= 2 && vm.measurement.avgTagArea >= 0.2)
-                // {
-                // xyStdDev = 0.5;
-                // thetaStdDev = 1.0;
-                // } else if (highestAmbiguity <= 0.2 && vm.measurement.avgTagArea >= 0.05) {
-                // xyStdDev = 5.0;
-                // }
-
                 if (highestAmbiguity <= 0.5) {
                     xyStdDev = 5.0;
                     thetaStdDev = 5.0;

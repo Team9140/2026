@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.team9140.frc2026.Constants;
+import org.team9140.frc2026.Constants.Turret;
 import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
 
@@ -151,17 +152,18 @@ public class Shooter extends SubsystemBase {
         yawMotor.getConfigurator().apply(yawConfig);
         shooterMotor.getConfigurator().apply(shooterConfig);
         shooterFollower.setControl(new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Aligned));
+        this.yawMotor.setControl(yawMotorControl.withPosition(0));
 
-        Mechanism2d yawMech = new Mechanism2d(1, 1);
-        MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
-        yawArmLigament = yawRoot.append(new MechanismLigament2d(
-                "yawArm",
-                0.3,
-                0,
-                6,
-                new Color8Bit(Color.kYellow)));
+        // Mechanism2d yawMech = new Mechanism2d(1, 1);
+        // MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
+        // yawArmLigament = yawRoot.append(new MechanismLigament2d(
+        //         "yawArm",
+        //         0.3,
+        //         0,
+        //         6,
+        //         new Color8Bit(Color.kYellow)));
 
-        SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
+        // SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
 
         this.setDefaultCommand(this.off());
 
@@ -175,7 +177,7 @@ public class Shooter extends SubsystemBase {
     public Command manualAdjust(boolean left) {
         return this.runOnce(() -> {
             this.isManual = true;
-            this.shooterMotor.setControl(new VoltageOut(12.0));
+            // this.shooterMotor.setControl(new VoltageOut(12.0));
             this.yawMotor.setControl(new VoltageOut(
                     left ? Constants.Turret.ADJUST_VOLTAGE : -Constants.Turret.ADJUST_VOLTAGE));
         }).andThen(this.run(() -> {
@@ -239,13 +241,14 @@ public class Shooter extends SubsystemBase {
             if (this.isManual)
                 return;
             this.shooterMotor.setControl(new CoastOut());
-            this.yawMotor.setControl(new StaticBrake());
+            this.yawMotor.setControl(yawMotorControl.withPosition(0));
         }).withName("Shooter Off");
     }
 
     public Command tuningSpeed(DoubleSupplier RPM) {
         return this.runOnce(() -> {
-            shooterFollower.setControl(new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Aligned));
+            shooterFollower.setControl(
+                    new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Aligned));
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(RPM.getAsDouble() / 60.0));
         }).andThen(this.run(() -> {
         }));
@@ -257,15 +260,18 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        targetYawRateOfChange = (this.yawMotorControl.Position - this.oldTargetYaw) / (Utils.getCurrentTimeSeconds() - this.timeSinceOldTargetYawUpdate);
+        this.yawMotor.getPosition().refresh();
+        this.shooterMotor.getVelocity().refresh();
+        targetYawRateOfChange = (this.yawMotorControl.Position - this.oldTargetYaw)
+                / (Utils.getCurrentTimeSeconds() - this.timeSinceOldTargetYawUpdate);
         oldTargetYaw = this.yawMotorControl.Position;
         timeSinceOldTargetYawUpdate = Utils.getCurrentTimeSeconds();
 
         // all these are in rotations per second
-        SmartDashboard.putNumber("Yaw Angle", yawMotor.getPosition(true).getValueAsDouble());
+        SmartDashboard.putNumber("Yaw Angle", yawMotor.getPosition(false).getValueAsDouble());
         SmartDashboard.putNumber("Yaw Target Position", this.yawMotorControl.Position);
-        SmartDashboard.putNumber("Shooter Velocity", shooterMotor.getVelocity(true).getValueAsDouble());
-        SmartDashboard.putNumber("Shooter Target Velocity", this.shooterSpeedControl.Velocity / Math.PI / 2.0);
+        SmartDashboard.putNumber("Shooter Velocity", shooterMotor.getVelocity(false).getValueAsDouble());
+        SmartDashboard.putNumber("Shooter Target Velocity", this.shooterSpeedControl.Velocity);
         SmartDashboard.putBoolean("Yaw Is At Position", this.yawIsAtPosition.getAsBoolean());
         SmartDashboard.putBoolean("Shooter Is At Velocity", this.shooterIsAtVelocity.getAsBoolean());
         SmartDashboard.putBoolean("Yaw Will Overturn Soon", this.yawWillOverturnSoon.getAsBoolean());
@@ -284,7 +290,7 @@ public class Shooter extends SubsystemBase {
             Math.PI,
             false,
             0);
-    private final MechanismLigament2d yawArmLigament;
+    // private final MechanismLigament2d yawArmLigament;
 
     private TalonFXSimState shooterMotorSimState;
     private final FlywheelSim shooterMotorSim = new FlywheelSim(
@@ -317,10 +323,12 @@ public class Shooter extends SubsystemBase {
         yawMotorSim.update(deltatime);
 
         yawMotor.getPosition().refresh();
-        yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
+        // yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
 
-        yawMotorSimState.setRawRotorPosition(yawMotorSim.getAngleRads() / 2.0 / Math.PI);
-        yawMotorSimState.setRotorVelocity(yawMotorSim.getVelocityRadPerSec() / 2.0 / Math.PI);
+        yawMotorSimState.setRawRotorPosition(
+                yawMotorSim.getAngleRads() * Constants.Turret.GEAR_RATIO / 2.0 / Math.PI);
+        yawMotorSimState.setRotorVelocity(
+                yawMotorSim.getVelocityRadPerSec() * Constants.Turret.GEAR_RATIO / 2.0 / Math.PI);
 
         shooterPos = new Pose3d(0, 0, 0,
                 new Rotation3d(0, 0, yawMotor.getPosition().getValueAsDouble() * 2 * Math.PI));
@@ -339,11 +347,15 @@ public class Shooter extends SubsystemBase {
 
     public final Trigger yawIsAtPosition = new Trigger(
             () -> Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(),
-                    this.yawMotorControl.Position));
+                    this.yawMotorControl.Position, 0.01));
 
     public final Trigger shooterIsAtVelocity = new Trigger(
             () -> Util.epsilonEquals(this.shooterMotor.getVelocity(false).getValueAsDouble(),
-                    this.shooterSpeedControl.Velocity));
+                    this.shooterSpeedControl.Velocity, 5));
 
-    public final Trigger yawWillOverturnSoon = new Trigger(() -> this.yawMotorControl.Position + this.targetYawRateOfChange * Constants.Shooter.OVERTURN_LOOKAHEAD_TIME > Constants.Shooter.FORWARD_SOFT_LIMIT_THRESHOLD || this.yawMotorControl.Position + this.targetYawRateOfChange * Constants.Shooter.OVERTURN_LOOKAHEAD_TIME < Constants.Shooter.REVERSE_SOFT_LIMIT_THRESHOLD);
+    public final Trigger yawWillOverturnSoon = new Trigger(() -> this.yawMotorControl.Position
+            + this.targetYawRateOfChange
+                    * Turret.OVERTURN_LOOKAHEAD_TIME > Constants.Turret.FORWARD_SOFT_LIMIT_THRESHOLD
+            || this.yawMotorControl.Position + this.targetYawRateOfChange
+                    * Turret.OVERTURN_LOOKAHEAD_TIME < Constants.Turret.REVERSE_SOFT_LIMIT_THRESHOLD);
 }
