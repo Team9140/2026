@@ -257,31 +257,32 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        targetPose = AimAlign.getZone(this.getState().Pose);
-        if (this.targetPose != null) {
-            targetPoseDecomposed[0] = this.targetPose.getX();
-            targetPoseDecomposed[1] = this.targetPose.getY();
-            targetPoseDecomposed[2] = this.targetPose.getRotation().getRadians();
-        } else {
-            targetPoseDecomposed[0] = -1;
-            targetPoseDecomposed[1] = -1;
-            targetPoseDecomposed[2] = -1;
-        }
+        // SwerveDriveState state = this.getState();
+        // targetPose = AimAlign.getZone(state.Pose);
+        // if (this.targetPose != null) {
+        //     targetPoseDecomposed[0] = this.targetPose.getX();
+        //     targetPoseDecomposed[1] = this.targetPose.getY();
+        //     targetPoseDecomposed[2] = this.targetPose.getRotation().getRadians();
+        // } else {
+        //     targetPoseDecomposed[0] = -1;
+        //     targetPoseDecomposed[1] = -1;
+        //     targetPoseDecomposed[2] = -1;
+        // }
 
-        if (this.targetPose != null) {
-            currentPoseDecomposed[0] = getState().Pose.getX();
-            currentPoseDecomposed[1] = getState().Pose.getY();
-            currentPoseDecomposed[2] = getState().Pose.getRotation().getRadians();
-        } else {
-            currentPoseDecomposed[0] = -1;
-            currentPoseDecomposed[1] = -1;
-            currentPoseDecomposed[2] = -1;
-        }
+        // if (this.targetPose != null) {
+        //     currentPoseDecomposed[0] = state.Pose.getX();
+        //     currentPoseDecomposed[1] = state.Pose.getY();
+        //     currentPoseDecomposed[2] = state.Pose.getRotation().getRadians();
+        // } else {
+        //     currentPoseDecomposed[0] = -1;
+        //     currentPoseDecomposed[1] = -1;
+        //     currentPoseDecomposed[2] = -1;
+        // }
 
-        SmartDashboard.putNumberArray("drive target pose", targetPoseDecomposed);
-        SignalLogger.writeDoubleArray("drive target pose", targetPoseDecomposed);
+        // SmartDashboard.putNumberArray("drive target pose", targetPoseDecomposed);
+        // SignalLogger.writeDoubleArray("drive target pose", targetPoseDecomposed);
         
-        SmartDashboard.putNumberArray("drive current pose", currentPoseDecomposed);
+        // SmartDashboard.putNumberArray("drive current pose", currentPoseDecomposed);
     }
 
     private void startSimThread() {
@@ -300,7 +301,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void acceptVisionMeasurement(Vision.EstimateType kind, double timestamp, PoseEstimate measurement) {
-        SmartDashboard.putNumber("vision measurement T", timestamp);
+        
         double xyStdDev = 9999;
         double thetaStdDev = 9999;
         boolean reject = false;
@@ -308,7 +309,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         double poseDiff = measurement.pose.getTranslation().getDistance(this.getState().Pose.getTranslation());
 
         reject |= Math.abs(Units.degreesToRotations(this.getPigeon2().getAngularVelocityZWorld().getValueAsDouble())) >= 0.5;
-        reject |= measurement.avgTagArea <= 0.05;
+        reject |= measurement.avgTagArea <= 0.01;
         reject |= poseDiff <= 0.01; // ignore updates smaller than 1cm to reduce jitter??
 
         if (reject) {
@@ -322,22 +323,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
         }
 
-        if (highestAmbiguity >= 0.5) {
-            return;
-        }
+        // if (highestAmbiguity >= 0.5) {
+        //     return;
+        // }
 
         if (DriverStation.isEnabled()) {
             if (kind.equals(Vision.EstimateType.MT1)) {
-                if (measurement.tagCount >= 2 && measurement.avgTagArea >= 0.25) {
+                if (measurement.tagCount >= 2 && measurement.avgTagArea >= 0.2) {
                     xyStdDev = 0.5;
                     thetaStdDev = 90.0;
-                } else if (measurement.tagCount >= 2 && measurement.avgTagArea >= 1.0) {
-                    xyStdDev = 0.2;
+                } else if (measurement.tagCount >= 2 && measurement.avgTagArea >= 0.5) {
+                    xyStdDev = 0.4;
                     thetaStdDev = 10.0;
-                } else if (measurement.avgTagArea >= 0.4) {
+                } else if (measurement.avgTagArea >= 0.15) {
                     xyStdDev = 1.5;
                     thetaStdDev = 20.0;
-                } else if (measurement.avgTagArea > 1.0
+                } else if (measurement.avgTagArea > 0.3
                         && speeds.omegaRadiansPerSecond <= Math.toRadians(10)
                         && Math.abs(speeds.vxMetersPerSecond) + Math.abs(speeds.vxMetersPerSecond) <= 0.5
                         && highestAmbiguity < 0.1) {
@@ -353,7 +354,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 }
             }
         }
-
+SmartDashboard.putNumber("vision measurement T", timestamp);
+SmartDashboard.putNumber("xyStdDev", xyStdDev);
         this.addVisionMeasurement(measurement.pose, timestamp,
                 VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev));
     }

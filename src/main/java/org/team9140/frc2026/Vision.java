@@ -37,6 +37,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableEvent.Kind;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Vision {
@@ -76,7 +77,7 @@ public class Vision {
         double timestamp = Utils.getCurrentTimeSeconds();
         LimelightHelpers.LimelightResults llResult = LimelightHelpers.getLatestResults(this.cameraName);
 
-        timestamp = llResult.latency_capture - llResult.latency_pipeline;
+        timestamp = Timer.getFPGATimestamp() - llResult.latency_capture - llResult.latency_pipeline;
 
         LimelightHelpers.PoseEstimate mt1 = LimelightHelpers
                 .getBotPoseEstimate_wpiBlue(this.cameraName);
