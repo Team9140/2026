@@ -63,8 +63,9 @@ public class FollowPath {
         for (EventMarker e : this.trajectory.events()) {
             this.eventTimes.put(e.event, atTime(e.timestamp));
             System.out.println("Added event " + e.event + " at time " + e.timestamp);
-
         }
+
+        this.trajectory.getFinalSample(false);
     }
 
     public TreeMap<String, Trigger> getEvents() {
