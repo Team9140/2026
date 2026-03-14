@@ -61,6 +61,9 @@ public class RobotContainer {
     this.controller.rightTrigger()
         .onTrue(this.hopper.feed())
         .onFalse(this.hopper.off());
+    this.controller.leftTrigger()
+        .onTrue(this.hopper.unjam())
+        .onFalse(this.hopper.off());
     this.controller.back().whileTrue(this.shooter.manualLeft());
     this.controller.start().whileTrue(this.shooter.manualRight());
     drivetrain.setDefaultCommand(driveCommand);
