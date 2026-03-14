@@ -75,16 +75,12 @@ public class RobotContainer {
   Command autonomousRoutine = null;
 
   public Command getAutonomousCommand() {
-    // Command path = autoRoutines.getCommand();
+    Command path = autoRoutines.getCommand();
 
-    // if (path != null) {
-    //   this.autonomousRoutine = path.finallyDo((interrupted) -> {
-    //   if (interrupted)
-    //     CommandScheduler.getInstance().schedule(hopper.off().andThen(shooter.off()));
-    //   });
-    // }
+    if (path != null) {
+      this.autonomousRoutine = path;
+    }
 
-    // return autonomousRoutine;
-    return new PrintCommand("nothing");
+    return autonomousRoutine;
   }
 }

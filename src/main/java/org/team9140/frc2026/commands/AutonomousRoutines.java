@@ -29,13 +29,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class AutonomousRoutines {
     private final CommandSwerveDrivetrain drivetrain;
 
-    private final Shooter shooter = Shooter.getInstance();
+    /*private final Shooter shooter = Shooter.getInstance();
     private final Climber climber = Climber.getInstance();
     private final Hopper hopper = Hopper.getInstance();
-    private final Intake intake = Intake.getInstance();
+    private final Intake intake = Intake.getInstance();*/
 
     private final SendableChooser<String> autoChooser = new SendableChooser<>();
-    private final HashMap<String, Command> namedCommands = new HashMap<>();
+    // private final HashMap<String, Command> namedCommands = new HashMap<>();
 
     private static AutonomousRoutines instance;
 
@@ -46,42 +46,60 @@ public class AutonomousRoutines {
     private AutonomousRoutines(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
         autoChooser.setDefaultOption("Do Nothing", "nothing");
-        autoChooser.addOption("Shoot Preload", "preload");
-        autoChooser.addOption("Climb Left", "climb_left");
-        autoChooser.addOption("Climb Right", "climb_right");
-        autoChooser.addOption("Sweep Middle From Depot", "sweep_middle_left");
-        autoChooser.addOption("Sweep Middle From Outpost", "sweep_middle_right");
-        autoChooser.addOption("Score from Depot starting Middle", "score_from_depot");
+        // autoChooser.addOption("Shoot Preload", "preload");
+        autoChooser.addOption("Sweep From Trench Right", "trench sweep right");
+        autoChooser.addOption("Sweep From Trench Left", "trench sweep left");
+        // autoChooser.addOption("Climb Left", "climb_left");
+        // autoChooser.addOption("Climb Right", "climb_right");
+        // autoChooser.addOption("Sweep Middle From Depot", "sweep_middle_left");
+        // autoChooser.addOption("Sweep Middle From Outpost", "sweep_middle_right");
+        // autoChooser.addOption("Score from Depot starting Middle", "score_from_depot");
         SmartDashboard.putData(autoChooser);
-        namedCommands.put("shoot", getShootCommand());
-        namedCommands.put("intakeOn", intake.intake());
-        namedCommands.put("intakeOff", intake.off());
+        // namedCommands.put("shoot", getShootCommand());
+        // namedCommands.put("intakeOn", intake.intake());
+        // namedCommands.put("intakeOff", intake.off());
     }
-
-    private Command getShootCommand() {
-        return shooter.aim(this.drivetrain::getState)
-                .alongWith(new WaitUntilCommand(shooter.yawIsAtPosition.and(shooter.shooterIsAtVelocity)).andThen(hopper.feed()));
-    }
+    
+    // private Command getShootCommand() {
+    //     return shooter.aim(this.drivetrain::getState)
+    //             .alongWith(new WaitUntilCommand(shooter.yawIsAtPosition.and(shooter.shooterIsAtVelocity)).andThen(hopper.feed()));
+    // }
 
     private DriverStation.Alliance lastAlliance = Alliance.Red;
     private String lastFetchedAuto = "";
+
+    // public Command getCommand() {
+    //     if (Util.getAlliance().isPresent() && (!Util.getAlliance().get().equals(lastAlliance) || (lastFetchedAuto != (lastFetchedAuto = autoChooser.getSelected())))) {
+    //         lastAlliance = Util.getAlliance().get();
+    //         switch (lastFetchedAuto) {
+    //             case "preload":
+    //                 return this.intake.armOut().andThen(new WaitCommand(2.0)).andThen(this.getShootCommand());
+    //             case "climb_left":
+    //                 return climb(true);
+    //             case "climb_right":
+    //                 return climb(false);
+    //             case "sweep_middle_left":
+    //                 return sweepMiddleFromLeft();
+    //             case "sweep_middle_right":
+    //                 return sweepMiddleFromRight();
+    //             case "score_from_depot":
+    //                 return depotShot();
+    //             default:
+    //                 return doNothing();
+    //         }
+    //     }
+
+    //     return null;
+    // }
 
     public Command getCommand() {
         if (Util.getAlliance().isPresent() && (!Util.getAlliance().get().equals(lastAlliance) || (lastFetchedAuto != (lastFetchedAuto = autoChooser.getSelected())))) {
             lastAlliance = Util.getAlliance().get();
             switch (lastFetchedAuto) {
-                case "preload":
-                    return this.intake.armOut().andThen(new WaitCommand(2.0)).andThen(this.getShootCommand());
-                case "climb_left":
-                    return climb(true);
-                case "climb_right":
-                    return climb(false);
-                case "sweep_middle_left":
-                    return sweepMiddleFromLeft();
-                case "sweep_middle_right":
-                    return sweepMiddleFromRight();
-                case "score_from_depot":
-                    return depotShot();
+                case "trench sweep left":
+                    return trenchSweepLeft();
+                case "trench sweep right":
+                    return trenchSweepRight();
                 default:
                     return doNothing();
             }
@@ -94,6 +112,21 @@ public class AutonomousRoutines {
         return new PrintCommand("Doing Nothing");
     }
 
+    public Command trenchSweepRight() {
+        FollowPath path = new FollowPath("trench_sweep_right", () -> this.drivetrain.getState().Pose,
+                this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
+        if (Robot.isSimulation()) drivetrain.resetPose(path.getInitialPose());
+        return path.gimmeCommand();
+    }
+    
+    public Command trenchSweepLeft() {
+        FollowPath path = new FollowPath("trench_sweep_left", () -> this.drivetrain.getState().Pose,
+                this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
+        if (Robot.isSimulation()) drivetrain.resetPose(path.getInitialPose());
+        return path.gimmeCommand();
+    }
+
+    /*
     public Command climb(boolean left) {
         Pose2d goalPos;
         if (left) {
@@ -150,5 +183,5 @@ public class AutonomousRoutines {
         if (Robot.isSimulation()) drivetrain.resetPose(path.getInitialPose());
         bindEventCommands(path);
         return path.gimmeCommand();
-    }
+    } */
 }
