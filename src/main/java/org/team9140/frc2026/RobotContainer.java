@@ -14,55 +14,59 @@ import org.team9140.frc2026.subsystems.Shooter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   // private final Climber climber = Climber.getInstance();
-  private final Hopper hopper = Hopper.getInstance();
-  private final Intake intake = Intake.getInstance();
-  private final Shooter shooter = Shooter.getInstance();
+  // private final Hopper hopper = Hopper.getInstance();
+  // private final Intake intake = Intake.getInstance();
+  // private final Shooter shooter = Shooter.getInstance();
 
   private final CommandXboxController controller = new CommandXboxController(0);
   private final SwerveTelemetry logger = new SwerveTelemetry(drivetrain, Constants.Drive.MAX_TELEOP_VELOCITY);
   private final AutonomousRoutines autoRoutines;
   private final Command driveCommand;
 
-  private final Vision limeA = new Vision(Constants.Vision.CAMERA_NAMES[0], this.drivetrain::acceptVisionMeasurement,
-      Constants.Vision.ROBOT_TO_CAM[0]);
-  private final Vision limeB = new Vision(Constants.Vision.CAMERA_NAMES[1], this.drivetrain::acceptVisionMeasurement,
-      Constants.Vision.ROBOT_TO_CAM[1]);
+  // private final Vision limeA = new Vision(Constants.Vision.CAMERA_NAMES[0], this.drivetrain::acceptVisionMeasurement,
+  //     Constants.Vision.ROBOT_TO_CAM[0]);
+  // private final Vision limeB = new Vision(Constants.Vision.CAMERA_NAMES[1], this.drivetrain::acceptVisionMeasurement,
+  //     Constants.Vision.ROBOT_TO_CAM[1]);
 
   public RobotContainer() {
-    limeA.setIMUMode(1);
-    limeB.setIMUMode(1);
+    // limeA.setIMUMode(1);
+    // limeB.setIMUMode(1);
     driveCommand = drivetrain.teleopDrive(controller::getLeftX, controller::getLeftY,
         controller::getRightX);
 
     configureBindings();
 
-    limeA.start();
-    limeB.start();
+    // limeA.start();
+    // limeB.start();
 
     autoRoutines = AutonomousRoutines.getInstance(drivetrain);
   }
 
   private void configureBindings() {
-    SmartDashboard.putNumber("tuning RPM", 2500);
-    this.controller.rightBumper()
-        .onTrue(this.intake.intake())
-        .onFalse(this.intake.off());
-    this.controller.leftBumper()
-        .onTrue(this.intake.reverse().alongWith(this.hopper.unjam()))
-        .onFalse(this.intake.off().alongWith(this.hopper.off()));
-    this.controller.y().onTrue(this.shooter.tuningSpeed(() -> SmartDashboard.getNumber("tuning RPM", 3500)));
-    this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getState));
-    this.controller.x().onTrue(this.shooter.off());
-    this.controller.rightTrigger()
-        .onTrue(this.hopper.feed())
-        .onFalse(this.hopper.off());
-    this.controller.back().whileTrue(this.shooter.manualLeft());
-    this.controller.start().whileTrue(this.shooter.manualRight());
+    // SmartDashboard.putNumber("tuning RPM", 2500);
+    // this.controller.rightBumper()
+    //     .onTrue(this.intake.intake())
+    //     .onFalse(this.intake.off());
+    // this.controller.leftBumper()
+    //     .onTrue(this.intake.reverse().alongWith(this.hopper.unjam()))
+    //     .onFalse(this.intake.off().alongWith(this.hopper.off()));
+    //   this.controller.leftBumper()
+    //     .onTrue(this.hopper.unjam())
+    //     .onFalse(this.hopper.off());
+    // this.controller.y().onTrue(this.shooter.tuningSpeed(() -> SmartDashboard.getNumber("tuning RPM", 3500)));
+    // this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getState));
+    // this.controller.x().onTrue(this.shooter.off());
+    // this.controller.rightTrigger()
+    //     .onTrue(this.hopper.feed())
+    //     .onFalse(this.hopper.off());
+    // this.controller.back().whileTrue(this.shooter.manualLeft());
+    // this.controller.start().whileTrue(this.shooter.manualRight());
     drivetrain.setDefaultCommand(driveCommand);
 
     this.drivetrain.registerTelemetry(logger::telemeterize);
@@ -71,15 +75,16 @@ public class RobotContainer {
   Command autonomousRoutine = null;
 
   public Command getAutonomousCommand() {
-    Command path = autoRoutines.getCommand();
+    // Command path = autoRoutines.getCommand();
 
-    if (path != null) {
-      this.autonomousRoutine = path.finallyDo((interrupted) -> {
-      if (interrupted)
-        CommandScheduler.getInstance().schedule(hopper.off().andThen(shooter.off()));
-      });
-    }
+    // if (path != null) {
+    //   this.autonomousRoutine = path.finallyDo((interrupted) -> {
+    //   if (interrupted)
+    //     CommandScheduler.getInstance().schedule(hopper.off().andThen(shooter.off()));
+    //   });
+    // }
 
-    return autonomousRoutine;
+    // return autonomousRoutine;
+    return new PrintCommand("nothing");
   }
 }
