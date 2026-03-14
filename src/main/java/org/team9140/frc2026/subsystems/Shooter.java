@@ -201,7 +201,7 @@ public class Shooter extends SubsystemBase {
         return this.run(() -> {
             if (this.isManual)
                 return;
-            Pose2d turretPose = chassisStateSupplier.get().Pose.plus(Constants.Turret.POSITION_TO_ROBOT);
+            Pose2d turretPose = chassisStateSupplier.get().Pose;
             
             Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
@@ -213,7 +213,7 @@ public class Shooter extends SubsystemBase {
 
     public Command shoot(Supplier<SwerveDriveState> chassisStateSupplier) {
         return this.run(() -> {
-            Pose2d turretPose = chassisStateSupplier.get().Pose.plus(Constants.Turret.POSITION_TO_ROBOT);
+            Pose2d turretPose = chassisStateSupplier.get().Pose;
             Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
                     AimAlign.getRequiredSpeed(turretPose, targetPose)));
