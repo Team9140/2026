@@ -68,10 +68,18 @@ public class RobotContainer {
     this.drivetrain.registerTelemetry(logger::telemeterize);
   }
 
+  Command autonomousRoutine = null;
+
   public Command getAutonomousCommand() {
-    return autoRoutines.getCommand().finallyDo((interrupted) -> {
+    Command path = autoRoutines.getCommand();
+
+    if (path != null) {
+      this.autonomousRoutine = path.finallyDo((interrupted) -> {
       if (interrupted)
         CommandScheduler.getInstance().schedule(hopper.off().andThen(shooter.off()));
-    });
+      });
+    }
+
+    return autonomousRoutine;
   }
 }

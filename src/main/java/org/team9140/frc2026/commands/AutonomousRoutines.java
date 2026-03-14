@@ -16,6 +16,7 @@ import org.team9140.lib.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -62,23 +63,31 @@ public class AutonomousRoutines {
                 .until(shooter.yawIsAtPosition.and(shooter.shooterIsAtVelocity)).andThen(hopper.feed());
     }
 
+    private DriverStation.Alliance lastAlliance = Alliance.Red;
+    private String lastFetchedAuto = "";
+
     public Command getCommand() {
-        switch (autoChooser.getSelected()) {
-            case "preload":
-                return shootPreload(3);
-            case "climb_left":
-                return climb(true);
-            case "climb_right":
-                return climb(false);
-            case "sweep_middle_left":
-                return sweepMiddleFromLeft();
-            case "sweep_middle_right":
-                return sweepMiddleFromRight();
-            case "score_from_depot":
-                return depotShot();
-            default:
-                return doNothing();
+        if (Util.getAlliance().isPresent() && (!Util.getAlliance().get().equals(lastAlliance) || (lastFetchedAuto != (lastFetchedAuto = autoChooser.getSelected())))) {
+            lastAlliance = Util.getAlliance().get();
+            switch (lastFetchedAuto) {
+                case "preload":
+                    return shootPreload(3);
+                case "climb_left":
+                    return climb(true);
+                case "climb_right":
+                    return climb(false);
+                case "sweep_middle_left":
+                    return sweepMiddleFromLeft();
+                case "sweep_middle_right":
+                    return sweepMiddleFromRight();
+                case "score_from_depot":
+                    return depotShot();
+                default:
+                    return doNothing();
+            }
         }
+
+        return null;
     }
 
     public Command doNothing() {
@@ -121,8 +130,7 @@ public class AutonomousRoutines {
             if (currCommand != null) {
                 currTrigger.onTrue(Commands.runOnce(() -> {
                     path.removeEvent(name);
-                    CommandScheduler.getInstance().schedule(currCommand);
-                }));
+                }).andThen(currCommand));
             }
         }
     }
