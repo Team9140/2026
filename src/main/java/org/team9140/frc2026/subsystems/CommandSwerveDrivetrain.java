@@ -231,7 +231,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // SignalLogger.writeDoubleArray("drive target pose", targetPoseDecomposed);
         
         // SmartDashboard.putNumberArray("drive current pose", currentPoseDecomposed);
-        SmartDashboard.putNumber("idle start time", startTime);
     }
 
     private void startSimThread() {
@@ -360,7 +359,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command teleopDrive(DoubleSupplier leftStickX, DoubleSupplier leftStickY, DoubleSupplier rightStickX) {
         return this.runOnce(() -> {
             startTime = Utils.getSystemTimeSeconds();
-            System.out.println(startTime);
         }).andThen(this.run(() -> {
             double vX = Constants.Drive.MAX_TELEOP_VELOCITY * Util.applyDeadband(-leftStickY.getAsDouble());
             double vY = Constants.Drive.MAX_TELEOP_VELOCITY * Util.applyDeadband(-leftStickX.getAsDouble());
@@ -369,20 +367,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             if (vX == 0.0 && vY == 0.0 && omega == 0) {
                 if (Utils.getSystemTimeSeconds() - startTime >= Constants.Drive.BRAKE_IDLE_TIME) {
                     this.setControl(brake);
+                    return;
                 }
             }
             else {
                 startTime = Utils.getSystemTimeSeconds();
-                if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
-                    vX = -1 * vX;
-                        vY = -1 * vY;
-                }
-
-                this.setControl(this.drive
-                        .withVelocityX(vX)
-                        .withVelocityY(vY)
-                        .withRotationalRate(omega));
             }
+
+            if (Optional.of(Alliance.Red).equals(Util.getAlliance())) {
+                vX = -1 * vX;
+                vY = -1 * vY;
+            }
+            this.setControl(this.drive
+                .withVelocityX(vX)
+                .withVelocityY(vY)
+                .withRotationalRate(omega));
         })).withName("regular drive");
     }
 
