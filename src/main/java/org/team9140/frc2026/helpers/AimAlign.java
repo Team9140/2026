@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class AimAlign {
     private static InterpolatingDoubleTreeMap lookupMotorSpeedFromDistance = new InterpolatingDoubleTreeMap();
+    private static InterpolatingDoubleTreeMap lookupHoodAngleFromDistance = new InterpolatingDoubleTreeMap();
     private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap();
 
     static {
@@ -27,8 +28,14 @@ public class AimAlign {
         lookupMotorSpeedFromDistance.put(5.449, 3150 / 60.0);
 
 
-        lookupAirtimeFromDistance.put(Double.valueOf(14.85), Double.valueOf(0.2));
-        lookupAirtimeFromDistance.put(Double.valueOf(9.74), Double.valueOf(-0.119));
+        //MUST BE FILLED IN WITH REAL VALUES
+        lookupHoodAngleFromDistance.put(Double.valueOf(Units.feetToMeters(7)), 0.05);
+        lookupHoodAngleFromDistance.put(Double.valueOf(Units.feetToMeters(8)), 0.05);
+        lookupHoodAngleFromDistance.put(Double.valueOf(Units.feetToMeters(9)), 0.05);
+        lookupHoodAngleFromDistance.put(Double.valueOf(Units.feetToMeters(10)), 0.05);
+        lookupHoodAngleFromDistance.put(Double.valueOf(Units.feetToMeters(11)), 0.05);
+        lookupHoodAngleFromDistance.put(Double.valueOf(Units.feetToMeters(12)), 0.05);
+        lookupHoodAngleFromDistance.put(Double.valueOf(Units.feetToMeters(13)), 0.05);
     }
 
     public static Translation2d getEffectivePose(Pose2d robotPose, Translation2d goalPose, ChassisSpeeds robotSpeed) {
@@ -49,6 +56,11 @@ public class AimAlign {
     public static double getRequiredSpeed(Pose2d robotPose, Translation2d effectivePose) {
         double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(effectivePose).getNorm();
         return lookupMotorSpeedFromDistance.get(distance);
+    }
+
+    public static double getRequiredHoodAngle(Pose2d robotPose, Translation2d effectivePose) {
+        double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(effectivePose).getNorm();
+        return lookupHoodAngleFromDistance.get(distance);
     }
 
     public static double yawAngleToPos(Pose2d robotPose, Translation2d endPose) {
