@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AimAlign {
     private static InterpolatingDoubleTreeMap lookupMotorSpeedFromDistance = new InterpolatingDoubleTreeMap();
+    private static InterpolatingDoubleTreeMap lookupHoodAngleFromDistance = new InterpolatingDoubleTreeMap();
     private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap();
 
     static {
@@ -72,6 +73,11 @@ public class AimAlign {
     public static double getRequiredSpeed(Pose2d robotPose, Translation2d effectivePose) {
         double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(effectivePose).getNorm();
         return lookupMotorSpeedFromDistance.get(distance);
+    }
+
+    public static double getRequiredHoodAngle(Pose2d robotPose, Translation2d effectivePose) {
+        double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(effectivePose).getNorm();
+        return lookupHoodAngleFromDistance.get(distance);
     }
 
     public static double yawAngleToPos(Pose2d robotPose, Translation2d endPose) {
