@@ -16,7 +16,7 @@ public class Constants {
     public static class Ports {
         public static final CANBus CANIVORE = new CANBus("sixseven", "./logs/example.hoot");
         public static final int YAW_MOTOR = 12;
-        public static final int PITCH_MOTOR = 0;
+        public static final int HOOD_MOTOR = 0;
         public static final int SHOOTER_MOTOR = 16;
         public static final int SHOOTER_FOLLOWER_MOTOR = 17;
         public static final int INTAKE_SPIN_MOTOR = 26;
@@ -181,6 +181,28 @@ public class Constants {
 
         public static final double TURN_SHOOTER_OFF_TIME = 1.0;
         public static final double CANCODER_OFFSET_ROTS = 0.0; // TODO: Actual value
+    }
+
+    public static class Hood {
+        public static final double STATOR_CURRENT_LIMIT = 0.0;
+        public static final double SUPPLY_CURRENT_LIMIT = 0.0;
+
+        public static final double MM_ACCELERATION = 0.0;
+        public static final double MM_CRUISE_VELOCITY = 0.0;
+
+        public static final double KS = 0.0;
+        public static final double KV = 0.0;
+        public static final double KA = 0.0;
+        public static final double KP = 0.0;
+        public static final double KI = 0.0;
+        public static final double KD = 0.0;
+
+        public static final double ADJUST_VOLTAGE = 0.0;
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.0;
+        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0.0;
+        public static final double GEAR_RATIO = 0.0;
+
+        public static final double OVERTURN_LOOKAHEAD_TIME = 0.0;
     }
 
     public static class Vision {
