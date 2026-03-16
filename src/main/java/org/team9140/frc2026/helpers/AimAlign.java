@@ -18,9 +18,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AimAlign {
-    private static InterpolatingDoubleTreeMap lookupMotorSpeedFromDistance = new InterpolatingDoubleTreeMap();
-    private static InterpolatingDoubleTreeMap lookupHoodAngleFromDistance = new InterpolatingDoubleTreeMap();
-    private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap();
+    private static InterpolatingDoubleTreeMap lookupMotorSpeedFromDistance = new InterpolatingDoubleTreeMap(); //in rotatations per second
+    private static InterpolatingDoubleTreeMap lookupHoodAngleFromDistance = new InterpolatingDoubleTreeMap(); //in rotations
+    private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap(); //in seconds
 
     static {
         lookupAirtimeFromDistance.put(2.0245, 0.8266666666666666667);

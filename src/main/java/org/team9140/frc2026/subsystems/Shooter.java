@@ -64,12 +64,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class Shooter extends SubsystemBase {
     private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR, Constants.Ports.CANIVORE);
     private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR, Constants.Ports.CANIVORE);
-    private final TalonFX shooterFollower = new TalonFX(Constants.Ports.SHOOTER_FOLLOWER_MOTOR,
-            Constants.Ports.CANIVORE);
+    private final TalonFX shooterFollower = new TalonFX(Constants.Ports.SHOOTER_FOLLOWER_MOTOR, Constants.Ports.CANIVORE);
+    private final TalonFX hoodMotor = new TalonFX(Constants.Ports.HOOD_MOTOR, Constants.Ports.CANIVORE);
 
     private final CANcoder yawCANcoder = new CANcoder(Constants.Ports.TURRET_CANCODER, Constants.Ports.CANIVORE);
 
     private final MotionMagicTorqueCurrentFOC yawMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
+    private final MotionMagicTorqueCurrentFOC hoodMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
     private final VelocityTorqueCurrentFOC shooterSpeedControl = new VelocityTorqueCurrentFOC(0).withSlot(0);
 
     private static Shooter instance;
@@ -79,7 +80,7 @@ public class Shooter extends SubsystemBase {
     }
 
     private Shooter() {
-        // START TURRET CONFIG
+        // START TURRET YAW CONFIG
 
         MotionMagicConfigs turretMotionMagicConfig = new MotionMagicConfigs()
                 .withMotionMagicAcceleration(Constants.Turret.MM_ACCELERATION)
@@ -135,7 +136,57 @@ public class Shooter extends SubsystemBase {
                 .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
                 .withMagnetOffset(Constants.Turret.CANCODER_OFFSET_ROTS);
 
-        // END TURRET CONFIG
+        // END TURRET YAW CONFIG
+
+        // START TURRET HOOD CONFIG
+
+        MotionMagicConfigs hoodMotionMagicConfig = new MotionMagicConfigs()
+                .withMotionMagicAcceleration(Constants.Turret.MM_ACCELERATION)
+                .withMotionMagicCruiseVelocity(Constants.Turret.MM_CRUISE_VELOCITY);
+
+        Slot0Configs hoodSlot0Configs = new Slot0Configs()
+                .withKS(Constants.Hood.KS)
+                .withKV(Constants.Hood.KV)
+                .withKA(Constants.Hood.KA)
+                .withKP(Constants.Hood.KP)
+                .withKI(Constants.Hood.KI)
+                .withKD(Constants.Hood.KD);
+
+        MotorOutputConfigs hoodMotorOutputConfigs = new MotorOutputConfigs()
+                .withInverted(InvertedValue.CounterClockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Brake);
+
+        TorqueCurrentConfigs hoodTorqueCurrentConfigs = new TorqueCurrentConfigs()
+                .withPeakForwardTorqueCurrent(Constants.Hood.STATOR_CURRENT_LIMIT)
+                .withPeakReverseTorqueCurrent(-Constants.Hood.STATOR_CURRENT_LIMIT);
+
+        CurrentLimitsConfigs hoodCurrentLimitsConfigs = new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(Constants.Hood.STATOR_CURRENT_LIMIT)
+                .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(Constants.Hood.SUPPLY_CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true);
+
+        SoftwareLimitSwitchConfigs hoodSoftwareLimitSwitchConfigs = new SoftwareLimitSwitchConfigs()
+                .withForwardSoftLimitThreshold(Constants.Hood.FORWARD_SOFT_LIMIT_THRESHOLD)
+                .withForwardSoftLimitEnable(true)
+                .withReverseSoftLimitThreshold(Constants.Hood.REVERSE_SOFT_LIMIT_THRESHOLD)
+                .withReverseSoftLimitEnable(true);
+
+        FeedbackConfigs hoodFeedbackConfigs = new FeedbackConfigs()
+                .withSensorToMechanismRatio(Constants.Hood.GEAR_RATIO);
+        
+        hoodMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
+
+        TalonFXConfiguration hoodConfig = new TalonFXConfiguration()
+                .withMotionMagic(hoodMotionMagicConfig)
+                .withSlot0(hoodSlot0Configs)
+                .withMotorOutput(hoodMotorOutputConfigs)
+                .withCurrentLimits(hoodCurrentLimitsConfigs)
+                .withTorqueCurrent(hoodTorqueCurrentConfigs)
+                .withSoftwareLimitSwitch(hoodSoftwareLimitSwitchConfigs)
+                .withFeedback(hoodFeedbackConfigs);
+
+        // END TURRET HOOD CONFIG
 
         // START FLYWHEEL CONFIG
 
@@ -169,11 +220,13 @@ public class Shooter extends SubsystemBase {
                 .withSlot0(shooterSlot0Configs)
                 .withMotorOutput(shooterMotorOutputConfigs)
                 .withTorqueCurrent(shooterTorqueCurrentConfigs)
-                .withCurrentLimits(shooterCurrentLimits)
-                .withFeedback(shooterFeedbackConfigs);
+                .withCurrentLimits(shooterCurrentLimits);
+
+        // END FLYWHEEL CONFIG
 
         yawMotor.getConfigurator().apply(yawConfig);
         yawCANcoder.getConfigurator().apply(yawCancoderConfig);
+        hoodMotor.getConfigurator().apply(hoodConfig);
         shooterMotor.getConfigurator().apply(shooterConfig);
         shooterFollower.getConfigurator().apply(shooterConfig);
         shooterFollower.setControl(new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Opposed));
@@ -208,7 +261,6 @@ public class Shooter extends SubsystemBase {
     public Command manualAdjust(boolean left) {
         return this.runOnce(() -> {
             this.isManual = true;
-            // this.shooterMotor.setControl(new VoltageOut(12.0));
             this.yawMotor.setControl(new VoltageOut(
                     left ? Constants.Turret.ADJUST_VOLTAGE : -Constants.Turret.ADJUST_VOLTAGE));
         }).andThen(this.run(() -> {
@@ -260,6 +312,8 @@ public class Shooter extends SubsystemBase {
             Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
                     AimAlign.getRequiredSpeed(turretPose, targetPose)));
+            this.hoodMotor.setControl(hoodMotorControl.withPosition(
+                    AimAlign.getRequiredHoodAngle(turretPose, targetPose)));
         }).withName("Shoot without aiming");
     }
 
@@ -269,6 +323,7 @@ public class Shooter extends SubsystemBase {
                 return;
             // point turret forward / starting orientation / whatever
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
+            this.hoodMotor.setControl(hoodMotorControl.withPosition(0));
             this.shooterMotor.setControl(new VoltageOut(Constants.Shooter.IDLE_VOLTAGE));
         }).andThen(Commands.idle(this)).withName("Idle");
     }
@@ -280,6 +335,7 @@ public class Shooter extends SubsystemBase {
                 return;
             this.shooterMotor.setControl(new CoastOut());
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
+            this.hoodMotor.setControl(hoodMotorControl.withPosition(0));
         }).withName("Shooter Off");
     }
 
@@ -358,6 +414,16 @@ public class Shooter extends SubsystemBase {
             0);
     private MechanismLigament2d yawArmLigament;
 
+    private final SingleJointedArmSim hoodMotorSim = new SingleJointedArmSim(
+            DCMotor.getKrakenX60Foc(1),
+            60,
+            1,
+            0.2,
+            0,
+            Math.PI / 2.0,
+            false,
+            0);
+
     private TalonFXSimState shooterMotorSimState;
     private final DCMotorSim shooterMotorSim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60Foc(2), 0.0024, 1),
@@ -396,6 +462,23 @@ public class Shooter extends SubsystemBase {
         yawMotorSimState.setRotorVelocity(
                 yawMotorSim.getVelocityRadPerSec() * Constants.Turret.GEAR_RATIO / 2.0 / Math.PI);
 
+        TalonFXSimState hoodMotorSimState = hoodMotor.getSimState();
+        double hoodSimVolts = hoodMotorSimState.getMotorVoltage();
+        hoodMotorSim.setInputVoltage(hoodSimVolts);
+        hoodMotorSim.update(deltatime);
+
+        hoodMotor.getPosition().refresh();
+
+        hoodMotorSimState.setRawRotorPosition(
+                hoodMotorSim.getAngleRads() * Constants.Hood.GEAR_RATIO / 2.0 / Math.PI);
+        hoodMotorSimState.setRotorVelocity(
+                hoodMotorSim.getVelocityRadPerSec() * Constants.Hood.GEAR_RATIO / 2.0 / Math.PI);
+
+        shooterPos = new Pose3d(0, 0, 0, new Rotation3d(
+                0, 
+                hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI, 
+                yawMotor.getPosition().getValueAsDouble() * 2 * Math.PI
+        ));
         shooterPos = new Pose3d(0, 0, 0,
                 new Rotation3d(0, 0, yawMotor.getPosition().getValueAsDouble() * 2 * Math.PI));
         yawPublisher.set(shooterPos);
@@ -419,7 +502,11 @@ public class Shooter extends SubsystemBase {
             () -> Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(),
                     this.yawMotorControl.Position, 0.01));
 
-    private final Trigger shooterIsAtVelocity = new Trigger(
+    public final Trigger hoodIsAtPosition = new Trigger(
+            () -> Util.epsilonEquals(this.hoodMotor.getPosition(false).getValueAsDouble(),
+                    this.hoodMotorControl.Position, 0.01));
+
+    public final Trigger shooterIsAtVelocity = new Trigger(
             () -> Util.epsilonEquals(this.shooterMotor.getVelocity(false).getValueAsDouble(),
                     this.shooterSpeedControl.Velocity, 5));
 
