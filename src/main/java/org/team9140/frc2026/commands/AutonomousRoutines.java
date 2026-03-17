@@ -3,6 +3,7 @@ package org.team9140.frc2026.commands;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.team9140.frc2026.FieldConstants;
 import org.team9140.frc2026.Robot;
@@ -35,8 +36,7 @@ public class AutonomousRoutines {
     private final Intake intake = Intake.getInstance();
 
     private final SendableChooser<String> autoChooser = new SendableChooser<>();
-    private final HashMap<String, Command> namedCommands = new HashMap<>();
-
+    private final HashMap<String, Supplier<Command>> namedCommands = new HashMap<>();
     private static AutonomousRoutines instance;
 
     public static AutonomousRoutines getInstance(CommandSwerveDrivetrain drivetrain) {
@@ -53,9 +53,9 @@ public class AutonomousRoutines {
         autoChooser.addOption("Sweep Middle From Outpost", "sweep_middle_right");
         autoChooser.addOption("Score from Depot starting Middle", "score_from_depot");
         SmartDashboard.putData(autoChooser);
-        namedCommands.put("shoot", getShootCommand());
-        namedCommands.put("intakeOn", intake.intake());
-        namedCommands.put("intakeOff", intake.off());
+        namedCommands.put("shoot", this::getShootCommand);
+        namedCommands.put("intakeOn", intake::intake);
+        namedCommands.put("intakeOff", intake::off);
     }
 
     private Command getShootCommand() {
@@ -81,7 +81,7 @@ public class AutonomousRoutines {
                 case "sweep_middle_right":
                     return runChoreoAuto("crossandsweep_Blue_Right");
                 case "score_from_depot":
-                    return runChoreoAuto("depotShot_Blue");
+                    return runChoreoAuto("depotShoot_Blue");
                 default:
                     return doNothing();
             }
@@ -118,7 +118,7 @@ public class AutonomousRoutines {
         for (Entry<String, Trigger> entry : path.getEvents().entrySet()) {
             String name = entry.getKey();
             Trigger currTrigger = entry.getValue();
-            Command currCommand = namedCommands.get(name);
+            Command currCommand = namedCommands.get(name).get();
             if (currCommand != null) {
                 currTrigger.onTrue(Commands.runOnce(() -> {
                     path.removeEvent(name);
