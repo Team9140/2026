@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.Vision;
 import org.team9140.frc2026.generated.TunerConstants.TunerSwerveDrivetrain;
-import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.frc2026.helpers.LimelightHelpers.PoseEstimate;
 import org.team9140.frc2026.helpers.LimelightHelpers.RawFiducial;
 import org.team9140.lib.Util;
@@ -200,12 +199,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    private SwerveDriveState cachedState = this.getState();
+
+    public SwerveDriveState getCachedState() {
+        return cachedState;
+    }
+
     @Override
     public void periodic() {
-        SwerveDriveState state = this.getState();
-        Pose2d turretPose = state.Pose.plus(Constants.Turret.POSITION_TO_ROBOT);
-        SmartDashboard.putNumber("distance to hub",
-                turretPose.getTranslation().minus(AimAlign.getZone(turretPose).getTranslation()).getNorm());
+        cachedState = this.getState();
+ 
         // if (this.targetPose != null) {
         // targetPoseDecomposed[0] = this.targetPose.getX();
         // targetPoseDecomposed[1] = this.targetPose.getY();

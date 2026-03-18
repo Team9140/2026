@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class AimAlign {
@@ -20,13 +19,14 @@ public class AimAlign {
     private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap();
 
     static {
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(7)), 2250.0 / 60);
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(8)), 2300.0 / 60);
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(9)), 2400.0 / 60);
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(10)), 2500.0 / 60);
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(11)), 2600.0 / 60);
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(12)), 2700.0 / 60);
-        lookupMotorSpeedFromDistance.put(Double.valueOf(Units.feetToMeters(13)), 2825.0 / 60);
+        lookupMotorSpeedFromDistance.put(1.973, 2000.0 / 60);
+        lookupMotorSpeedFromDistance.put(2.59, 2250.0 / 60);
+        lookupMotorSpeedFromDistance.put(3.167, 2500 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.545, 2650 / 60.0);
+        lookupMotorSpeedFromDistance.put(4.193, 2750 / 60.0);
+        lookupMotorSpeedFromDistance.put(4.333, 2900 / 60.0);
+        lookupMotorSpeedFromDistance.put(5.449, 3150 / 60.0);
+
 
         lookupAirtimeFromDistance.put(Double.valueOf(14.85), Double.valueOf(0.2));
         lookupAirtimeFromDistance.put(Double.valueOf(9.74), Double.valueOf(-0.119));
