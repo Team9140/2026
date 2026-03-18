@@ -49,6 +49,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    this.shooter.setPoseSupplier(() -> this.drivetrain.getCachedState().Pose);
     SmartDashboard.putNumber("tuning RPM", 2500);
     this.controller.rightBumper()
         .onTrue(this.intake.intake())
@@ -57,7 +58,7 @@ public class RobotContainer {
         .onTrue(this.intake.reverse().alongWith(this.hopper.unjam()))
         .onFalse(this.intake.off().alongWith(this.hopper.off()));
     this.controller.y().onTrue(this.shooter.tuningSpeed(() -> SmartDashboard.getNumber("tuning RPM", 3500)));
-    this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getState));
+    this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getCachedState));
     this.controller.x().onTrue(this.shooter.off());
     this.controller.rightTrigger()
         .onTrue(this.hopper.feed())
