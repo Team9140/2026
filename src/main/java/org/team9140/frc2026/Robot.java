@@ -18,7 +18,9 @@ public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
+    FieldConstants.AprilTagLayoutType.OFFICIAL.getLayout();
     m_robotContainer = new RobotContainer();
+    SignalLogger.setPath("/media/sda1");
     SignalLogger.enableAutoLogging(false);
   }
 

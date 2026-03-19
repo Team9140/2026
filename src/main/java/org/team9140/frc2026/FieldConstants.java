@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 
 public class FieldConstants {
-
     public static final FieldType fieldType = FieldType.ANDYMARK;
     public static final double FIELD_LENGTH = AprilTagLayoutType.OFFICIAL.getLayout().getFieldLength();
     public static final double FIELD_WIDTH = AprilTagLayoutType.OFFICIAL.getLayout().getFieldWidth();
