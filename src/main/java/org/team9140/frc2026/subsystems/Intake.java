@@ -15,8 +15,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -153,8 +155,8 @@ public class Intake extends SubsystemBase {
                 .withName("Set Intake position to Arm Out");
     }
 
-    public Command setRollerVolts(double speed) {
-        return this.runOnce(() -> rollerMotor.setVoltage(speed))
+    public Command setRollerVolts(double voltage) {
+        return this.runOnce(() -> rollerMotor.setVoltage(voltage))
                 .withName("Set Intake Arm Roller Speed");
     }
 
@@ -212,6 +214,10 @@ public class Intake extends SubsystemBase {
             Constants.Intake.MAX_HEIGHT,
             false,
             0);
+;
+    private final DCMotorSim rollerSim = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60Foc(1), 0.0005, 1),
+            DCMotor.getKrakenX60Foc(1));
 
     private void updateSimState(double t, double volts) {
         double extendVolts = this.extendMotor.getSimState().getMotorVoltage();
@@ -220,6 +226,8 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putNumber("roller volts", rollerVolts);
         this.extensionSim.setInputVoltage(extendVolts);
         this.extensionSim.update(t);
+        this.rollerSim.setInputVoltage(rollerVolts);
+        this.rollerSim.update(t);
 
         double pos = this.extensionSim.getPositionMeters();
         double vel = this.extensionSim.getVelocityMetersPerSecond();
@@ -230,5 +238,10 @@ public class Intake extends SubsystemBase {
                 .setRotorVelocity(vel / Constants.Intake.PINION_CIRCUMFERENCE * Constants.Intake.EXTENSION_GEAR_RATIO);
 
         intakeSlide.setLength(0.5 + pos);
+
+        this.rollerMotor.getSimState().setRawRotorPosition(this.rollerSim.getAngularPositionRotations());
+        this.rollerMotor.getSimState().setRotorVelocity(this.rollerSim.getAngularVelocityRPM() / 60.0);
+        this.rollerMotor.getSimState().setRotorAcceleration(
+                this.rollerSim.getAngularAccelerationRadPerSecSq() / 2.0 / Math.PI);
     }
 }
