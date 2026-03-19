@@ -160,8 +160,8 @@ public class Constants {
         public static final double KD = 50;
 
         public static final double ADJUST_VOLTAGE = 2.0;
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.25; // rot
-        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -0.25; // rot
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 200.0 / 360.0; // rot
+        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -200.0 / 360.0; // rot
         public static final double GEAR_RATIO = 98.0 / 10.0 * 50.0 / 11.0;
 
         public static final double OVERTURN_LOOKAHEAD_TIME = 1.5;
