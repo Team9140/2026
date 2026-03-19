@@ -40,9 +40,14 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -149,16 +154,16 @@ public class Shooter extends SubsystemBase {
         shooterFollower.setControl(new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Aligned));
         this.yawMotor.setControl(yawMotorControl.withPosition(0));
 
-        // Mechanism2d yawMech = new Mechanism2d(1, 1);
-        // MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
-        // yawArmLigament = yawRoot.append(new MechanismLigament2d(
-        //         "yawArm",
-        //         0.3,
-        //         0,
-        //         6,
-        //         new Color8Bit(Color.kYellow)));
+        Mechanism2d yawMech = new Mechanism2d(1, 1);
+        MechanismRoot2d yawRoot = yawMech.getRoot("yawArm Root", 1.5, 0.5);
+        yawArmLigament = yawRoot.append(new MechanismLigament2d(
+                "yawArm",
+                0.3,
+                0,
+                6,
+                new Color8Bit(Color.kYellow)));
 
-        // SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
+        SmartDashboard.putData("YAW ARM MECHANISM", yawMech);
 
         this.setDefaultCommand(this.off());
 
@@ -287,11 +292,11 @@ public class Shooter extends SubsystemBase {
             Math.PI,
             false,
             0);
-    // private final MechanismLigament2d yawArmLigament;
+    private MechanismLigament2d yawArmLigament;
 
     private TalonFXSimState shooterMotorSimState;
-    private final FlywheelSim shooterMotorSim = new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60Foc(2), 0.2, 60),
+    private final DCMotorSim shooterMotorSim = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60Foc(2), 0.0024, 1),
             DCMotor.getKrakenX60Foc(2));
 
     private final StructPublisher<Pose3d> publisher1 = NetworkTableInstance.getDefault()
@@ -320,7 +325,7 @@ public class Shooter extends SubsystemBase {
         yawMotorSim.update(deltatime);
 
         yawMotor.getPosition().refresh();
-        // yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
+        yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
 
         yawMotorSimState.setRawRotorPosition(
                 yawMotorSim.getAngleRads() * Constants.Turret.GEAR_RATIO / 2.0 / Math.PI);
@@ -337,6 +342,7 @@ public class Shooter extends SubsystemBase {
 
         shooterMotorSim.update(deltatime);
 
+        shooterMotorSimState.setRawRotorPosition(shooterMotorSim.getAngularPositionRotations());
         shooterMotorSimState.setRotorVelocity(shooterMotorSim.getAngularVelocityRPM() / 60.0);
         shooterMotorSimState.setRotorAcceleration(
                 shooterMotorSim.getAngularAccelerationRadPerSecSq() / 2.0 / Math.PI);
