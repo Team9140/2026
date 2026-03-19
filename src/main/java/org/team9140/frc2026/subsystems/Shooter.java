@@ -273,8 +273,15 @@ public class Shooter extends SubsystemBase {
             Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
                     AimAlign.getRequiredSpeed(turretPose, targetPose)));
-            this.yawMotor.setControl(yawMotorControl.withPosition(
-                    AimAlign.yawAngleToPos(turretPose, targetPose) / (2.0 * Math.PI)));
+            this.hoodMotor.setControl(hoodMotorControl.withPosition(
+                    AimAlign.getRequiredHoodAngle(turretPose, targetPose)));
+            double yaw = AimAlign.yawAngleToPos(turretPose, targetPose) / (2.0 * Math.PI);    
+            if (this.yawMotor.getPosition().getValueAsDouble() > 0 && yaw < -160.0 / 360.0) {
+                yaw += 1;
+            } else if(this.yawMotor.getPosition().getValueAsDouble() < 0 && yaw > 160.0 / 360.0) {
+                yaw -= 1;
+            }
+            this.yawMotor.setControl(yawMotorControl.withPosition(yaw));
         }).withName("Continuously Aim Automatically");
     }
 
@@ -370,8 +377,8 @@ public class Shooter extends SubsystemBase {
             60,
             1,
             0.2,
-            -Math.PI,
-            Math.PI,
+            -200 * Math.PI / 180.0,
+            200 * Math.PI / 180.0,
             false,
             0);
     private MechanismLigament2d yawArmLigament;
