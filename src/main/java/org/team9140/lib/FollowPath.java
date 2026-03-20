@@ -76,9 +76,6 @@ public class FollowPath {
         return this.eventTimes.get(eventName);
     }
 
-    public Trigger removeEvent(String eventName) {
-        return this.eventTimes.remove(eventName);
-    }
     public Trigger atTime(double timestamp) {
         return new Trigger(
                 loop,
