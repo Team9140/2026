@@ -278,7 +278,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         double kArea = 0.2;
         double kLinearVel = 2.5;
         double kAngularVel = 3.0;
-        double kAmb = 1.0;
+        double kAmb = 4.0;
 
         if (measurement.tagCount == 1) {
             kArea *= 0.5;
@@ -297,7 +297,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         double sigmaLinearVel = kLinearVel * linearVel;
         double sigmaAngularVel = kAngularVel * angularVel;
 
-        double sigmaAmb = kAmb * highestAmbiguity;
+        double sigmaAmb = kAmb * highestAmbiguity * highestAmbiguity;
 
         xyStdDev = Math.sqrt(
                 sigmaArea * sigmaArea +
