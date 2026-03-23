@@ -16,6 +16,8 @@ import org.team9140.lib.FollowPath;
 import org.team9140.lib.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -127,12 +129,16 @@ public class AutonomousRoutines {
         }
     }
 
+    private final StructPublisher<Pose2d> initialPosePublisher = NetworkTableInstance.getDefault()
+        .getStructTopic("Auto Path Initial Pose", Pose2d.struct).publish();
+
     public Command runChoreoAuto(String pathame) {
         FollowPath path = new FollowPath(pathame, () -> this.drivetrain.getState().Pose,
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
         if (Robot.isSimulation())
             drivetrain.resetPose(path.getInitialPose());
         bindEventCommands(path);
+        initialPosePublisher.set(path.getInitialPose());
         return path.gimmeCommand();
     }
 

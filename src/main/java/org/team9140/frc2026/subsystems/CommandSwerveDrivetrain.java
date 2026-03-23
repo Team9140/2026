@@ -34,7 +34,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.Publisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -205,9 +210,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return cachedState;
     }
 
+    private final StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault().getStructTopic("Drivetrain Target", Pose2d.struct).publish();
+
     @Override
     public void periodic() {
         cachedState = this.getState();
+
+        targetPosePublisher.accept(targetPose);
+
+        SmartDashboard.putNumber("Drivetrain X error", targetPose.getX() - this.getCachedState().Pose.getX());
+        SmartDashboard.putNumber("Drivetrain Y error", targetPose.getY() - this.getCachedState().Pose.getY());
+        SmartDashboard.putNumber("Drivetrain Theta error", targetPose.getRotation().getRadians() - this.getCachedState().Pose.getRotation().getRadians());
  
         // if (this.targetPose != null) {
         // targetPoseDecomposed[0] = this.targetPose.getX();
@@ -251,37 +264,47 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void acceptVisionMeasurement(Vision.EstimateType kind, double timestamp, PoseEstimate measurement) {
+        SmartDashboard.putNumber("vision last timestamp", timestamp);
+        
         double xyStdDev;
         double thetaStdDev;
 
         boolean reject = false;
 
         ChassisSpeeds speeds = this.getState().Speeds;
-        double poseDiff = measurement.pose.getTranslation()
-                .getDistance(this.getState().Pose.getTranslation());
+        // double poseDiff = measurement.pose.getTranslation()
+        //         .getDistance(this.getState().Pose.getTranslation());
 
         reject |= Math.abs(Units.degreesToRotations(
                 this.getPigeon2().getAngularVelocityZWorld().getValueAsDouble())) >= 0.5;
         reject |= measurement.avgTagArea <= 0.01;
-        reject |= poseDiff <= 0.01;
+        // reject |= poseDiff <= 0.01;
+
+        SmartDashboard.putNumber("vision area", measurement.avgTagArea);
 
         if (reject) {
+            SmartDashboard.putBoolean("vision rejected", true);
             return;
         }
 
-        double highestAmbiguity = 0.0;
+        double lowestAmbiguity = Double.MAX_VALUE;
         for (RawFiducial tag : measurement.rawFiducials) {
-            highestAmbiguity = Math.max(highestAmbiguity, tag.ambiguity);
+            lowestAmbiguity = Math.min(lowestAmbiguity, tag.ambiguity);
         }
 
-        if (highestAmbiguity > 0.3) {
+        SmartDashboard.putNumber("vision ambiguity", lowestAmbiguity);
+
+        if (lowestAmbiguity > 0.6) {
+            SmartDashboard.putBoolean("vision rejected", true);
+            SmartDashboard.putBoolean("vision high ambiguity", true);
             return;
         }
+        SmartDashboard.putBoolean("vision high ambiguity", false);
 
         double kArea = 0.2;
         double kLinearVel = 2.5;
         double kAngularVel = 3.0;
-        double kAmb = 4.0;
+        double kAmb = 1.0;
 
         if (measurement.tagCount == 1) {
             kArea *= 0.5;
@@ -300,13 +323,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         double sigmaLinearVel = kLinearVel * linearVel;
         double sigmaAngularVel = kAngularVel * angularVel;
 
-        double sigmaAmb = kAmb * highestAmbiguity * highestAmbiguity;
+        double sigmaAmb = kAmb * lowestAmbiguity;
 
         xyStdDev = Math.sqrt(
                 sigmaArea * sigmaArea +
                         sigmaLinearVel * sigmaLinearVel +
                         sigmaAngularVel * sigmaAngularVel +
-                        sigmaAmb * sigmaAmb);
+                        sigmaAmb * sigmaAmb + 3);
 
         thetaStdDev = xyStdDev * 2.0;
 
@@ -318,8 +341,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         xyStdDev = MathUtil.clamp(xyStdDev, 0.05, 5.0);
         thetaStdDev = MathUtil.clamp(thetaStdDev, 1.0, 100.0);
 
-        SmartDashboard.putNumber("vision ambiguity", highestAmbiguity);
-        SmartDashboard.putNumber("vision area", measurement.avgTagArea);
+        if (DriverStation.isEnabled()) {
+            thetaStdDev = 9999;
+        }
+
+        SmartDashboard.putBoolean("vision rejected", false);
         SmartDashboard.putNumber("vision xyStdDev", xyStdDev);
         SmartDashboard.putNumber("vision thetaStdDev", thetaStdDev);
 
