@@ -140,24 +140,27 @@ public class AutonomousRoutines {
     private final StructPublisher<Pose2d> initialPosePublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Auto Path Initial Pose", Pose2d.struct).publish();
 
-    public Command runChoreoAuto(String pathame) {
+    public Command runChoreoAuto(String pathame, boolean resetPose) {
         FollowPath path = new FollowPath(pathame, () -> this.drivetrain.getState().Pose,
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
-        if (Robot.isSimulation())
+        if (Robot.isSimulation() && resetPose)
             drivetrain.resetPose(path.getInitialPose());
         this.bindEventCommands(path);
         initialPosePublisher.set(path.getInitialPose());
         return path.gimmeCommand();
     }
 
+    public Command runChoreoAuto(String pathName) {
+        return runChoreoAuto(pathName, true);
+    }
+
     public Command runRepeatReverse(String side) {
         if (side.equals("outpost")) {
             return runChoreoAuto("repeatReverse_Blue_Outpost_Shallow")
-                    .andThen(runChoreoAuto("repeatReverse_Blue_Outpost_Reset"))
-                    .andThen(runChoreoAuto("repeatReverse_Blue_Outpost_Deep"))
-                    .andThen(runChoreoAuto("repeatReverse_Blue_Outpost_Reset"));
-        }
-        else {
+                    .andThen(runChoreoAuto("repeatReverse_Blue_Outpost_Reset", false))
+                    .andThen(runChoreoAuto("repeatReverse_Blue_Outpost_Deep", false))
+                    .andThen(runChoreoAuto("repeatReverse_Blue_Outpost_Reset", false));
+        } else {
             return null;
         }
     }
