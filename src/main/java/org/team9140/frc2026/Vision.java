@@ -83,7 +83,7 @@ public class Vision {
                 .getBotPoseEstimate_wpiBlue(this.cameraName);
 
         if (mt1 != null && mt1.tagCount >= 1) {
-            this.estConsumer.accept(EstimateType.MT1, timestamp, mt1);
+            this.estConsumer.accept(EstimateType.MT1, timestamp, mt1, 0);
         }
     }
 
@@ -94,7 +94,7 @@ public class Vision {
 
     @FunctionalInterface
     public static interface EstimateConsumer {
-        public void accept(EstimateType kind, double timestamp, PoseEstimate estimate);
+        public void accept(EstimateType kind, double timestamp, PoseEstimate estimate, double additional_stddev);
     }
 
     private int m_listenerID = -1;

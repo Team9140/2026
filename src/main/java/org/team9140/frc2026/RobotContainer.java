@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
@@ -33,10 +32,13 @@ public class RobotContainer {
       Constants.Vision.ROBOT_TO_CAM[0]);
   private final Vision limeB = new Vision(Constants.Vision.CAMERA_NAMES[1], this.drivetrain::acceptVisionMeasurement,
       Constants.Vision.ROBOT_TO_CAM[1]);
+  private final Vision limeC = new Vision(Constants.Vision.CAMERA_NAMES[2], this.shooter::acceptVisionMeasurement,
+          Constants.Vision.ROBOT_TO_CAM[2]);
 
   public RobotContainer() {
     limeA.setIMUMode(1);
     limeB.setIMUMode(1);
+    limeC.setIMUMode(1);
     driveCommand = drivetrain.teleopDrive(controller::getLeftX, controller::getLeftY,
         controller::getRightX);
 
@@ -44,6 +46,7 @@ public class RobotContainer {
 
     limeA.start();
     limeB.start();
+    limeC.start();
 
     autoRoutines = AutonomousRoutines.getInstance(drivetrain);
   }

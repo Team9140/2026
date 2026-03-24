@@ -166,10 +166,11 @@ public class Constants {
 
         public static final double OVERTURN_LOOKAHEAD_TIME = 1.5;
         public static final Transform2d POSITION_TO_ROBOT = new Transform2d(-0.15, 0.2, new Rotation2d(-Math.PI));
+        public static final Transform2d TURRET_TO_CAMERA = new Transform2d(0, 0.1, new Rotation2d()); // TODO: Actual value
     }
 
     public static class Vision {
-        public static final String[] CAMERA_NAMES = {"limelight-a", "limelight-b"};
-        public static Transform3d[] ROBOT_TO_CAM = {null, null};
+        public static final String[] CAMERA_NAMES = {"limelight-a", "limelight-b", "limelight-c"};
+        public static Transform3d[] ROBOT_TO_CAM = {null, null, null};
     }
 }

@@ -6,7 +6,9 @@ import java.util.function.Supplier;
 import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.Constants.Turret;
 import org.team9140.frc2026.FieldConstants;
+import org.team9140.frc2026.Vision;
 import org.team9140.frc2026.helpers.AimAlign;
+import org.team9140.frc2026.helpers.LimelightHelpers.PoseEstimate;
 import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.Utils;
@@ -181,6 +183,12 @@ public class Shooter extends SubsystemBase {
         this.posSupplier = positionSupplier;
     }
 
+    Vision.EstimateConsumer estimateConsumer = null;
+
+    public void setVisionEstimateConsumer(Vision.EstimateConsumer estimateConsumer) {
+        this.estimateConsumer = estimateConsumer;
+    }
+
     private boolean isManual = false;
 
     public Command manualAdjust(boolean left) {
@@ -218,7 +226,8 @@ public class Shooter extends SubsystemBase {
             SwerveDriveState robotState = chassisStateSupplier.get();
             Pose2d turretPose = robotState.Pose;
 
-            Translation2d targetPose = AimAlign.getEffectivePose(turretPose, AimAlign.getZone(turretPose).getTranslation(), robotState.Speeds);
+            Translation2d targetPose = AimAlign.getEffectivePose(turretPose,
+                    AimAlign.getZone(turretPose).getTranslation(), robotState.Speeds);
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
                     AimAlign.getRequiredSpeed(turretPose, targetPose)));
             this.yawMotor.setControl(yawMotorControl.withPosition(
@@ -387,4 +396,16 @@ public class Shooter extends SubsystemBase {
                     * Turret.OVERTURN_LOOKAHEAD_TIME > Constants.Turret.FORWARD_SOFT_LIMIT_THRESHOLD
             || this.yawMotorControl.Position + this.targetYawRateOfChange
                     * Turret.OVERTURN_LOOKAHEAD_TIME < Constants.Turret.REVERSE_SOFT_LIMIT_THRESHOLD);
+
+    public void acceptVisionMeasurement(Vision.EstimateType kind, double timestamp, PoseEstimate measurement,
+            double additional_stddev) {
+        measurement.pose = measurement.pose.transformBy(
+                new Transform2d(
+                        new Pose2d(Constants.Turret.POSITION_TO_ROBOT.getTranslation(),
+                                new Rotation2d(this.yawMotor.getPosition(false).getValueAsDouble()))
+                                .plus(Constants.Turret.TURRET_TO_CAMERA),
+                        Pose2d.kZero));
+        additional_stddev += 3.0 * Math.abs(this.yawMotor.getVelocity(false).getValueAsDouble() * 2.0 * Math.PI);
+        this.estimateConsumer.accept(kind, timestamp, measurement, additional_stddev);
+    }
 }

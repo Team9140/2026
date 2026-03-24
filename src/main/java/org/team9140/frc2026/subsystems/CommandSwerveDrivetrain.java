@@ -263,7 +263,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    public void acceptVisionMeasurement(Vision.EstimateType kind, double timestamp, PoseEstimate measurement) {
+    public void acceptVisionMeasurement(Vision.EstimateType kind, double timestamp, PoseEstimate measurement, double additional_stddev) {
         SmartDashboard.putNumber("vision last timestamp", timestamp);
         
         double xyStdDev;
@@ -329,7 +329,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 sigmaArea * sigmaArea +
                         sigmaLinearVel * sigmaLinearVel +
                         sigmaAngularVel * sigmaAngularVel +
-                        sigmaAmb * sigmaAmb + 3);
+                        sigmaAmb * sigmaAmb +
+                        additional_stddev * additional_stddev + 3);
 
         thetaStdDev = xyStdDev * 2.0;
 
