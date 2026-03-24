@@ -149,6 +149,7 @@ public class FollowPath {
                 },
                 interrupted -> {
                     this.active = false;
+                    this.loop.poll();
                 },
                 () -> (this.timer.hasElapsed(this.trajectory.getTotalTime()))
                         && Util.epsilonEquals(poseSupplier.get(), getFinalPose()),
