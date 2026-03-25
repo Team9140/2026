@@ -301,7 +301,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         SmartDashboard.putBoolean("vision high ambiguity", false);
 
-        double kArea = 0.2;
+        double kArea = 0.6;
         double kLinearVel = 2.5;
         double kAngularVel = 3.0;
         double kAmb = 1.0;
