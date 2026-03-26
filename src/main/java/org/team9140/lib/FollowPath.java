@@ -136,7 +136,7 @@ public class FollowPath {
         return this.finalPose;
     }
 
-    public Command gimmeCommand() {
+    public Command gimmeCommand(boolean waitUntilAtFinalTarget) {
         return new FunctionalCommand(
                 () -> {
                     this.timer.restart();
@@ -152,7 +152,11 @@ public class FollowPath {
                     this.loop.poll();
                 },
                 () -> (this.timer.hasElapsed(this.trajectory.getTotalTime()))
-                        && Util.epsilonEquals(poseSupplier.get(), getFinalPose()),
+                        && (!waitUntilAtFinalTarget || Util.epsilonEquals(poseSupplier.get(), getFinalPose())),
                 requirement);
+    }
+
+    public Command gimmeCommand() {
+        return this.gimmeCommand(true);
     }
 }
