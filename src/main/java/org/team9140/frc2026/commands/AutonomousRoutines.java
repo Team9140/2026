@@ -95,17 +95,17 @@ public class AutonomousRoutines {
                 case "one_pass_depot":
                     return runChoreoAuto("onceReverse_Depot");
                 case "two_pass_outpost":
-                    return runChoreoAuto("repeatReverse_Outpost_Deep", false)
-                    .andThen(runChoreoAuto("repeatReverse_Outpost_Shallow"));
+                    return runChoreoAuto("repeatReverse_Outpost_Deep", false, true)
+                    .andThen(runChoreoAuto("repeatReverse_Outpost_Shallow", true, false));
                 case "two_pass_depot":
-                    return runChoreoAuto("repeatReverse_Depot_Deep", false)
-                    .andThen(runChoreoAuto("repeatReverse_Depot_Shallow"));
+                    return runChoreoAuto("repeatReverse_Depot_Deep", false, true)
+                    .andThen(runChoreoAuto("repeatReverse_Depot_Shallow", true, false));
                 case "two_pass_outpost_safe":
-                    return runChoreoAuto("repeatReverse_Outpost_Deep_SAFE", false)
-                    .andThen(runChoreoAuto("repeatReverse_Outpost_Shallow"));
+                    return runChoreoAuto("repeatReverse_Outpost_Deep_SAFE", false, true)
+                    .andThen(runChoreoAuto("repeatReverse_Outpost_Shallow", true, false));
                 case "two_pass_depot_safe":
-                    return runChoreoAuto("repeatReverse_Depot_Deep_SAFE", false)
-                    .andThen(runChoreoAuto("repeatReverse_Depot_Shallow"));
+                    return runChoreoAuto("repeatReverse_Depot_Deep_SAFE", false, true)
+                    .andThen(runChoreoAuto("repeatReverse_Depot_Shallow", true, false));
                 default:
                     return doNothing();
             }
@@ -147,10 +147,10 @@ public class AutonomousRoutines {
     private final StructPublisher<Pose2d> initialPosePublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Auto Path Initial Pose", Pose2d.struct).publish();
 
-    public Command runChoreoAuto(String pathame, boolean waitUntilAtFinalTarget) {
+    public Command runChoreoAuto(String pathame, boolean waitUntilAtFinalTarget, boolean reset) {
         FollowPath path = new FollowPath(pathame, () -> this.drivetrain.getState().Pose,
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
-        if (Robot.isSimulation())
+        if (Robot.isSimulation() && reset)
             drivetrain.resetPose(path.getInitialPose());
         this.bindEventCommands(path);
         initialPosePublisher.set(path.getInitialPose());
@@ -158,7 +158,7 @@ public class AutonomousRoutines {
     }
 
     public Command runChoreoAuto(String pathame) {
-        return this.runChoreoAuto(pathame, true);
+        return this.runChoreoAuto(pathame, true, true);
     }
 
 }
