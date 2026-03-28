@@ -113,8 +113,8 @@ public class Constants {
         public static final double INTAKE_VOLTAGE = 12.0;
         public static final double INTAKE_OFF = 0.0;
 
-        public static final double ROLLER_STATOR_CURRENT_LIMIT = 80.0;
-        public static final double EXTEND_STATOR_CURRENT_LIMIT = 40.0;
+        public static final double ROLLER_STATOR_CURRENT_LIMIT = 20.0;
+        public static final double EXTEND_STATOR_CURRENT_LIMIT = 10.0;
 
         public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 40.0;
         public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 60.0;
