@@ -14,7 +14,7 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
     public static class Ports {
-        public static final CANBus CANIVORE = new CANBus("poop", "./logs/example.hoot");
+        public static final CANBus CANIVORE = new CANBus("sixseven", "./logs/example.hoot");
         public static final int YAW_MOTOR = 12;
         public static final int PITCH_MOTOR = 0;
         public static final int SHOOTER_MOTOR = 16;
@@ -104,27 +104,27 @@ public class Constants {
     }
 
     public static class Intake {
-        public static final double EXTENSION_GEAR_RATIO = 30.0 / 15.0 * 50.0 / 11.0;
+        public static final double EXTENSION_GEAR_RATIO = 36.0 / 15.0 * 50.0 / 11.0;
         public static final double TOLERANCE = Units.inchesToMeters(0.5);
 
         public static final int PINION_TEETH = 10;
         public static final double PINION_DP = 10;
         public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
-        public static final double INTAKE_VOLTAGE = 12.0;
+        public static final double INTAKE_VOLTAGE = 10.0;
         public static final double INTAKE_OFF = 0.0;
 
         public static final double ROLLER_STATOR_CURRENT_LIMIT = 80.0;
-        public static final double EXTEND_STATOR_CURRENT_LIMIT = 40.0;
+        public static final double EXTEND_STATOR_CURRENT_LIMIT = 10.0;
 
-        public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 40.0;
+        public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 30.0;
         public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 60.0;
 
         public static final double MOTION_MAGIC_CRUISE_VELOCITY = 64;
         public static final double MOTION_MAGIC_ACCELERATION = 64;
-        public static final double EXTEND_KP = 500;
+        public static final double EXTEND_KP = 300;
 
         public static final double ARM_IN_POSITION = 0.0;
-        public static final double ARM_OUT_POSITION = 0.305;
+        public static final double ARM_OUT_POSITION = 0.29;
 
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = ARM_OUT_POSITION / PINION_CIRCUMFERENCE;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;

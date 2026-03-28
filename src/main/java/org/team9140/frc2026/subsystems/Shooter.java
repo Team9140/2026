@@ -158,6 +158,7 @@ public class Shooter extends SubsystemBase {
 
         yawMotor.getConfigurator().apply(yawConfig);
         shooterMotor.getConfigurator().apply(shooterConfig);
+        shooterFollower.getConfigurator().apply(shooterConfig);
         shooterFollower.setControl(new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Opposed));
         this.yawMotor.setControl(yawMotorControl.withPosition(0));
 
@@ -263,8 +264,6 @@ public class Shooter extends SubsystemBase {
     public Command tuningSpeed(DoubleSupplier RPM) {
         return this.runOnce(() -> {
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
-            this.shooterFollower.setControl(
-                    new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Aligned));
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(RPM.getAsDouble() / 60.0));
         }).andThen(this.run(() -> {
         }));
