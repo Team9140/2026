@@ -11,10 +11,15 @@ import org.team9140.frc2026.subsystems.Hopper;
 import org.team9140.frc2026.subsystems.Intake;
 import org.team9140.frc2026.subsystems.Shooter;
 
+import com.ctre.phoenix6.Utils;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
@@ -47,7 +52,12 @@ public class RobotContainer {
     autoRoutines = AutonomousRoutines.getInstance(drivetrain);
   }
 
+  private double timeAtShootRelease = Utils.getSystemTimeSeconds();
+  Trigger stopShooting = new Trigger(
+      () -> Utils.getSystemTimeSeconds() - timeAtShootRelease >= Constants.Turret.TURN_OFF_TIME);
+
   private void configureBindings() {
+
     this.shooter.setPoseSupplier(() -> this.drivetrain.getCachedState().Pose);
     SmartDashboard.putNumber("tuning RPM", 2500);
     this.controller.rightBumper()
@@ -56,13 +66,19 @@ public class RobotContainer {
     this.controller.leftBumper()
         .onTrue(this.intake.armIn().andThen(this.hopper.unjam()))
         .onFalse(this.intake.off().alongWith(this.hopper.off()));
-    this.controller.rightTrigger()
-        .whileTrue(this.hopper.feed())
-        .onFalse(this.hopper.off());
+    this.controller.rightTrigger().onTrue(
+        shooter.aim(this.drivetrain::getCachedState)
+            .alongWith(new WaitUntilCommand(shooter.yawIsAtPosition.and(shooter.shooterIsAtVelocity))
+                .andThen(hopper.feed())))
+        .onFalse(Commands.runOnce(() -> {
+          timeAtShootRelease = Utils.getSystemTimeSeconds();
+        }));
+
+    stopShooting.onTrue(shooter.idle().andThen(this.hopper.off()));
 
     this.controller.y().onTrue(this.shooter.tuningSpeed(this.drivetrain::getCachedState, () -> SmartDashboard.getNumber("tuning RPM", 2500)));
-    this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getCachedState));
-    this.controller.x().onTrue(this.shooter.off());
+    // this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getCachedState));
+    // this.controller.x().onTrue(this.shooter.off());
 
     this.controller.back().whileTrue(this.shooter.manualLeft());
     this.controller.start().whileTrue(this.shooter.manualRight());
