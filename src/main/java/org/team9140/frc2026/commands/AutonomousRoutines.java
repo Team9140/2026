@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -52,7 +53,9 @@ public class AutonomousRoutines {
         autoChooser.addOption("Sweep Middle From Depot", "sweep_middle_depot");
         autoChooser.addOption("Sweep Middle From Outpost", "sweep_middle_outpost");
         autoChooser.addOption("Score from Depot starting Middle", "score_from_depot");
+        autoChooser.addOption("Score from Depot starting Left", "depot_shoot_left");
         autoChooser.addOption("1 Pass From Depot", "one_pass_depot");
+        autoChooser.addOption("1 Pass From Depot then Score from Depot", "one_pass_depot_then_depot_shoot");
         autoChooser.addOption("1 Pass From Outpost", "one_pass_outpost");
         autoChooser.addOption("2 Passes from Outpost", "two_pass_outpost");
         autoChooser.addOption("2 Passes from Depot", "two_pass_depot");
@@ -93,6 +96,8 @@ public class AutonomousRoutines {
                     }
 
                     return this.intake.armOut().andThen(new WaitCommand(2.0)).andThen(shooter.aim(this.drivetrain::getCachedState, () -> targetHub));
+                case "depot_shoot_left":
+                    return runChoreoAuto("depotShoot_Left").andThen(this.getShootCommand());
                 case "sweep_middle_depot":
                     return runChoreoAuto("crossandsweep_Depot");
                 case "sweep_middle_outpost":
@@ -115,6 +120,8 @@ public class AutonomousRoutines {
                 case "two_pass_depot_safe":
                     return runChoreoAuto("repeatReverse_Depot_Deep_SAFE", false, true)
                     .andThen(runChoreoAuto("repeatReverse_Depot_Shallow", true, false));
+                case "one_pass_depot_then_depot_shoot":
+                    return runChoreoAuto("onceReverse_Depot", false, true).andThen(new WaitCommand(8.0)).andThen(runChoreoAuto("depotShoot_Left"));
                 default:
                     return doNothing();
             }

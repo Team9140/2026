@@ -60,7 +60,7 @@ public class Constants {
         public static final double HEADING_CONTROLLER_D = 0.03; // 0.04
 
         public static final double REACHEDPOSE_DEBOUNCE = 0.5;
-        public static final double BRAKE_IDLE_TIME = 6.0;
+        public static final double BRAKE_IDLE_TIME = 1.0;
         public static final double TELEOP_SHOOTING_VELOCITY_MULTIPLIER = 0.67;
 
     }

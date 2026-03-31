@@ -22,12 +22,16 @@ public class AimAlign {
     private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap();
 
     static {
-        lookupMotorSpeedFromDistance.put(1.973, 2000.0 / 60);
-        lookupMotorSpeedFromDistance.put(2.59, 2250.0 / 60);
-        lookupMotorSpeedFromDistance.put(3.167, 2500 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.545, 2650 / 60.0);
-        lookupMotorSpeedFromDistance.put(4.193, 2750 / 60.0);
-        lookupMotorSpeedFromDistance.put(4.333, 2900 / 60.0);
+        lookupMotorSpeedFromDistance.put(1.86, 1900.0 / 60);
+        lookupMotorSpeedFromDistance.put(2.12, 2000.0 / 60);
+        lookupMotorSpeedFromDistance.put(2.67, 2250.0 / 60);
+        lookupMotorSpeedFromDistance.put(3.34, 2400 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.52, 2500 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.75, 2650.0 / 60);
+        lookupMotorSpeedFromDistance.put(4.06, 2700.0 / 60);
+        lookupMotorSpeedFromDistance.put(4.21, 2750 / 60.0);
+        lookupMotorSpeedFromDistance.put(4.48, 2800 / 60.0);
+        lookupMotorSpeedFromDistance.put(5.02, 3000.0 / 60);
         lookupMotorSpeedFromDistance.put(5.449, 3150 / 60.0);
 
 
