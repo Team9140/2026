@@ -266,11 +266,18 @@ public class Shooter extends SubsystemBase {
         }).withName("Shooter Off");
     }
 
-    public Command tuningSpeed(DoubleSupplier RPM) {
-        return this.runOnce(() -> {
-            this.yawMotor.setControl(yawMotorControl.withPosition(0));
+    public Command tuningSpeed(Supplier<SwerveDriveState> chassisStateSupplier, DoubleSupplier RPM) {
+        return this.run(() -> {
+            if (this.isManual)
+                return;
+            SwerveDriveState robotState = chassisStateSupplier.get();
+            Pose2d turretPose = robotState.Pose;
+
+            Translation2d targetPose = AimAlign.getHub().getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(RPM.getAsDouble() / 60.0));
-        }).andThen(Commands.idle(this));
+            this.yawMotor.setControl(yawMotorControl.withPosition(
+                    AimAlign.yawAngleToPos(turretPose, targetPose) / (2.0 * Math.PI)));
+        }).withName("Continuously Aim Automatically");
     }
 
     private double targetYawRateOfChange = 0;

@@ -104,4 +104,12 @@ public class AimAlign {
         }
         return position;
     }
+
+    public static Pose2d getHub() {
+        if (Util.getAlliance().equals(Optional.of(DriverStation.Alliance.Red))) {
+            return FieldConstants.Hub.RED_CENTER_POINT;
+        }
+
+        return FieldConstants.Hub.CENTER_POINT;
+    }
 }

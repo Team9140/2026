@@ -60,7 +60,7 @@ public class RobotContainer {
         .whileTrue(this.hopper.feed())
         .onFalse(this.hopper.off());
 
-    this.controller.y().onTrue(this.shooter.tuningSpeed(() -> SmartDashboard.getNumber("tuning RPM", 2500)));
+    this.controller.y().onTrue(this.shooter.tuningSpeed(this.drivetrain::getCachedState, () -> SmartDashboard.getNumber("tuning RPM", 2500)));
     this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getCachedState));
     this.controller.x().onTrue(this.shooter.off());
 
