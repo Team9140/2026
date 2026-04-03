@@ -2,21 +2,31 @@ package org.team9140.frc2026.subsystems;
 
 import org.team9140.frc2026.Constants;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Hopper extends SubsystemBase {
     private final TalonFX spinnerMotor = new TalonFX(Constants.Ports.HOPPER_SPINNER_MOTOR, Constants.Ports.CANIVORE);
     private final TalonFX feederMotor = new TalonFX(Constants.Ports.HOPPER_FEEDER_MOTOR, Constants.Ports.CANIVORE);
     private static Hopper instance;
+
+    private final DCMotorSim spinnerSim = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60Foc(1), 0.0005, 1),
+            DCMotor.getKrakenX60Foc(1));
 
     private Hopper() {
         CurrentLimitsConfigs spinnerCurrentLimits = new CurrentLimitsConfigs()
@@ -48,6 +58,10 @@ public class Hopper extends SubsystemBase {
         this.spinnerMotor.getConfigurator().apply(spinnerMotorConfigs);
         this.feederMotor.getConfigurator().apply(feederMotorConfigs);
 
+        if (Utils.isSimulation()) {
+            startSimThread();
+        }
+
         this.setDefaultCommand(off());
     }
 
@@ -75,7 +89,41 @@ public class Hopper extends SubsystemBase {
         return this.setSpeeds(0, 0)
                 .withName("Hopper Off");
     }
-    
-	public final Trigger feederOff = new Trigger(() -> this.feederMotor.getMotorVoltage().getValueAsDouble() == 0);
+
+    public Command reverseAndOff() {
+        return off().withTimeout(0.5).andThen(unjam()).withTimeout(Constants.Hopper.REVERSE_FEEDER_TIME).andThen(off())
+                .withName("Reverse Hopper and Off");
+    }
+
+    private static final double kSimLoopPeriod = Constants.Intake.SIM_PERIOD; // 4 ms
+    private Notifier m_simNotifier = null;
+    private double m_lastSimTime;
+
+    private void startSimThread() {
+        m_lastSimTime = Utils.getCurrentTimeSeconds();
+
+        /* Run simulation at a faster rate so PID gains behave more reasonably */
+        m_simNotifier = new Notifier(() -> {
+            final double currentTime = Utils.getCurrentTimeSeconds();
+            double deltaTime = currentTime - m_lastSimTime;
+            m_lastSimTime = currentTime;
+
+            /* use the measured time delta, get battery voltage from WPILib */
+            updateSimState(deltaTime, RobotController.getBatteryVoltage());
+        });
+
+        m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    private void updateSimState(double deltaTime, double batteryVoltage) {
+        double spinnerMotor = this.spinnerMotor.getSimState().getMotorVoltage();
+        SmartDashboard.putNumber("spinner volts", spinnerMotor);
+        this.spinnerSim.setInputVoltage(spinnerMotor);
+        this.spinnerSim.update(deltaTime);
+        this.spinnerMotor.getSimState().setRawRotorPosition(this.spinnerSim.getAngularPositionRotations());
+        this.spinnerMotor.getSimState().setRotorVelocity(this.spinnerSim.getAngularVelocityRPM() / 60.0);
+        this.spinnerMotor.getSimState().setRotorAcceleration(
+                this.spinnerSim.getAngularAccelerationRadPerSecSq() / 2.0 / Math.PI);
+    }
 
 }
