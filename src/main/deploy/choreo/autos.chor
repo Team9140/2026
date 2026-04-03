@@ -27,6 +27,20 @@
      "val":0.0
     }
    },
+   "Blue_Depot_Bump_End":{
+    "x":{
+     "exp":"3 m",
+     "val":3.0
+    },
+    "y":{
+     "exp":"5.6 m",
+     "val":5.6
+    },
+    "heading":{
+     "exp":"180 deg",
+     "val":3.141592653589793
+    }
+   },
    "Blue_Depot_Trench":{
     "x":{
      "exp":"4.358846664428711 m",
@@ -81,6 +95,20 @@
     "heading":{
      "exp":"0 rad",
      "val":0.0
+    }
+   },
+   "Blue_Outpost_Bump_End":{
+    "x":{
+     "exp":"2.7913107872009277 m",
+     "val":2.7913107872009277
+    },
+    "y":{
+     "exp":"2.317690372467041 m",
+     "val":2.317690372467041
+    },
+    "heading":{
+     "exp":"180 deg",
+     "val":3.141592653589793
     }
    },
    "Blue_Outpost_Trench":{

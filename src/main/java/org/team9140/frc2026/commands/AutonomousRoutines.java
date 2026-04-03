@@ -61,6 +61,13 @@ public class AutonomousRoutines {
         autoChooser.addOption("2 Passes from Depot", "two_pass_depot");
         autoChooser.addOption("2 Safe Passes from Outpost", "two_pass_outpost_safe");
         autoChooser.addOption("2 Safe Passes from Depot", "two_pass_depot_safe");
+
+        autoChooser.addOption("1 Pass Over Bump From Depot", "one_pass_depot_bump");
+        autoChooser.addOption("1 Pass Over Bump From Outpost", "one_pass_outpost_bump");
+        autoChooser.addOption("2 Passes Over Bump from Outpost", "two_pass_outpost_bump");
+        autoChooser.addOption("2 Passes Over Bump from Depot", "two_pass_depot_bump");
+        autoChooser.addOption("2 Safe Passes Over Bump from Outpost", "two_pass_outpost_safe_bump");
+        autoChooser.addOption("2 Safe Passes Over Bump from Depot", "two_pass_depot_safe_bump");
         SmartDashboard.putData(autoChooser);
         namedCommands.put("shoot", this::getShootCommand);
         namedCommands.put("intakeOn", intake::intake);
@@ -115,11 +122,27 @@ public class AutonomousRoutines {
                     return runChoreoAuto("repeatReverse_Depot_Deep", false, true)
                     .andThen(runChoreoAuto("repeatReverse_Depot_Shallow", true, false));
                 case "two_pass_outpost_safe":
-                    return runChoreoAuto("repeatReverse_Outpost_Deep_SAFE", false, true)
+                    return runChoreoAuto("repeatReverse_Outpost_SAFE", false, true)
                     .andThen(runChoreoAuto("repeatReverse_Outpost_Shallow", true, false));
                 case "two_pass_depot_safe":
-                    return runChoreoAuto("repeatReverse_Depot_Deep_SAFE", false, true)
+                    return runChoreoAuto("repeatReverse_Depot_SAFE", false, true)
                     .andThen(runChoreoAuto("repeatReverse_Depot_Shallow", true, false));
+                case "one_pass_outpost_bump":
+                    return runChoreoAuto("onceReverseBump_Outpost");
+                case "one_pass_depot_bump":
+                    return runChoreoAuto("onceReverseBump_Depot");
+                case "two_pass_outpost_bump":
+                    return runChoreoAuto("repeatReverseBump_Outpost_Deep", false, true)
+                    .andThen(runChoreoAuto("repeatReverseBump_Outpost_Shallow", true, false));
+                case "two_pass_depot_bump":
+                    return runChoreoAuto("repeatReverseBump_Depot_Deep", false, true)
+                    .andThen(runChoreoAuto("repeatReverseBump_Depot_Shallow", true, false));
+                case "two_pass_outpost_safe_bump":
+                    return runChoreoAuto("repeatReverseBump_Outpost_SAFE", false, true)
+                    .andThen(runChoreoAuto("repeatReverseBump_Outpost_Shallow", true, false));
+                case "two_pass_depot_safe_bump":
+                    return runChoreoAuto("repeatReverseBump_Depot_SAFE", false, true)
+                    .andThen(runChoreoAuto("repeatReverseBump_Depot_Shallow", true, false));
                 case "one_pass_depot_then_depot_shoot":
                     return runChoreoAuto("onceReverse_Depot", false, true).andThen(new WaitCommand(8.0)).andThen(runChoreoAuto("depotShoot_Left"));
                 default:
