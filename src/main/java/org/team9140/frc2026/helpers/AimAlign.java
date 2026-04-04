@@ -46,11 +46,14 @@ public class AimAlign {
     static StructPublisher<Pose2d> effectivePosePublisher = NetworkTableInstance.getDefault().getStructTopic("Effective Pose", Pose2d.struct).publish();
 
     public static Translation2d getEffectivePose(Pose2d robotPose, Translation2d goalPose, ChassisSpeeds robotSpeed) {
+        robotSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeed, robotPose.getRotation());
         Translation2d robotVelocity = new Translation2d(
                 robotSpeed.vxMetersPerSecond,
                 robotSpeed.vyMetersPerSecond);
-        double distance, airtime;
-        Translation2d newPose = goalPose.plus(robotVelocity.times(lookupAirtimeFromDistance.get(robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(goalPose).getNorm())));
+
+        double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(goalPose).getNorm(); 
+        double airtime = lookupAirtimeFromDistance.get(distance);
+        Translation2d newPose = goalPose.minus(robotVelocity.times(airtime));
 
         int iterations = 0;
         do {
@@ -59,7 +62,7 @@ public class AimAlign {
             airtime = lookupAirtimeFromDistance.get(distance);
             SmartDashboard.putNumber("Estimated Airtime", airtime);
             effectivePosePublisher.set(new Pose2d(newPose, new Rotation2d()));
-        } while (newPose.minus(newPose = goalPose.plus(robotVelocity.times(airtime))).getNorm() > 0.05 && iterations < 5);
+        } while (newPose.minus(newPose = goalPose.minus(robotVelocity.times(airtime))).getNorm() > 0.05 && iterations < 5);
 
         SmartDashboard.putNumber("NumIterations", iterations);
 
