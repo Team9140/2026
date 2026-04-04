@@ -150,7 +150,7 @@ public class Constants {
         public static final double SPINNER_VOLTAGE = 12;
         public static final double FEEDER_VOLTAGE = 12;
 
-        public static final double REVERSE_FEEDER_TIME = 2;
+        public static final double REVERSE_FEEDER_TIME = 1.0;
     }
 
     public static class Turret {
@@ -175,7 +175,7 @@ public class Constants {
         public static final double OVERTURN_LOOKAHEAD_TIME = 1.5;
         public static final Transform2d POSITION_TO_ROBOT = new Transform2d(-0.178, -0.114, new Rotation2d(-Math.PI));
 
-        public static final double TURN_SHOOTER_OFF_TIME = 3;
+        public static final double TURN_SHOOTER_OFF_TIME = 1.0;
     }
 
     public static class Vision {

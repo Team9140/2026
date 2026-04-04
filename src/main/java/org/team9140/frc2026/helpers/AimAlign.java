@@ -35,9 +35,9 @@ public class AimAlign {
         lookupMotorSpeedFromDistance.put(2.0245, 1900.0 / 60.0);
         lookupMotorSpeedFromDistance.put(2.3213, 2050.0 / 60.0);
         lookupMotorSpeedFromDistance.put(2.66, 2150.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(2.91, 2300.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(2.91, 2350.0 / 60.0);
         lookupMotorSpeedFromDistance.put(3.19, 2425.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.49, 2575.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.49, 2600.0 / 60.0);
         lookupMotorSpeedFromDistance.put(3.81, 2700.0 / 60.0);
         lookupMotorSpeedFromDistance.put(4.17, 2825.0 / 60.0);
         lookupMotorSpeedFromDistance.put(4.45, 3050.0 / 60.0);

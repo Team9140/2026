@@ -91,7 +91,7 @@ public class Hopper extends SubsystemBase {
     }
 
     public Command reverseAndOff() {
-        return off().withTimeout(0.5).andThen(unjam()).withTimeout(Constants.Hopper.REVERSE_FEEDER_TIME).andThen(off())
+        return this.setSpeeds(0, -Constants.Hopper.FEEDER_VOLTAGE).withTimeout(Constants.Hopper.REVERSE_FEEDER_TIME).andThen(off())
                 .withName("Reverse Hopper and Off");
     }
 

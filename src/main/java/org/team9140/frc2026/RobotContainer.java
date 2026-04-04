@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
@@ -54,30 +55,25 @@ public class RobotContainer {
     this.shooter.setPoseSupplier(() -> this.drivetrain.getCachedState().Pose);
     SmartDashboard.putNumber("tuning RPM", 2500);
 
-    this.controller.rightBumper()
-        .onTrue(this.intake.intake())
-        .onFalse(this.intake.off());
+    // this.controller.rightBumper()
+    //     .onTrue(this.intake.intake())
+    //     .onFalse(this.intake.off());
 
     this.controller.leftBumper()
         .onTrue(this.intake.armIn().andThen(this.hopper.unjam()))
         .onFalse(this.intake.off().alongWith(this.hopper.off()));
 
-    this.controller.rightTrigger(0.7).debounce(Constants.Turret.TURN_SHOOTER_OFF_TIME, DebounceType.kFalling)
-        .onTrue(shooter.aim(this.drivetrain::getCachedState)
-            .alongWith(
-                new WaitUntilCommand(shooter.readyToShoot)
-                    .andThen(hopper.feed())))
-        .onFalse(
-            shooter.off());
-    
-    this.controller.rightTrigger().onFalse(hopper.reverseAndOff());
+    Trigger wantAim = this.controller.rightTrigger(0.3).debounce(Constants.Turret.TURN_SHOOTER_OFF_TIME, DebounceType.kFalling);
+    Trigger wantShoot = this.controller.rightTrigger(0.9);
 
-    this.controller.rightTrigger(0.3).and(this.controller.rightTrigger(0.7).negate()).debounce(Constants.Turret.TURN_SHOOTER_OFF_TIME, DebounceType.kFalling)
-        .onTrue(shooter.aim(this.drivetrain::getCachedState))
-        .onFalse(shooter.off());
+    wantShoot.and(shooter.readyToShoot).whileTrue(hopper.feed()).onFalse(hopper.reverseAndOff());
+    wantAim.whileTrue(this.shooter.aim(this.drivetrain::getCachedState));
 
-    this.controller.rightBumper().debounce(Constants.Intake.TURN_OFF_TIME, DebounceType.kFalling).negate()
-        .and(this.controller.rightTrigger().debounce(Constants.Intake.TURN_OFF_TIME, DebounceType.kRising)).onTrue(intake.armIn());
+    Trigger wantIntake = this.controller.rightBumper();
+
+    wantIntake.whileTrue(this.intake.intake());
+
+    wantShoot.and(shooter.readyToShoot).and(wantIntake.negate()).debounce(2.0).onTrue(this.intake.squeeze());
 
     this.controller.y().onTrue(this.shooter.tuningSpeed(this.drivetrain::getCachedState, () -> SmartDashboard.getNumber("tuning RPM", 2500)));
     // this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getCachedState));

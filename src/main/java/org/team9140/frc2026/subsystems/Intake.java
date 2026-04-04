@@ -251,4 +251,11 @@ public class Intake extends SubsystemBase {
         this.rollerMotor.getSimState().setRotorAcceleration(
                 this.rollerSim.getAngularAccelerationRadPerSecSq() / 2.0 / Math.PI);
     }
+
+    public Command squeeze() {
+        return this.armIn()
+                .andThen(this.setRollerVolts(Constants.Intake.INTAKE_VOLTAGE))
+                .withDeadline(Commands.waitSeconds(5.0).raceWith(Commands.waitUntil(this.atPosition)))
+                .andThen(this.setRollerVolts(0));
+    }
 }
