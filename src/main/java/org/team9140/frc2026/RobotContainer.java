@@ -68,7 +68,9 @@ public class RobotContainer {
                 new WaitUntilCommand(shooter.readyToShoot)
                     .andThen(hopper.feed())))
         .onFalse(
-            shooter.off().alongWith(hopper.reverseAndOff()));
+            shooter.off());
+    
+    this.controller.rightTrigger().onFalse(hopper.reverseAndOff());
 
     this.controller.rightTrigger(0.3).and(this.controller.rightTrigger(0.7).negate()).debounce(Constants.Turret.TURN_SHOOTER_OFF_TIME, DebounceType.kFalling)
         .onTrue(shooter.aim(this.drivetrain::getCachedState))
