@@ -2,6 +2,7 @@ package org.team9140.frc2026.commands;
 
 import java.util.Optional;
 
+import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.FieldConstants;
 import org.team9140.frc2026.Robot;
 import org.team9140.frc2026.subsystems.CommandSwerveDrivetrain;
@@ -85,69 +86,69 @@ public class AutonomousRoutines {
                     }
                     return this.intake.armOut().andThen(new WaitCommand(2.0)).andThen(shooter.aim(this.drivetrain::getCachedState, () -> targetHub));
                 case "depot_shoot_left":
-                    return intake.intake().alongWith(runChoreoAuto("depotShoot_Left").andThen(this.getShootCommand().asProxy()));
+                    return intake.intake().alongWith(runChoreoAuto("depotShoot_Left", true, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(this.getShootCommand().asProxy()));
                 case "score_from_depot":
-                    return intake.intake().alongWith(runChoreoAuto("depotShoot").andThen(this.getShootCommand().asProxy()));
+                    return intake.intake().alongWith(runChoreoAuto("depotShoot", true, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(this.getShootCommand().asProxy()));
                 case "one_pass_outpost":
-                    return intake.intake().alongWith(runChoreoAuto("Trench_Outpost_Deep").andThen(this.getShootCommand().asProxy()));
+                    return intake.intake().alongWith(runChoreoAuto("Trench_Outpost_Deep", true, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(this.getShootCommand().asProxy()));
                 case "one_pass_depot":
-                    return intake.intake().alongWith(runChoreoAuto("Trench_Depot_Deep").andThen(this.getShootCommand().asProxy()));
+                    return intake.intake().alongWith(runChoreoAuto("Trench_Depot_Deep", true, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(this.getShootCommand().asProxy()));
                 case "two_pass_outpost":
-                    return intake.intake().alongWith(runChoreoAuto("Trench_Outpost_Deep", false, true)
+                    return intake.intake().alongWith(runChoreoAuto("Trench_Outpost_Deep", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                    .andThen(runChoreoAuto("Trench_Reset_Outpost", false, false))
-                    .andThen(runChoreoAuto("Trench_Outpost_Shallow", true, false))
+                    .andThen(runChoreoAuto("Trench_Reset_Outpost", false, false, 0, null))
+                    .andThen(runChoreoAuto("Trench_Outpost_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().asProxy()));
                 case "two_pass_depot":
-                    return intake.intake().alongWith(runChoreoAuto("Trench_Depot_Deep", false, true)
+                    return intake.intake().alongWith(runChoreoAuto("Trench_Depot_Deep", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                    .andThen(runChoreoAuto("Trench_Reset_Depot", false, false))
-                    .andThen(runChoreoAuto("Trench_Depot_Shallow", true, false))
+                    .andThen(runChoreoAuto("Trench_Reset_Depot", false, false, 0, null))
+                    .andThen(runChoreoAuto("Trench_Depot_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().withTimeout(5).asProxy()));
                 case "two_pass_outpost_safe":
-                    return intake.intake().alongWith(runChoreoAuto("Trench_Outpost_Shallow", false, true)
+                    return intake.intake().alongWith(runChoreoAuto("Trench_Outpost_Shallow", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                    .andThen(runChoreoAuto("Trench_Reset_Outpost", false, false))
-                    .andThen(runChoreoAuto("Trench_Outpost_Shallow", true, false))
+                    .andThen(runChoreoAuto("Trench_Reset_Outpost", false, false, 0, null))
+                    .andThen(runChoreoAuto("Trench_Outpost_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().asProxy()));
                 case "two_pass_depot_safe":
-                    return intake.intake().alongWith(runChoreoAuto("Trench_Depot_Shallow", false, true)
+                    return intake.intake().alongWith(runChoreoAuto("Trench_Depot_Shallow", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                    .andThen(runChoreoAuto("Trench_Reset_Depot", false, false))
-                    .andThen(runChoreoAuto("Trench_Depot_Shallow", true, false))
+                    .andThen(runChoreoAuto("Trench_Reset_Depot", false, false, 0, null))
+                    .andThen(runChoreoAuto("Trench_Depot_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().withTimeout(5).asProxy()));
                 case "one_pass_outpost_bump":
-                    return intake.intake().alongWith(runChoreoAuto("Bump_Outpost_Deep").andThen(this.getShootCommand().asProxy()));
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Outpost_Deep", true, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(this.getShootCommand().asProxy()));
                 case "one_pass_depot_bump":
-                    return intake.intake().alongWith(runChoreoAuto("Bump_Depot_Deep").andThen(this.getShootCommand().asProxy()));
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Depot_Deep", true, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(this.getShootCommand().asProxy()));
                 case "two_pass_outpost_bump":
-                    return intake.intake().alongWith(runChoreoAuto("Bump_Outpost_Deep", true, true)
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Outpost_Deep", true, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                    .andThen(runChoreoAuto("Bump_Reset_Outpost", false, false))
-                    .andThen(runChoreoAuto("Bump_Outpost_Shallow", true, false))
+                    .andThen(runChoreoAuto("Bump_Reset_Outpost", false, false, 0, null))
+                    .andThen(runChoreoAuto("Bump_Outpost_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().asProxy()));
                 case "two_pass_depot_bump":
-                    return intake.intake().alongWith(runChoreoAuto("Bump_Depot_Deep", false, true)
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Depot_Deep", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                    .andThen(runChoreoAuto("Bump_Reset_Depot", false, false))
-                    .andThen(runChoreoAuto("Bump_Depot_Shallow", true, false))
+                    .andThen(runChoreoAuto("Bump_Reset_Depot", false, false, 0, null))
+                    .andThen(runChoreoAuto("Bump_Depot_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().asProxy()));
                 case "two_pass_outpost_safe_bump":
-                    return intake.intake().alongWith(runChoreoAuto("Bump_Outpost_Shallow", false, true)
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Outpost_Shallow", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                    .andThen(runChoreoAuto("Bump_Reset_Outpost", false, false))
-                    .andThen(runChoreoAuto("Bump_Outpost_Shallow", true, false))
+                    .andThen(runChoreoAuto("Bump_Reset_Outpost", false, false, 0, null))
+                    .andThen(runChoreoAuto("Bump_Outpost_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().asProxy()));
                 case "two_pass_depot_safe_bump":
-                    return intake.intake().alongWith(runChoreoAuto("Bump_Depot_Shallow", false, true)
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Depot_Shallow", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                    .andThen(runChoreoAuto("Bump_Reset_Depot", false, false))
-                    .andThen(runChoreoAuto("Bump_Depot_Shallow", true, false))
+                    .andThen(runChoreoAuto("Bump_Reset_Depot", false, false, 0, null))
+                    .andThen(runChoreoAuto("Bump_Depot_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().asProxy()));
                 case "one_pass_depot_then_depot_shoot":
-                    return intake.intake().alongWith(runChoreoAuto("Trench_Depot_Deep", false, true)
+                    return intake.intake().alongWith(runChoreoAuto("Trench_Depot_Deep", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                    .andThen(runChoreoAuto("depotShoot_Left", true, false))
+                    .andThen(runChoreoAuto("depotShoot_Left", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().asProxy()));
                 default:
                     return doNothing();
@@ -165,17 +166,20 @@ public class AutonomousRoutines {
     private final StructPublisher<Pose2d> initialPosePublisher = NetworkTableInstance.getDefault()
             .getStructTopic("Auto Path Initial Pose", Pose2d.struct).publish();
 
-    public Command runChoreoAuto(String pathame, boolean waitUntilAtFinalTarget, boolean reset) {
+    public Command runChoreoAuto(String pathame, boolean waitUntilAtFinalTarget, boolean reset, double timeBeforeEnd, Command pathCommand) {
         FollowPath path = new FollowPath(pathame, () -> this.drivetrain.getState().Pose,
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
         if (Robot.isSimulation() && reset)
             drivetrain.resetPose(path.getInitialPose());
+        if (pathCommand != null) {
+            path.atTimeFromEnd(timeBeforeEnd).onTrue(pathCommand);
+        }
         initialPosePublisher.set(path.getInitialPose());
         return path.gimmeCommand(waitUntilAtFinalTarget);
     }
 
     public Command runChoreoAuto(String pathame) {
-        return this.runChoreoAuto(pathame, true, true);
+        return this.runChoreoAuto(pathame, true, true, 0, null);
     }
 
 }
