@@ -175,7 +175,7 @@ public class AutonomousRoutines {
             path.atTimeFromEnd(timeBeforeEnd).onTrue(pathCommand);
         }
         initialPosePublisher.set(path.getInitialPose());
-        return path.gimmeCommand(waitUntilAtFinalTarget);
+        return path.gimmeCommand(waitUntilAtFinalTarget).asProxy();
     }
 
     public Command runChoreoAuto(String pathame) {
