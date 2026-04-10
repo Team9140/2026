@@ -400,11 +400,15 @@ public class Shooter extends SubsystemBase {
         // all these are in rotations per second
         SmartDashboard.putNumber("Yaw Angle", yawMotor.getPosition(false).getValueAsDouble());
         SmartDashboard.putNumber("Yaw Target Position", this.yawMotorControl.Position);
+        SmartDashboard.putNumber("Hood Angle", hoodMotor.getPosition(false).getValueAsDouble());
+        SmartDashboard.putNumber("Hood Target Position", this.hoodMotorControl.Position);
         SmartDashboard.putNumber("Shooter Velocity", shooterMotor.getVelocity(false).getValueAsDouble());
         SmartDashboard.putNumber("Shooter Target Velocity", this.shooterSpeedControl.Velocity);
         SmartDashboard.putBoolean("Yaw Is At Position", this.yawIsAtPosition.getAsBoolean());
+        SmartDashboard.putBoolean("Hood Is At Position", this.hoodIsAtPosition.getAsBoolean());
         SmartDashboard.putBoolean("Shooter Is At Velocity", this.shooterIsAtVelocity.getAsBoolean());
         SmartDashboard.putBoolean("Yaw Will Overturn Soon", this.yawWillOverturnSoon.getAsBoolean());
+        SmartDashboard.putBoolean("Ready To Shoot", this.readyToShoot.getAsBoolean());
     }
 
     private static final double kSimLoopPeriod = 0.004; // 4 ms

@@ -69,7 +69,6 @@ public class Constants {
     public static class Shooter {
         public static final double PEAK_FORWARD_TORQUE = 40.0;
         public static final double IDLE_VOLTAGE = 6.7;
-        public static final double SPEED_AT_IDLE = 0.0;
 
         public static final double SHOOTER_KS = 0;
         public static final double SHOOTER_KV = 0;
@@ -184,25 +183,22 @@ public class Constants {
     }
 
     public static class Hood {
-        public static final double STATOR_CURRENT_LIMIT = 0.0;
-        public static final double SUPPLY_CURRENT_LIMIT = 0.0;
+        public static final double STATOR_CURRENT_LIMIT = 60.0;
+        public static final double SUPPLY_CURRENT_LIMIT = 40.0;
 
-        public static final double MM_ACCELERATION = 0.0;
-        public static final double MM_CRUISE_VELOCITY = 0.0;
+        public static final double MM_ACCELERATION = 10.0;
+        public static final double MM_CRUISE_VELOCITY = 6.0;
 
         public static final double KS = 0.0;
         public static final double KV = 0.0;
         public static final double KA = 0.0;
-        public static final double KP = 0.0;
+        public static final double KP = 500.0;
         public static final double KI = 0.0;
-        public static final double KD = 0.0;
+        public static final double KD = 25.0;
 
-        public static final double ADJUST_VOLTAGE = 0.0;
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.0;
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 50.0 / 360.0;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0.0;
-        public static final double GEAR_RATIO = 0.0;
-
-        public static final double OVERTURN_LOOKAHEAD_TIME = 0.0;
+        public static final double GEAR_RATIO = 1.0;
     }
 
     public static class Vision {
