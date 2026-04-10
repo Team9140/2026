@@ -42,6 +42,8 @@ public class AimAlign {
         lookupMotorSpeedFromDistance.put(3.81, 2700.0 / 60.0);
         lookupMotorSpeedFromDistance.put(4.17, 2825.0 / 60.0);
         lookupMotorSpeedFromDistance.put(4.45, 3050.0 / 60.0);
+
+        lookupHoodAngleFromDistance.put(1.0, 18.0 / 360.0);
     }
 
     static StructPublisher<Pose2d> effectivePosePublisher = NetworkTableInstance.getDefault().getStructTopic("Effective Pose", Pose2d.struct).publish();
@@ -49,8 +51,13 @@ public class AimAlign {
     public static Translation2d getEffectivePose(Pose2d robotPose, Translation2d goalPose, ChassisSpeeds robotSpeed) {
         robotSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeed, robotPose.getRotation());
         Translation2d robotVelocity = new Translation2d(
+            Turret.POSITION_TO_ROBOT.getX(),
+            Turret.POSITION_TO_ROBOT.getY()
+        );
+        robotVelocity = robotVelocity.rotateBy(robotPose.getRotation().plus(new Rotation2d(Math.PI/2))).times(-robotSpeed.omegaRadiansPerSecond);
+        robotVelocity = robotVelocity.plus(new Translation2d(
                 robotSpeed.vxMetersPerSecond,
-                robotSpeed.vyMetersPerSecond);
+                robotSpeed.vyMetersPerSecond));
 
         double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(goalPose).getNorm(); 
         double airtime = lookupAirtimeFromDistance.get(distance);
