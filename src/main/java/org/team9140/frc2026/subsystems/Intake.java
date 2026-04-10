@@ -10,8 +10,10 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -35,6 +37,8 @@ import org.team9140.lib.Util;
 
 public class Intake extends SubsystemBase {
     private final TalonFX rollerMotor;
+    private final TalonFX rollerFollower = new TalonFX(Constants.Ports.INTAKE_SPIN_FOLLOWER_MOTOR,
+            Constants.Ports.CANIVORE);
     private final TalonFX extendMotor;
     private static Intake instance;
     private final MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
@@ -99,6 +103,8 @@ public class Intake extends SubsystemBase {
                 .withTorqueCurrent(extendTorqueCurrentConfigs);
 
         this.rollerMotor.getConfigurator().apply(spinMotorConfigs);
+        this.rollerFollower.getConfigurator().apply(spinMotorConfigs);
+        this.rollerFollower.setControl(new Follower(Constants.Ports.INTAKE_SPIN_MOTOR, MotorAlignmentValue.Opposed));
         this.extendMotor.getConfigurator().apply(extendMotorConfigs);
 
         if (Utils.isSimulation()) {

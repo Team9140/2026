@@ -20,6 +20,7 @@ public class Constants {
         public static final int SHOOTER_MOTOR = 16;
         public static final int SHOOTER_FOLLOWER_MOTOR = 17;
         public static final int INTAKE_SPIN_MOTOR = 24;
+        public static final int INTAKE_SPIN_FOLLOWER_MOTOR = 0;
         public static final int INTAKE_EXTEND_MOTOR = 9;
         public static final int CLIMBER_MOTOR = 14;
         public static final int HOPPER_SPINNER_MOTOR = 10;
