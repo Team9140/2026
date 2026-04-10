@@ -518,11 +518,15 @@ public class Shooter extends SubsystemBase {
             () -> Util.epsilonEquals(this.shooterMotor.getVelocity(false).getValueAsDouble(),
                     this.shooterSpeedControl.Velocity, 5));
 
-    public final Trigger readyToShoot = new Trigger(yawIsAtPosition.and(shooterIsAtVelocity));
-
     public final Trigger yawWillOverturnSoon = new Trigger(() -> this.yawMotorControl.Position
             + this.targetYawRateOfChange
                     * Turret.OVERTURN_LOOKAHEAD_TIME > Constants.Turret.FORWARD_SOFT_LIMIT_THRESHOLD
             || this.yawMotorControl.Position + this.targetYawRateOfChange
                     * Turret.OVERTURN_LOOKAHEAD_TIME < Constants.Turret.REVERSE_SOFT_LIMIT_THRESHOLD);
+
+    public final Trigger readyToShoot = new Trigger(
+        yawIsAtPosition
+        .and(shooterIsAtVelocity)
+        .and(hoodIsAtPosition)
+        .and(yawWillOverturnSoon.negate()));
 }
