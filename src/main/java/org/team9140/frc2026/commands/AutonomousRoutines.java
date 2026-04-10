@@ -59,6 +59,11 @@ public class AutonomousRoutines {
         autoChooser.addOption("2 Passes Over Bump from Depot", "two_pass_depot_bump");
         autoChooser.addOption("2 Safe Passes Over Bump from Outpost", "two_pass_outpost_safe_bump");
         autoChooser.addOption("2 Safe Passes Over Bump from Depot", "two_pass_depot_safe_bump");
+
+        autoChooser.addOption("2 Passes Over Bump from Outpost (Move and Shoot)", "two_pass_outpost_bump_move");
+        autoChooser.addOption("2 Passes Over Bump from Depot (Move and Shoot)", "two_pass_depot_bump_move");
+        autoChooser.addOption("2 Safe Passes Over Bump from Outpost (Move and Shoot)", "two_pass_outpost_safe_bump_move");
+        autoChooser.addOption("2 Safe Passes Over Bump from Depot (Move and Shoot)", "two_pass_depot_safe_bump_move");
         SmartDashboard.putData(autoChooser);
     }
 
@@ -143,6 +148,26 @@ public class AutonomousRoutines {
                     return intake.intake().alongWith(runChoreoAuto("Bump_Depot_Shallow", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
                     .andThen(runChoreoAuto("Bump_Reset_Depot", false, false, 0, null))
+                    .andThen(runChoreoAuto("Bump_Depot_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
+                    .andThen(this.getShootCommand().asProxy()));
+                case "two_pass_outpost_bump_move":
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Outpost_Deep", true, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
+                    .andThen(runChoreoAuto("Bump_Reset_Outpost_Shoot", false, false, 0, null).alongWith(this.getShootCommand().withTimeout(5).asProxy()))
+                    .andThen(runChoreoAuto("Bump_Outpost_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
+                    .andThen(this.getShootCommand().asProxy()));
+                case "two_pass_depot_bump_move":
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Depot_Deep", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
+                    .andThen(runChoreoAuto("Bump_Reset_Depot_Shoot", false, false, 0, null).alongWith(this.getShootCommand().withTimeout(5).asProxy()))
+                    .andThen(runChoreoAuto("Bump_Depot_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
+                    .andThen(this.getShootCommand().asProxy()));
+                case "two_pass_outpost_safe_bump_move":
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Outpost_Shallow", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
+                    .andThen(runChoreoAuto("Bump_Reset_Outpost_Shoot", false, false, 0, null).alongWith(this.getShootCommand().withTimeout(5).asProxy()))
+                    .andThen(runChoreoAuto("Bump_Outpost_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
+                    .andThen(this.getShootCommand().asProxy()));
+                case "two_pass_depot_safe_bump_move":
+                    return intake.intake().alongWith(runChoreoAuto("Bump_Depot_Shallow", false, true, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
+                    .andThen(runChoreoAuto("Bump_Reset_Depot_Shoot", false, false, 0, null).alongWith(this.getShootCommand().withTimeout(5).asProxy()))
                     .andThen(runChoreoAuto("Bump_Depot_Shallow", true, false, Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()))
                     .andThen(this.getShootCommand().asProxy()));
                 case "one_pass_depot_then_depot_shoot":
