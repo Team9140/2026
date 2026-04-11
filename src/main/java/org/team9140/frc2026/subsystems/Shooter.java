@@ -10,8 +10,10 @@ import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -24,10 +26,13 @@ import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -61,6 +66,8 @@ public class Shooter extends SubsystemBase {
     private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR, Constants.Ports.CANIVORE);
     private final TalonFX shooterFollower = new TalonFX(Constants.Ports.SHOOTER_FOLLOWER_MOTOR,
             Constants.Ports.CANIVORE);
+
+    private final CANcoder yawCANcoder = new CANcoder(Constants.Ports.TURRET_CANCODER, Constants.Ports.CANIVORE);
 
     private final MotionMagicTorqueCurrentFOC yawMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
     private final VelocityTorqueCurrentFOC shooterSpeedControl = new VelocityTorqueCurrentFOC(0).withSlot(0);
@@ -107,7 +114,10 @@ public class Shooter extends SubsystemBase {
                 .withReverseSoftLimitEnable(true);
 
         FeedbackConfigs turretFeedbackConfigs = new FeedbackConfigs()
-                .withSensorToMechanismRatio(Constants.Turret.GEAR_RATIO);
+                .withSensorToMechanismRatio(Constants.Turret.SENSOR_TO_MECHANISM)
+                .withFeedbackRemoteSensorID(Constants.Ports.TURRET_CANCODER)
+                .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+                .withRotorToSensorRatio(Constants.Turret.GEAR_RATIO / Constants.Turret.GEAR_RATIO);
 
         yawMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
 
@@ -119,6 +129,11 @@ public class Shooter extends SubsystemBase {
                 .withTorqueCurrent(turretTorqueCurrentConfigs)
                 .withSoftwareLimitSwitch(turretSoftwareLimitSwitchConfigs)
                 .withFeedback(turretFeedbackConfigs);
+        
+        MagnetSensorConfigs yawCancoderConfig = new MagnetSensorConfigs()
+                .withAbsoluteSensorDiscontinuityPoint(0.5)
+                .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+                .withMagnetOffset(Constants.Turret.CANCODER_OFFSET_ROTS);
 
         // END TURRET CONFIG
 
@@ -158,6 +173,7 @@ public class Shooter extends SubsystemBase {
                 .withFeedback(shooterFeedbackConfigs);
 
         yawMotor.getConfigurator().apply(yawConfig);
+        yawCANcoder.getConfigurator().apply(yawCancoderConfig);
         shooterMotor.getConfigurator().apply(shooterConfig);
         shooterFollower.getConfigurator().apply(shooterConfig);
         shooterFollower.setControl(new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Opposed));

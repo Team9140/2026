@@ -25,7 +25,7 @@ public class Constants {
         public static final int CLIMBER_MOTOR = 14;
         public static final int HOPPER_SPINNER_MOTOR = 10;
         public static final int HOPPER_FEEDER_MOTOR = 13;
-
+        public static final int TURRET_CANCODER = 67;
     }
 
     public static class Cantdle {
@@ -174,11 +174,13 @@ public class Constants {
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.3; // rot
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -0.3; // rot
         public static final double GEAR_RATIO = 90.0 / 10.0 * 50.0 / 11.0;
+        public static final double SENSOR_TO_MECHANISM = 18.0 / 90.0;
 
         public static final double OVERTURN_LOOKAHEAD_TIME = 1.5;
         public static final Transform2d POSITION_TO_ROBOT = new Transform2d(-0.178, -0.114, new Rotation2d(-Math.PI));
 
         public static final double TURN_SHOOTER_OFF_TIME = 1.0;
+        public static final double CANCODER_OFFSET_ROTS = 0.0; // TODO: Actual value
     }
 
     public static class Vision {
