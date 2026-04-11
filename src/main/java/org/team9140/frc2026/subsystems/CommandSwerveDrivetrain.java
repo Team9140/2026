@@ -446,6 +446,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return Commands.runOnce(() -> this.teleop_velocity_multiplier = Constants.Drive.TELEOP_SHOOTING_VELOCITY_MULTIPLIER).andThen(Commands.idle()).finallyDo(() -> this.teleop_velocity_multiplier = 1.0);
     }
 
+    public Command stop() {
+        return this.runOnce(() -> this.setControl(this.drive
+                    .withVelocityX(0)
+                    .withVelocityY(0)
+                    .withRotationalRate(0)));
+    }
+
     private final SwerveRequest.FieldCentric auton = new SwerveRequest.FieldCentric()
             .withDeadband(Constants.Drive.MIN_AUTON_VELOCITY)
             .withRotationalDeadband(Constants.Drive.MIN_AUTON_ROTATION)
