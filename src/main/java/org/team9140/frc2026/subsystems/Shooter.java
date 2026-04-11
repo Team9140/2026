@@ -322,7 +322,7 @@ public class Shooter extends SubsystemBase {
                     AimAlign.getRequiredSpeed(turretPose, targetPose)));
             this.hoodMotor.setControl(hoodMotorControl.withPosition(
                     AimAlign.getRequiredHoodAngle(turretPose, targetPose)));
-        }).withName("Shoot without aiming");
+        }).withName("Shoot without Aiming");
     }
 
     public Command idle() {
@@ -352,13 +352,27 @@ public class Shooter extends SubsystemBase {
             if (this.isManual)
                 return;
             SwerveDriveState robotState = chassisStateSupplier.get();
-            Pose2d turretPose = robotState.Pose;
+            Pose2d robotPose = robotState.Pose;
 
             Translation2d targetPose = AimAlign.getHub().getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(RPM.getAsDouble() / 60.0));
             this.yawMotor.setControl(yawMotorControl.withPosition(
-                    AimAlign.yawAngleToPos(turretPose, targetPose) / (2.0 * Math.PI)));
-        }).withName("Continuously Aim Automatically");
+                    AimAlign.yawAngleToPos(robotPose, targetPose) / (2.0 * Math.PI)));
+        }).withName("Tune Speed Aiming Automatically");
+    }
+
+    public Command tuningHood(Supplier<SwerveDriveState> chassisStateSupplier, DoubleSupplier Angle) {
+        return this.run(() -> {
+            if (this.isManual)
+                return;
+            SwerveDriveState robotState = chassisStateSupplier.get();
+            Pose2d robotPose = robotState.Pose;
+
+            Translation2d targetPose = AimAlign.getHub().getTranslation();
+            this.hoodMotor.setControl(hoodMotorControl.withPosition(Angle.getAsDouble() / 360.0));
+            this.yawMotor.setControl(yawMotorControl.withPosition(
+                    AimAlign.yawAngleToPos(robotPose, targetPose) / (2.0 * Math.PI)));
+        }).withName("Tune Hood Angle Aiming Automatically");
     }
 
     private double targetYawRateOfChange = 0;
@@ -531,6 +545,5 @@ public class Shooter extends SubsystemBase {
     public final Trigger readyToShoot = new Trigger(
         yawIsAtPosition
         .and(shooterIsAtVelocity)
-        .and(hoodIsAtPosition)
-        .and(yawWillOverturnSoon.negate()));
+        .and(hoodIsAtPosition));
 }
