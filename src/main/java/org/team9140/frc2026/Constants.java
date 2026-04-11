@@ -16,7 +16,7 @@ public class Constants {
     public static class Ports {
         public static final CANBus CANIVORE = new CANBus("sixseven", "./logs/example.hoot");
         public static final int YAW_MOTOR = 12;
-        public static final int HOOD_MOTOR = 0;
+        public static final int HOOD_MOTOR = 25;
         public static final int SHOOTER_MOTOR = 16;
         public static final int SHOOTER_FOLLOWER_MOTOR = 17;
         public static final int INTAKE_SPIN_MOTOR = 26;
@@ -25,8 +25,8 @@ public class Constants {
         public static final int CLIMBER_MOTOR = 14;
         public static final int HOPPER_SPINNER_MOTOR = 10;
         public static final int HOPPER_FEEDER_MOTOR = 13;
-        public static final int TURRET_CANCODER = 67;
-        public static final int HOOD_CANCODER = 68;
+        public static final int TURRET_CANCODER = 28;
+        public static final int HOOD_CANCODER = 29;
     }
 
     public static class Cantdle {
