@@ -19,8 +19,8 @@ public class Constants {
         public static final int PITCH_MOTOR = 0;
         public static final int SHOOTER_MOTOR = 16;
         public static final int SHOOTER_FOLLOWER_MOTOR = 17;
-        public static final int INTAKE_SPIN_MOTOR = 24;
-        public static final int INTAKE_SPIN_FOLLOWER_MOTOR = 0;
+        public static final int INTAKE_SPIN_MOTOR = 26;
+        public static final int INTAKE_SPIN_FOLLOWER_MOTOR = 27;
         public static final int INTAKE_EXTEND_MOTOR = 9;
         public static final int CLIMBER_MOTOR = 14;
         public static final int HOPPER_SPINNER_MOTOR = 10;
@@ -113,10 +113,10 @@ public class Constants {
         public static final int PINION_TEETH = 10;
         public static final double PINION_DP = 10;
         public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
-        public static final double INTAKE_VOLTAGE = 12.0;
+        public static final double INTAKE_VOLTAGE = 10.0;
         public static final double INTAKE_OFF = 0.0;
 
-        public static final double ROLLER_STATOR_CURRENT_LIMIT = 80.0;
+        public static final double ROLLER_STATOR_CURRENT_LIMIT = 40.0;
         public static final double EXTEND_STATOR_CURRENT_LIMIT = 15.0;
 
         public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 30.0;
