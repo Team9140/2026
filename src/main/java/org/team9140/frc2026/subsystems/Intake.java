@@ -37,8 +37,7 @@ import org.team9140.lib.Util;
 
 public class Intake extends SubsystemBase {
     private final TalonFX rollerMotor;
-    private final TalonFX rollerFollower = new TalonFX(Constants.Ports.INTAKE_SPIN_FOLLOWER_MOTOR,
-            Constants.Ports.CANIVORE);
+    private final TalonFX rollerFollower;
     private final TalonFX extendMotor;
     private static Intake instance;
     private final MotionMagicTorqueCurrentFOC motionMagic = new MotionMagicTorqueCurrentFOC(0);
@@ -51,6 +50,7 @@ public class Intake extends SubsystemBase {
 
     private Intake() {
         this.rollerMotor = new TalonFX(Constants.Ports.INTAKE_SPIN_MOTOR, CANBus.roboRIO());
+        this.rollerFollower = new TalonFX(Constants.Ports.INTAKE_SPIN_FOLLOWER_MOTOR, CANBus.roboRIO());
         this.extendMotor = new TalonFX(Constants.Ports.INTAKE_EXTEND_MOTOR, Constants.Ports.CANIVORE);
 
         CurrentLimitsConfigs rollerCurrentLimits = new CurrentLimitsConfigs()
