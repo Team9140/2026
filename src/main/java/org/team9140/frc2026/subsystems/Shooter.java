@@ -68,6 +68,7 @@ public class Shooter extends SubsystemBase {
     private final TalonFX hoodMotor = new TalonFX(Constants.Ports.HOOD_MOTOR, Constants.Ports.CANIVORE);
 
     private final CANcoder yawCANcoder = new CANcoder(Constants.Ports.TURRET_CANCODER, Constants.Ports.CANIVORE);
+    private final CANcoder hoodCANcoder = new CANcoder(Constants.Ports.HOOD_CANCODER, Constants.Ports.CANIVORE);
 
     private final MotionMagicTorqueCurrentFOC yawMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
     private final MotionMagicTorqueCurrentFOC hoodMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
@@ -173,7 +174,10 @@ public class Shooter extends SubsystemBase {
                 .withReverseSoftLimitEnable(true);
 
         FeedbackConfigs hoodFeedbackConfigs = new FeedbackConfigs()
-                .withSensorToMechanismRatio(Constants.Hood.GEAR_RATIO);
+                .withSensorToMechanismRatio(Constants.Hood.SENSOR_TO_MECHANISM_RATIO)
+                .withRotorToSensorRatio(Constants.Hood.GEAR_RATIO / Constants.Hood.SENSOR_TO_MECHANISM_RATIO)
+                .withFeedbackRemoteSensorID(Constants.Ports.HOOD_CANCODER)
+                .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder);
         
         hoodMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
 
@@ -185,6 +189,11 @@ public class Shooter extends SubsystemBase {
                 .withTorqueCurrent(hoodTorqueCurrentConfigs)
                 .withSoftwareLimitSwitch(hoodSoftwareLimitSwitchConfigs)
                 .withFeedback(hoodFeedbackConfigs);
+        
+        MagnetSensorConfigs hoodCancoderConfig = new MagnetSensorConfigs()
+                .withAbsoluteSensorDiscontinuityPoint(0.5)
+                .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+                .withMagnetOffset(Constants.Hood.CANCODER_OFFSET_ROTS);
 
         // END TURRET HOOD CONFIG
 
@@ -228,6 +237,7 @@ public class Shooter extends SubsystemBase {
         yawMotor.getConfigurator().apply(yawConfig);
         yawCANcoder.getConfigurator().apply(yawCancoderConfig);
         hoodMotor.getConfigurator().apply(hoodConfig);
+        hoodCANcoder.getConfigurator().apply(hoodCancoderConfig);
         shooterMotor.getConfigurator().apply(shooterConfig);
         shooterFollower.getConfigurator().apply(shooterConfig);
         shooterFollower.setControl(new Follower(Constants.Ports.SHOOTER_MOTOR, MotorAlignmentValue.Opposed));

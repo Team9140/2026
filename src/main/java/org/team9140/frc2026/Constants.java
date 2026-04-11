@@ -26,6 +26,7 @@ public class Constants {
         public static final int HOPPER_SPINNER_MOTOR = 10;
         public static final int HOPPER_FEEDER_MOTOR = 13;
         public static final int TURRET_CANCODER = 67;
+        public static final int HOOD_CANCODER = 68;
     }
 
     public static class Cantdle {
@@ -198,7 +199,9 @@ public class Constants {
 
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 50.0 / 360.0;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0.0;
-        public static final double GEAR_RATIO = 1.0;
+        public static final double GEAR_RATIO = 8.0 / 36.0 * 10.0 / 167.0;
+        public static final double SENSOR_TO_MECHANISM_RATIO = 16.0 / 25.0 * 10.0 / 167.0;
+        public static final double CANCODER_OFFSET_ROTS = 0.0;
     }
 
     public static class Vision {
