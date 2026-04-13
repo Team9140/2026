@@ -32,6 +32,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -118,7 +119,7 @@ public class Shooter extends SubsystemBase {
                 .withSensorToMechanismRatio(Constants.Turret.SENSOR_TO_MECHANISM)
                 .withFeedbackRemoteSensorID(Constants.Ports.TURRET_CANCODER)
                 .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
-                .withRotorToSensorRatio(Constants.Turret.GEAR_RATIO / Constants.Turret.GEAR_RATIO);
+                .withRotorToSensorRatio(Constants.Turret.GEAR_RATIO / Constants.Turret.SENSOR_TO_MECHANISM);
 
         yawMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
 
@@ -485,6 +486,8 @@ public class Shooter extends SubsystemBase {
         yawMotorSim.setInputVoltage(yawSimVolts);
         yawMotorSim.update(deltatime);
 
+        CANcoderSimState yawCANcoderSimState = yawCANcoder.getSimState();
+
         yawMotor.getPosition().refresh();
         yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
 
@@ -492,6 +495,10 @@ public class Shooter extends SubsystemBase {
                 yawMotorSim.getAngleRads() * Constants.Turret.GEAR_RATIO / 2.0 / Math.PI);
         yawMotorSimState.setRotorVelocity(
                 yawMotorSim.getVelocityRadPerSec() * Constants.Turret.GEAR_RATIO / 2.0 / Math.PI);
+        yawCANcoderSimState.setRawPosition(
+                -yawMotorSim.getAngleRads() * Constants.Turret.SENSOR_TO_MECHANISM / 2.0 / Math.PI);
+        yawCANcoderSimState.setVelocity(
+                -yawMotorSim.getVelocityRadPerSec() * Constants.Turret.SENSOR_TO_MECHANISM / 2.0 / Math.PI);
 
         TalonFXSimState hoodMotorSimState = hoodMotor.getSimState();
         double hoodSimVolts = hoodMotorSimState.getMotorVoltage();
