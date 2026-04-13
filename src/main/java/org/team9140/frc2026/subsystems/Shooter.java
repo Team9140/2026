@@ -145,11 +145,7 @@ public class Shooter extends SubsystemBase {
                 .withMotionMagicCruiseVelocity(Constants.Turret.MM_CRUISE_VELOCITY);
 
         Slot0Configs hoodSlot0Configs = new Slot0Configs()
-                .withKS(Constants.Hood.KS)
-                .withKV(Constants.Hood.KV)
-                .withKA(Constants.Hood.KA)
                 .withKP(Constants.Hood.KP)
-                .withKI(Constants.Hood.KI)
                 .withKD(Constants.Hood.KD);
 
         MotorOutputConfigs hoodMotorOutputConfigs = new MotorOutputConfigs()
@@ -190,8 +186,8 @@ public class Shooter extends SubsystemBase {
                 .withFeedback(hoodFeedbackConfigs);
         
         MagnetSensorConfigs hoodCancoderConfig = new MagnetSensorConfigs()
-                .withAbsoluteSensorDiscontinuityPoint(0.5)
-                .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+                .withAbsoluteSensorDiscontinuityPoint(1.0)
+                .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
                 .withMagnetOffset(Constants.Hood.CANCODER_OFFSET_ROTS);
 
         // END TURRET HOOD CONFIG

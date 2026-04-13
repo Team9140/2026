@@ -26,7 +26,7 @@ public class Constants {
         public static final int HOPPER_SPINNER_MOTOR = 10;
         public static final int HOPPER_FEEDER_MOTOR = 13;
         public static final int TURRET_CANCODER = 28;
-        public static final int HOOD_CANCODER = 29;
+        public static final int HOOD_CANCODER = 5;
     }
 
     public static class Cantdle {
@@ -184,24 +184,24 @@ public class Constants {
     }
 
     public static class Hood {
-        public static final double STATOR_CURRENT_LIMIT = 60.0;
-        public static final double SUPPLY_CURRENT_LIMIT = 40.0;
+        public static final double STATOR_CURRENT_LIMIT = 25.0;
+        public static final double SUPPLY_CURRENT_LIMIT = 10.0;
 
-        public static final double MM_ACCELERATION = 10.0;
-        public static final double MM_CRUISE_VELOCITY = 6.0;
+        public static final double MM_ACCELERATION = 3.0;
+        public static final double MM_CRUISE_VELOCITY = 4.0;
 
         public static final double KS = 0.0;
         public static final double KV = 0.0;
         public static final double KA = 0.0;
-        public static final double KP = 500.0;
+        public static final double KP = 9140.0;
         public static final double KI = 0.0;
-        public static final double KD = 25.0;
+        public static final double KD = 67.0;
 
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 50.0 / 360.0;
-        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0.0;
-        public static final double GEAR_RATIO = 8.0 / 36.0 * 10.0 / 167.0;
-        public static final double SENSOR_TO_MECHANISM_RATIO = 16.0 / 25.0 * 10.0 / 167.0;
-        public static final double CANCODER_OFFSET_ROTS = 0.0;
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.08;
+        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0.01;
+        public static final double GEAR_RATIO = 36.0 / 8.0 * 170.0 / 10.0;
+        public static final double SENSOR_TO_MECHANISM_RATIO = 170.0 / 10.0 * 16.0 / 25.0;
+        public static final double CANCODER_OFFSET_ROTS = 0.064208984375;
     }
 
     public static class Vision {
