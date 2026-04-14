@@ -126,7 +126,7 @@ public class Constants {
         public static final double MOTION_MAGIC_ACCELERATION = 64;
         public static final double EXTEND_KP = 200;
 
-        public static final double ARM_IN_POSITION = 0.0;
+        public static final double ARM_IN_POSITION = 0.29 / 3.0;
         public static final double ARM_OUT_POSITION = 0.29;
 
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = ARM_OUT_POSITION / PINION_CIRCUMFERENCE;
