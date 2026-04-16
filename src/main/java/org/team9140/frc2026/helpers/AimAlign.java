@@ -33,17 +33,25 @@ public class AimAlign {
         lookupAirtimeFromDistance.put(4.17, 1.47333333333333);
         lookupAirtimeFromDistance.put(4.45, 1.6166666666666667);
 
-        lookupMotorSpeedFromDistance.put(2.0245, 1900.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(2.3213, 2050.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(2.66, 2150.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(2.91, 2350.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.19, 2425.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.49, 2600.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.81, 2700.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(4.17, 2825.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(4.45, 3050.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(2.93, 2000.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.37, 2000.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.50, 2000.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.55, 2100.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.92, 2100.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(4.28, 2200.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(4.35, 2200.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(4.67, 2250.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(6.0, 2500.0 / 60.0);
 
-        lookupHoodAngleFromDistance.put(1.0, 18.0 / 360.0);
+        lookupHoodAngleFromDistance.put(2.93, 22.5);
+        lookupHoodAngleFromDistance.put(3.37, 23.5);
+        lookupHoodAngleFromDistance.put(3.50, 25.0);
+        lookupHoodAngleFromDistance.put(3.55, 26.0);
+        lookupHoodAngleFromDistance.put(3.92, 27.0);
+        lookupHoodAngleFromDistance.put(4.28, 28.0);
+        lookupHoodAngleFromDistance.put(4.35, 29.0);
+        lookupHoodAngleFromDistance.put(4.67, 30.0);
+        lookupHoodAngleFromDistance.put(6.0, 45.0);
     }
 
     static StructPublisher<Pose2d> effectivePosePublisher = NetworkTableInstance.getDefault().getStructTopic("Effective Pose", Pose2d.struct).publish();

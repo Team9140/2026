@@ -45,19 +45,19 @@ public class AutonomousRoutines {
         autoChooser.addOption("Shoot Preload", "preload");
         autoChooser.addOption("Score from Depot starting Middle", "score_from_depot");
         autoChooser.addOption("Score from Depot starting Left", "depot_shoot_left");
-        autoChooser.addOption("1 Pass From Depot", "one_pass_depot");
-        autoChooser.addOption("1 Pass From Depot then Score from Depot", "one_pass_depot_then_depot_shoot");
-        autoChooser.addOption("1 Pass From Outpost", "one_pass_outpost");
-        autoChooser.addOption("2 Passes from Outpost", "two_pass_outpost");
-        autoChooser.addOption("2 Passes from Depot", "two_pass_depot");
+        autoChooser.addOption("1 Pass From Left", "one_pass_depot");
+        autoChooser.addOption("1 Pass From Left then Score from Depot", "one_pass_depot_then_depot_shoot");
+        autoChooser.addOption("1 Pass From Right", "one_pass_outpost");
+        autoChooser.addOption("2 Passes from Right", "two_pass_outpost");
+        autoChooser.addOption("2 Passes from Left", "two_pass_depot");
 
-        autoChooser.addOption("1 Pass Over Bump From Depot", "one_pass_depot_bump");
-        autoChooser.addOption("1 Pass Over Bump From Outpost", "one_pass_outpost_bump");
-        autoChooser.addOption("2 Passes Over Bump from Outpost", "two_pass_outpost_bump");
-        autoChooser.addOption("2 Passes Over Bump from Depot", "two_pass_depot_bump");
+        autoChooser.addOption("1 Pass Over Bump From Left", "one_pass_depot_bump");
+        autoChooser.addOption("1 Pass Over Bump From Right", "one_pass_outpost_bump");
+        autoChooser.addOption("2 Passes Over Bump from Right", "two_pass_outpost_bump");
+        autoChooser.addOption("2 Passes Over Bump from Left", "two_pass_depot_bump");
 
-        autoChooser.addOption("2 Passes Over Bump from Outpost (Move and Shoot)", "two_pass_outpost_bump_move");
-        autoChooser.addOption("2 Passes Over Bump from Depot (Move and Shoot)", "two_pass_depot_bump_move");
+        autoChooser.addOption("2 Passes Over Bump from Right (Move and Shoot)", "two_pass_outpost_bump_move");
+        autoChooser.addOption("2 Passes Over Bump from Left (Move and Shoot)", "two_pass_depot_bump_move");
         SmartDashboard.putData(autoChooser);
     }
 

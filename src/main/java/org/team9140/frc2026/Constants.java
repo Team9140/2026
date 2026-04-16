@@ -15,10 +15,11 @@ import edu.wpi.first.math.util.Units;
 public class Constants {
     public static class Ports {
         public static final CANBus CANIVORE = new CANBus("sixseven", "./logs/example.hoot");
+        public static final CANBus SHOOTER_CANIVORE = new CANBus("kenny", "./logs/example.hoot");
         public static final int YAW_MOTOR = 12;
-        public static final int HOOD_MOTOR = 25;
-        public static final int SHOOTER_MOTOR = 16;
-        public static final int SHOOTER_FOLLOWER_MOTOR = 17;
+        public static final int HOOD_MOTOR = 15;
+        public static final int SHOOTER_MOTOR = 17;
+        public static final int SHOOTER_FOLLOWER_MOTOR = 16;
         public static final int INTAKE_SPIN_MOTOR = 26;
         public static final int INTAKE_SPIN_FOLLOWER_MOTOR = 27;
         public static final int INTAKE_EXTEND_MOTOR = 9;
@@ -113,26 +114,26 @@ public class Constants {
         public static final int PINION_TEETH = 10;
         public static final double PINION_DP = 10;
         public static final double PINION_CIRCUMFERENCE = Units.inchesToMeters(PINION_TEETH / PINION_DP * Math.PI);
-        public static final double INTAKE_VOLTAGE = 10.0;
+        public static final double INTAKE_VOLTAGE = 12.0;
         public static final double INTAKE_OFF = 0.0;
 
         public static final double ROLLER_STATOR_CURRENT_LIMIT = 40.0;
-        public static final double EXTEND_STATOR_CURRENT_LIMIT = 15.0;
+        public static final double EXTEND_STATOR_CURRENT_LIMIT = 25.0;
 
         public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 30.0;
-        public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 60.0;
+        public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 30.0;
 
         public static final double MOTION_MAGIC_CRUISE_VELOCITY = 64;
         public static final double MOTION_MAGIC_ACCELERATION = 64;
         public static final double EXTEND_KP = 200;
 
-        public static final double ARM_IN_POSITION = 0.29 / 3.0;
         public static final double ARM_OUT_POSITION = 0.29;
+        public static final double ARM_IN_POSITION = ARM_OUT_POSITION / 3.0;
 
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = ARM_OUT_POSITION / PINION_CIRCUMFERENCE;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
 
-        public static final double MIN_HEIGHT = ARM_IN_POSITION;
+        public static final double MIN_HEIGHT = 0.0;
         public static final double MAX_HEIGHT = ARM_OUT_POSITION;
 
         public static final double LIGAMENT_LENGTH = 12;
@@ -171,10 +172,10 @@ public class Constants {
         public static final double KD = 50;
 
         public static final double ADJUST_VOLTAGE = 2.0;
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 200.0 / 360.0; // rot
-        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -200.0 / 360.0; // rot
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 100.0 / 360.0; // rot
+        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -100.0 / 360.0; // rot
         public static final double GEAR_RATIO = 90.0 / 10.0 * 50.0 / 11.0;
-        public static final double SENSOR_TO_MECHANISM = 18.0 / 90.0;
+        public static final double SENSOR_TO_MECHANISM = GEAR_RATIO; // 18.0 / 90.0;
 
         public static final double OVERTURN_LOOKAHEAD_TIME = 1.5;
         public static final Transform2d POSITION_TO_ROBOT = new Transform2d(-0.178, -0.114, new Rotation2d(-Math.PI));
@@ -202,10 +203,11 @@ public class Constants {
         public static final double GEAR_RATIO = 36.0 / 8.0 * 170.0 / 10.0;
         public static final double SENSOR_TO_MECHANISM_RATIO = 170.0 / 10.0 * 16.0 / 25.0;
         public static final double CANCODER_OFFSET_ROTS = 0.064208984375;
+        public static final double ANGLE_MIN = Units.degreesToRadians(18.0);
     }
 
     public static class Vision {
-        public static final String[] CAMERA_NAMES = {"limelight-a", "limelight-b"};
-        public static Transform3d[] ROBOT_TO_CAM = {null, null};
+        public static final String[] CAMERA_NAMES = {"limelight-a", "limelight-b", "limelight-c"};
+        public static Transform3d[] ROBOT_TO_CAM = {null, null, null};
     }
 }

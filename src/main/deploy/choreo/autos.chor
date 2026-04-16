@@ -21,8 +21,8 @@
    "intake_velocity":{
     "dimension":"LinVel",
     "var":{
-     "exp":"2 m / s",
-     "val":2.0
+     "exp":"1 m / s",
+     "val":1.0
     }
    },
    "max_acceleration":{
@@ -79,8 +79,8 @@
      "val":7.40605525970459
     },
     "heading":{
-     "exp":"-90 deg",
-     "val":-1.5707963267948966
+     "exp":"0 deg",
+     "val":0.0
     }
    },
    "Blue_Depot_Trench_End":{
@@ -149,8 +149,8 @@
      "val":0.611431217193604
     },
     "heading":{
-     "exp":"90 deg",
-     "val":1.5707963267948966
+     "exp":"0 deg",
+     "val":0.0
     }
    },
    "Blue_Outpost_Trench_End":{

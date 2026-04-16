@@ -15,7 +15,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -35,10 +34,13 @@ public class RobotContainer {
       Constants.Vision.ROBOT_TO_CAM[0]);
   private final Vision limeB = new Vision(Constants.Vision.CAMERA_NAMES[1], this.drivetrain::acceptVisionMeasurement,
       Constants.Vision.ROBOT_TO_CAM[1]);
+  private final Vision limeC = new Vision(Constants.Vision.CAMERA_NAMES[2], this.drivetrain::acceptVisionMeasurement, 
+      Constants.Vision.ROBOT_TO_CAM[2]);
 
   public RobotContainer() {
     limeA.setIMUMode(1);
     limeB.setIMUMode(1);
+    limeC.setIMUMode(1);
     driveCommand = drivetrain.teleopDrive(controller::getLeftX, controller::getLeftY,
         controller::getRightX);
 
@@ -46,14 +48,15 @@ public class RobotContainer {
 
     limeA.start();
     limeB.start();
+    limeC.start();
 
     autoRoutines = AutonomousRoutines.getInstance(drivetrain);
   }
 
   private void configureBindings() {
-
     this.shooter.setPoseSupplier(() -> this.drivetrain.getCachedState().Pose);
     SmartDashboard.putNumber("tuning RPM", 2500);
+    SmartDashboard.putNumber("tuning Angle", 24.0);
 
     // this.controller.rightBumper()
     //     .onTrue(this.intake.intake())
@@ -73,14 +76,15 @@ public class RobotContainer {
 
     wantIntake.whileTrue(this.intake.intake());
 
-    //ewantShoot.and(shooter.readyToShoot).and(wantIntake.negate()).debounce(2.0).onTrue(this.intake.squeeze());
+    wantShoot.and(shooter.readyToShoot).and(wantIntake.negate()).debounce(2.0).onTrue(this.intake.squeeze());
 
-    this.controller.y().onTrue(this.shooter.tuningSpeed(this.drivetrain::getCachedState, () -> SmartDashboard.getNumber("tuning RPM", 2500)));
+    // this.controller.y().onTrue(this.shooter.tuning(this.drivetrain::getCachedState, () -> SmartDashboard.getNumber("tuning RPM", 2500), () -> SmartDashboard.getNumber("tuning Angle", 24.0)));
     // this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getCachedState));
     // this.controller.x().onTrue(this.shooter.off());
+    this.controller.leftTrigger().onTrue(hopper.feed()).onFalse(hopper.reverseAndOff());
 
-    this.controller.back().whileTrue(this.shooter.manualLeft());
-    this.controller.start().whileTrue(this.shooter.manualRight());
+    // this.controller.back().whileTrue(this.shooter.manualLeft());
+    // this.controller.start().whileTrue(this.shooter.manualRight());
     // this.controller.y().whileTrue(this.drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // this.controller.a().whileTrue(this.drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     // this.controller.b().whileTrue(this.drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));

@@ -77,8 +77,8 @@ public class FieldConstants {
     }
 
     public static class FeedingPositions {
-        public static final Pose2d FEEDING_POS_LOWER = new Pose2d(0, 1, new Rotation2d());
-        public static final Pose2d FEEDING_POS_UPPER = new Pose2d(0, 7, new Rotation2d());
+        public static final Pose2d FEEDING_POS_LOWER = new Pose2d(0, 3, new Rotation2d());
+        public static final Pose2d FEEDING_POS_UPPER = new Pose2d(0, 5, new Rotation2d());
         public static final Pose2d FEEDING_POS_LOWER_RED = new Pose2d(FIELD_LENGTH - FEEDING_POS_LOWER.getX(), FEEDING_POS_LOWER.getY(), Rotation2d.k180deg);
         public static final Pose2d FEEDING_POS_UPPER_RED = new Pose2d(FIELD_LENGTH - FEEDING_POS_UPPER.getX(), FEEDING_POS_UPPER.getY(), Rotation2d.k180deg);
     }

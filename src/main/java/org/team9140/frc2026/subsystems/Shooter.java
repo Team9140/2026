@@ -1,5 +1,7 @@
 package org.team9140.frc2026.subsystems;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -37,6 +39,7 @@ import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -45,6 +48,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Notifier;
@@ -60,15 +64,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class Shooter extends SubsystemBase {
     private final TalonFX yawMotor = new TalonFX(Constants.Ports.YAW_MOTOR, Constants.Ports.CANIVORE);
-    private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR, Constants.Ports.CANIVORE);
-    private final TalonFX shooterFollower = new TalonFX(Constants.Ports.SHOOTER_FOLLOWER_MOTOR, Constants.Ports.CANIVORE);
-    private final TalonFX hoodMotor = new TalonFX(Constants.Ports.HOOD_MOTOR, Constants.Ports.CANIVORE);
+    private final TalonFX shooterMotor = new TalonFX(Constants.Ports.SHOOTER_MOTOR,
+            Constants.Ports.SHOOTER_CANIVORE);
+    private final TalonFX shooterFollower = new TalonFX(Constants.Ports.SHOOTER_FOLLOWER_MOTOR,
+            Constants.Ports.SHOOTER_CANIVORE);
+    private final TalonFX hoodMotor = new TalonFX(Constants.Ports.HOOD_MOTOR, Constants.Ports.SHOOTER_CANIVORE);
 
-    private final CANcoder yawCANcoder = new CANcoder(Constants.Ports.TURRET_CANCODER, Constants.Ports.CANIVORE);
-    private final CANcoder hoodCANcoder = new CANcoder(Constants.Ports.HOOD_CANCODER, Constants.Ports.CANIVORE);
+    // private final CANcoder yawCANcoder = new
+    // CANcoder(Constants.Ports.TURRET_CANCODER, Constants.Ports.CANIVORE);
+    private final CANcoder hoodCANcoder = new CANcoder(Constants.Ports.HOOD_CANCODER,
+            Constants.Ports.SHOOTER_CANIVORE);
 
     private final MotionMagicTorqueCurrentFOC yawMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
     private final MotionMagicTorqueCurrentFOC hoodMotorControl = new MotionMagicTorqueCurrentFOC(0).withSlot(0);
@@ -116,10 +125,11 @@ public class Shooter extends SubsystemBase {
                 .withReverseSoftLimitEnable(true);
 
         FeedbackConfigs turretFeedbackConfigs = new FeedbackConfigs()
-                .withSensorToMechanismRatio(Constants.Turret.SENSOR_TO_MECHANISM)
-                .withFeedbackRemoteSensorID(Constants.Ports.TURRET_CANCODER)
-                .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
-                .withRotorToSensorRatio(Constants.Turret.GEAR_RATIO / Constants.Turret.SENSOR_TO_MECHANISM);
+                .withSensorToMechanismRatio(Constants.Turret.SENSOR_TO_MECHANISM);
+        // .withFeedbackRemoteSensorID(Constants.Ports.TURRET_CANCODER)
+        // .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+        // .withRotorToSensorRatio(Constants.Turret.GEAR_RATIO /
+        // Constants.Turret.SENSOR_TO_MECHANISM);
 
         yawMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
 
@@ -131,11 +141,11 @@ public class Shooter extends SubsystemBase {
                 .withTorqueCurrent(turretTorqueCurrentConfigs)
                 .withSoftwareLimitSwitch(turretSoftwareLimitSwitchConfigs)
                 .withFeedback(turretFeedbackConfigs);
-        
-        MagnetSensorConfigs yawCancoderConfig = new MagnetSensorConfigs()
-                .withAbsoluteSensorDiscontinuityPoint(0.5)
-                .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
-                .withMagnetOffset(Constants.Turret.CANCODER_OFFSET_ROTS);
+
+        // MagnetSensorConfigs yawCancoderConfig = new MagnetSensorConfigs()
+        // .withAbsoluteSensorDiscontinuityPoint(0.5)
+        // .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+        // .withMagnetOffset(Constants.Turret.CANCODER_OFFSET_ROTS);
 
         // END TURRET YAW CONFIG
 
@@ -171,10 +181,11 @@ public class Shooter extends SubsystemBase {
 
         FeedbackConfigs hoodFeedbackConfigs = new FeedbackConfigs()
                 .withSensorToMechanismRatio(Constants.Hood.SENSOR_TO_MECHANISM_RATIO)
-                .withRotorToSensorRatio(Constants.Hood.GEAR_RATIO / Constants.Hood.SENSOR_TO_MECHANISM_RATIO)
+                .withRotorToSensorRatio(
+                        Constants.Hood.GEAR_RATIO / Constants.Hood.SENSOR_TO_MECHANISM_RATIO)
                 .withFeedbackRemoteSensorID(Constants.Ports.HOOD_CANCODER)
                 .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder);
-        
+
         hoodMotor.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
 
         TalonFXConfiguration hoodConfig = new TalonFXConfiguration()
@@ -185,7 +196,7 @@ public class Shooter extends SubsystemBase {
                 .withTorqueCurrent(hoodTorqueCurrentConfigs)
                 .withSoftwareLimitSwitch(hoodSoftwareLimitSwitchConfigs)
                 .withFeedback(hoodFeedbackConfigs);
-        
+
         MagnetSensorConfigs hoodCancoderConfig = new MagnetSensorConfigs()
                 .withAbsoluteSensorDiscontinuityPoint(1.0)
                 .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
@@ -231,7 +242,7 @@ public class Shooter extends SubsystemBase {
         // END FLYWHEEL CONFIG
 
         yawMotor.getConfigurator().apply(yawConfig);
-        yawCANcoder.getConfigurator().apply(yawCancoderConfig);
+        // yawCANcoder.getConfigurator().apply(yawCancoderConfig);
         hoodMotor.getConfigurator().apply(hoodConfig);
         hoodCANcoder.getConfigurator().apply(hoodCancoderConfig);
         shooterMotor.getConfigurator().apply(shooterConfig);
@@ -304,12 +315,12 @@ public class Shooter extends SubsystemBase {
                     targetTranslationSupplier.get(), robotState.Speeds);
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
                     AimAlign.getRequiredSpeed(turretPose, targetPose)));
-            this.hoodMotor.setControl(hoodMotorControl.withPosition(
-                    AimAlign.getRequiredHoodAngle(turretPose, targetPose)));
-            double yaw = AimAlign.yawAngleToPos(turretPose, targetPose) / (2.0 * Math.PI);    
+            this.setHoodPosition(
+                    AimAlign.getRequiredHoodAngle(turretPose, targetPose));
+            double yaw = AimAlign.yawAngleToPos(turretPose, targetPose) / (2.0 * Math.PI);
             if (this.yawMotor.getPosition().getValueAsDouble() > 0 && yaw < -160.0 / 360.0) {
                 yaw += 1;
-            } else if(this.yawMotor.getPosition().getValueAsDouble() < 0 && yaw > 160.0 / 360.0) {
+            } else if (this.yawMotor.getPosition().getValueAsDouble() < 0 && yaw > 160.0 / 360.0) {
                 yaw -= 1;
             }
             this.yawMotor.setControl(yawMotorControl.withPosition(yaw));
@@ -326,8 +337,8 @@ public class Shooter extends SubsystemBase {
             Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
                     AimAlign.getRequiredSpeed(turretPose, targetPose)));
-            this.hoodMotor.setControl(hoodMotorControl.withPosition(
-                    AimAlign.getRequiredHoodAngle(turretPose, targetPose)));
+            this.setHoodPosition(
+                    AimAlign.getRequiredHoodAngle(turretPose, targetPose));
         }).withName("Shoot without Aiming");
     }
 
@@ -349,7 +360,7 @@ public class Shooter extends SubsystemBase {
                 return;
             this.shooterMotor.setControl(new CoastOut());
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
-            this.hoodMotor.setControl(hoodMotorControl.withPosition(0));
+            setHoodPosition(30.0);
         }).withName("Shooter Off");
     }
 
@@ -367,7 +378,7 @@ public class Shooter extends SubsystemBase {
         }).withName("Tune Speed Aiming Automatically");
     }
 
-    public Command tuningHood(Supplier<SwerveDriveState> chassisStateSupplier, DoubleSupplier Angle) {
+    public Command tuningHood(Supplier<SwerveDriveState> chassisStateSupplier, DoubleSupplier AngleDegrees) {
         return this.run(() -> {
             if (this.isManual)
                 return;
@@ -375,10 +386,32 @@ public class Shooter extends SubsystemBase {
             Pose2d robotPose = robotState.Pose;
 
             Translation2d targetPose = AimAlign.getHub().getTranslation();
-            this.hoodMotor.setControl(hoodMotorControl.withPosition(Angle.getAsDouble() / 360.0));
+            this.setHoodPosition(AngleDegrees.getAsDouble());
             this.yawMotor.setControl(yawMotorControl.withPosition(
                     AimAlign.yawAngleToPos(robotPose, targetPose) / (2.0 * Math.PI)));
         }).withName("Tune Hood Angle Aiming Automatically");
+    }
+
+    public Command tuning(Supplier<SwerveDriveState> chassisStateSupplier, DoubleSupplier RPM,
+            DoubleSupplier AngleDegrees) {
+        return this.run(() -> {
+            if (this.isManual)
+                return;
+            SwerveDriveState robotState = chassisStateSupplier.get();
+            Pose2d robotPose = robotState.Pose;
+
+            Translation2d targetPose = AimAlign.getHub().getTranslation();
+
+            this.setHoodPosition(AngleDegrees.getAsDouble());
+            this.shooterMotor.setControl(shooterSpeedControl.withVelocity(RPM.getAsDouble() / 60.0));
+            this.yawMotor.setControl(yawMotorControl.withPosition(
+                    AimAlign.yawAngleToPos(robotPose, targetPose) / (2.0 * Math.PI)));
+        }).withName("Tune Hood Angle and Speed Aiming Automatically");
+    }
+
+    public void setHoodPosition(double angleDegrees) {
+        this.hoodMotor.setControl(hoodMotorControl.withPosition(
+                angleDegrees / 360.0 - Units.radiansToRotations(Constants.Hood.ANGLE_MIN)));
     }
 
     private double targetYawRateOfChange = 0;
@@ -486,7 +519,7 @@ public class Shooter extends SubsystemBase {
         yawMotorSim.setInputVoltage(yawSimVolts);
         yawMotorSim.update(deltatime);
 
-        CANcoderSimState yawCANcoderSimState = yawCANcoder.getSimState();
+        // CANcoderSimState yawCANcoderSimState = yawCANcoder.getSimState();
 
         yawMotor.getPosition().refresh();
         yawArmLigament.setAngle(yawMotor.getPosition().getValueAsDouble() * 360);// convert rot to deg
@@ -495,11 +528,14 @@ public class Shooter extends SubsystemBase {
                 yawMotorSim.getAngleRads() * Constants.Turret.GEAR_RATIO / 2.0 / Math.PI);
         yawMotorSimState.setRotorVelocity(
                 yawMotorSim.getVelocityRadPerSec() * Constants.Turret.GEAR_RATIO / 2.0 / Math.PI);
-        yawCANcoderSimState.setRawPosition(
-                -yawMotorSim.getAngleRads() * Constants.Turret.SENSOR_TO_MECHANISM / 2.0 / Math.PI);
-        yawCANcoderSimState.setVelocity(
-                -yawMotorSim.getVelocityRadPerSec() * Constants.Turret.SENSOR_TO_MECHANISM / 2.0 / Math.PI);
+        // yawCANcoderSimState.setRawPosition(
+        // -yawMotorSim.getAngleRads() * Constants.Turret.SENSOR_TO_MECHANISM / 2.0 /
+        // Math.PI);
+        // yawCANcoderSimState.setVelocity(
+        // -yawMotorSim.getVelocityRadPerSec() * Constants.Turret.SENSOR_TO_MECHANISM /
+        // 2.0 / Math.PI);
 
+        CANcoderSimState hoodCANcoderSimState = hoodCANcoder.getSimState();
         TalonFXSimState hoodMotorSimState = hoodMotor.getSimState();
         double hoodSimVolts = hoodMotorSimState.getMotorVoltage();
         hoodMotorSim.setInputVoltage(hoodSimVolts);
@@ -511,12 +547,15 @@ public class Shooter extends SubsystemBase {
                 hoodMotorSim.getAngleRads() * Constants.Hood.GEAR_RATIO / 2.0 / Math.PI);
         hoodMotorSimState.setRotorVelocity(
                 hoodMotorSim.getVelocityRadPerSec() * Constants.Hood.GEAR_RATIO / 2.0 / Math.PI);
+        hoodCANcoderSimState.setRawPosition(
+                hoodMotorSim.getAngleRads() * Constants.Hood.SENSOR_TO_MECHANISM_RATIO / 2.0 / Math.PI);
+        hoodCANcoderSimState.setVelocity(hoodMotorSim.getVelocityRadPerSec()
+                * Constants.Hood.SENSOR_TO_MECHANISM_RATIO / 2.0 / Math.PI);
 
         shooterPos = new Pose3d(0, 0, 0, new Rotation3d(
-                0, 
-                hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI, 
-                yawMotor.getPosition().getValueAsDouble() * 2 * Math.PI
-        ));
+                0,
+                hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI,
+                yawMotor.getPosition().getValueAsDouble() * 2 * Math.PI));
         shooterPos = new Pose3d(0, 0, 0,
                 new Rotation3d(0, 0, yawMotor.getPosition().getValueAsDouble() * 2 * Math.PI));
         yawPublisher.set(shooterPos);
@@ -538,7 +577,7 @@ public class Shooter extends SubsystemBase {
 
     private final Trigger yawIsAtPosition = new Trigger(
             () -> Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(),
-                    this.yawMotorControl.Position, 0.01));
+                    this.yawMotorControl.Position, Units.degreesToRotations(5)));
 
     public final Trigger hoodIsAtPosition = new Trigger(
             () -> Util.epsilonEquals(this.hoodMotor.getPosition(false).getValueAsDouble(),
@@ -554,8 +593,14 @@ public class Shooter extends SubsystemBase {
             || this.yawMotorControl.Position + this.targetYawRateOfChange
                     * Turret.OVERTURN_LOOKAHEAD_TIME < Constants.Turret.REVERSE_SOFT_LIMIT_THRESHOLD);
 
-    public final Trigger readyToShoot = new Trigger(
-        yawIsAtPosition
-        .and(shooterIsAtVelocity)
-        .and(hoodIsAtPosition));
+    public final Trigger readyToShoot = new Trigger(shooterIsAtVelocity.and(yawIsAtPosition))
+            .debounce(0.2, DebounceType.kBoth);
+
+    @SuppressWarnings("unused")
+    private final SysIdRoutine flywheelRoutine = new SysIdRoutine(
+        new SysIdRoutine.Config(null, null, null),
+        new SysIdRoutine.Mechanism((volts) -> {
+            this.shooterMotor.setVoltage(volts.in(Volts));
+        }, null, this)
+    );
 }
