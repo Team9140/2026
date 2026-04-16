@@ -78,7 +78,7 @@ public class RobotContainer {
 
     wantShoot.and(shooter.readyToShoot).and(wantIntake.negate()).debounce(2.0).onTrue(this.intake.squeeze());
 
-    // this.controller.y().onTrue(this.shooter.tuning(this.drivetrain::getCachedState, () -> SmartDashboard.getNumber("tuning RPM", 2500), () -> SmartDashboard.getNumber("tuning Angle", 24.0)));
+    this.controller.y().onTrue(this.shooter.tuning(this.drivetrain::getCachedState, () -> SmartDashboard.getNumber("tuning RPM", 2500), () -> SmartDashboard.getNumber("tuning Angle", 24.0)));
     // this.controller.a().onTrue(this.shooter.aim(this.drivetrain::getCachedState));
     // this.controller.x().onTrue(this.shooter.off());
     this.controller.leftTrigger().onTrue(hopper.feed()).onFalse(hopper.reverseAndOff());

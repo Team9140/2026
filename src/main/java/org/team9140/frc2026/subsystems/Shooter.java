@@ -445,6 +445,7 @@ public class Shooter extends SubsystemBase {
 
         this.yawMotor.getPosition().refresh();
         this.shooterMotor.getVelocity().refresh();
+        this.hoodMotor.getPosition().refresh();
         targetYawRateOfChange = (this.yawMotorControl.Position - this.oldTargetYaw)
                 / (Utils.getCurrentTimeSeconds() - this.timeSinceOldTargetYawUpdate);
         oldTargetYaw = this.yawMotorControl.Position;
