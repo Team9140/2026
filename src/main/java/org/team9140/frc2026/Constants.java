@@ -118,14 +118,14 @@ public class Constants {
         public static final double INTAKE_OFF = 0.0;
 
         public static final double ROLLER_STATOR_CURRENT_LIMIT = 40.0;
-        public static final double EXTEND_STATOR_CURRENT_LIMIT = 25.0;
+        public static final double EXTEND_STATOR_CURRENT_LIMIT = 30.0;
 
         public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 30.0;
         public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 30.0;
 
         public static final double MOTION_MAGIC_CRUISE_VELOCITY = 64;
         public static final double MOTION_MAGIC_ACCELERATION = 64;
-        public static final double EXTEND_KP = 200;
+        public static final double EXTEND_KP = 500;
 
         public static final double ARM_OUT_POSITION = 0.29;
         public static final double ARM_IN_POSITION = ARM_OUT_POSITION / 3.0;

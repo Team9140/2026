@@ -264,58 +264,94 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void acceptVisionMeasurement(Vision.EstimateType kind, double timestamp, PoseEstimate measurement) {
-        double xyStdDev = 9999;
-        double thetaStdDev = 9999;
-        boolean reject = false;
-        ChassisSpeeds speeds = this.getCachedState().Speeds;
-        // double poseDiff =
-        // measurement.pose.getTranslation().getDistance(this.getState().Pose.getTranslation());
+        SmartDashboard.putNumber("vision last timestamp", timestamp);
+        
+        double xyStdDev;
+        double thetaStdDev;
 
-        reject |= Math
-                .abs(Units.degreesToRotations(this.getPigeon2().getAngularVelocityZWorld().getValueAsDouble())) >= 0.5;
-        reject |= measurement.avgTagArea <= 0.02;
-        // reject |= poseDiff <= 0.01; // ignore updates smaller than 1cm to reduce
-        // jitter??
+        boolean reject = false;
+
+        ChassisSpeeds speeds = this.getState().Speeds;
+        // double poseDiff = measurement.pose.getTranslation()
+        //         .getDistance(this.getState().Pose.getTranslation());
+
+        reject |= Math.abs(Units.degreesToRotations(
+                this.getPigeon2().getAngularVelocityZWorld().getValueAsDouble())) >= 0.5;
+        reject |= measurement.avgTagArea <= 0.01;
+        // reject |= poseDiff <= 0.01;
+
+        SmartDashboard.putNumber("vision area", measurement.avgTagArea);
 
         if (reject) {
+            SmartDashboard.putBoolean("vision rejected", true);
             return;
         }
 
-        if (DriverStation.isEnabled()) {
-            double highestAmbiguity = 0.0;
-            for (RawFiducial tag : measurement.rawFiducials) {
-                if (tag.ambiguity >= highestAmbiguity) {
-                    highestAmbiguity = tag.ambiguity;
-                }
-            }
-
-            if (highestAmbiguity >= 0.4) {
-                return;
-            }
-            if (kind.equals(Vision.EstimateType.MT1)) {
-                if (measurement.tagCount >= 2 && measurement.avgTagArea >= 0.2) {
-                    xyStdDev = 1.0;
-                } else if (measurement.tagCount >= 2 && measurement.avgTagArea >= 0.5) {
-                    xyStdDev = 0.5;
-                } else if (measurement.avgTagArea >= 0.2) {
-                    xyStdDev = 5;
-                } else if (measurement.avgTagArea > 0.3
-                        && speeds.omegaRadiansPerSecond <= Math.toRadians(5)
-                        && Math.abs(speeds.vxMetersPerSecond) + Math.abs(speeds.vxMetersPerSecond) <= 0.5
-                        && highestAmbiguity < 0.1) {
-                    xyStdDev = 2.0;
-                    thetaStdDev = 10.0;
-                }
-            }
-        } else {
-            if (kind.equals(Vision.EstimateType.MT1)) {
-                    xyStdDev = 2.0;
-                    thetaStdDev = 5.0;
-            }
+        double lowestAmbiguity = Double.MAX_VALUE;
+        for (RawFiducial tag : measurement.rawFiducials) {
+            lowestAmbiguity = Math.min(lowestAmbiguity, tag.ambiguity);
         }
-        SmartDashboard.putNumber("vision measurement T", timestamp);
-        SmartDashboard.putNumber("xyStdDev", xyStdDev);
-        this.addVisionMeasurement(measurement.pose, timestamp,
+
+        SmartDashboard.putNumber("vision ambiguity", lowestAmbiguity);
+
+        if (lowestAmbiguity > 0.6) {
+            SmartDashboard.putBoolean("vision rejected", true);
+            SmartDashboard.putBoolean("vision high ambiguity", true);
+            return;
+        }
+        SmartDashboard.putBoolean("vision high ambiguity", false);
+
+        double kArea = 3.0;
+        double kLinearVel = 2.5;
+        double kAngularVel = 3.0;
+        double kAmb = 3.0;
+
+        if (measurement.tagCount == 1) {
+            kArea *= 0.5;
+            kLinearVel *= 2;
+            kAngularVel *= 2;
+            kAmb *= 1;
+        }
+
+        double sigmaArea = kArea * Math.exp(5 - 10 * Math.sqrt(measurement.avgTagArea));
+
+        double linearVel = Math.hypot(
+                speeds.vxMetersPerSecond,
+                speeds.vyMetersPerSecond);
+        double angularVel = Math.abs(speeds.omegaRadiansPerSecond);
+
+        double sigmaLinearVel = kLinearVel * linearVel;
+        double sigmaAngularVel = kAngularVel * angularVel;
+
+        double sigmaAmb = kAmb * lowestAmbiguity;
+
+        xyStdDev = Math.sqrt(
+                sigmaArea * sigmaArea +
+                        sigmaLinearVel * sigmaLinearVel +
+                        sigmaAngularVel * sigmaAngularVel +
+                        sigmaAmb * sigmaAmb + 3);
+
+        thetaStdDev = xyStdDev * 2.0;
+
+        if (measurement.tagCount >= 2) {
+            xyStdDev *= 0.7;
+            thetaStdDev *= 0.7;
+        }
+
+        // xyStdDev = MathUtil.clamp(xyStdDev, 0.05, 5.0);
+        // thetaStdDev = MathUtil.clamp(thetaStdDev, 1.0, 100.0);
+
+        if (DriverStation.isEnabled()) {
+            thetaStdDev = 9999;
+        }
+
+        SmartDashboard.putBoolean("vision rejected", false);
+        SmartDashboard.putNumber("vision xyStdDev", xyStdDev);
+        SmartDashboard.putNumber("vision thetaStdDev", thetaStdDev);
+
+        this.addVisionMeasurement(
+                measurement.pose,
+                timestamp,
                 VecBuilder.fill(xyStdDev, xyStdDev, thetaStdDev));
     }
 

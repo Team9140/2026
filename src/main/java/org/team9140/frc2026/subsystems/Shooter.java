@@ -599,7 +599,7 @@ public class Shooter extends SubsystemBase {
                     * Turret.OVERTURN_LOOKAHEAD_TIME < Constants.Turret.REVERSE_SOFT_LIMIT_THRESHOLD);
 
     public final Trigger readyToShoot = new Trigger(shooterIsAtVelocity.and(yawIsAtPosition))
-            .debounce(0.2, DebounceType.kBoth);
+            .debounce(0.5, DebounceType.kBoth);
 
     @SuppressWarnings("unused")
     private final SysIdRoutine flywheelRoutine = new SysIdRoutine(
