@@ -275,7 +275,7 @@ public class Shooter extends SubsystemBase {
     }
 
     private boolean isManual = false;
-
+    
     public Command manualAdjust(boolean left) {
         return this.runOnce(() -> {
             this.isManual = true;
@@ -342,6 +342,8 @@ public class Shooter extends SubsystemBase {
         }).withName("Shoot without Aiming");
     }
 
+    private final VoltageOut shooterIdleController = new VoltageOut(Constants.Shooter.IDLE_VOLTAGE);
+
     public Command idle() {
         return this.runOnce(() -> {
             if (this.isManual)
@@ -349,16 +351,18 @@ public class Shooter extends SubsystemBase {
             // point turret forward / starting orientation / whatever
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
             this.hoodMotor.setControl(hoodMotorControl.withPosition(0));
-            this.shooterMotor.setControl(new VoltageOut(Constants.Shooter.IDLE_VOLTAGE));
+            this.shooterMotor.setControl(shooterIdleController);
         }).andThen(Commands.idle(this)).withName("Idle");
     }
 
     // make this default command
+    private final CoastOut shooterCoastOut = new CoastOut();
+
     public Command off() {
         return this.runOnce(() -> {
             if (this.isManual)
                 return;
-            this.shooterMotor.setControl(new CoastOut());
+            this.shooterMotor.setControl(shooterCoastOut);
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
             setHoodPosition(30.0);
         }).withName("Shooter Off");
