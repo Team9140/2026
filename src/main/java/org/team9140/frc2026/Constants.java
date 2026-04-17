@@ -172,8 +172,8 @@ public class Constants {
         public static final double KD = 50;
 
         public static final double ADJUST_VOLTAGE = 2.0;
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 100.0 / 360.0; // rot
-        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -100.0 / 360.0; // rot
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 130.0 / 360.0; // rot
+        public static final double REVERSE_SOFT_LIMIT_THRESHOLD = -150.0 / 360.0; // rot
         public static final double GEAR_RATIO = 90.0 / 10.0 * 50.0 / 11.0;
         public static final double SENSOR_TO_MECHANISM = GEAR_RATIO; // 18.0 / 90.0;
 
@@ -207,7 +207,7 @@ public class Constants {
     }
 
     public static class Vision {
-        public static final String[] CAMERA_NAMES = {"limelight-a", "limelight-b", "limelight-c"};
+        public static final String[] CAMERA_NAMES = {"limelight-a", "limelight-b", "limelight-center"};
         public static Transform3d[] ROBOT_TO_CAM = {null, null, null};
     }
 }

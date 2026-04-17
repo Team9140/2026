@@ -23,34 +23,27 @@ public class AimAlign {
     private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap(); //in seconds
 
     static {
-        lookupAirtimeFromDistance.put(2.0245, 0.8266666666666666667);
-        lookupAirtimeFromDistance.put(2.3213, 1.0);
-        lookupAirtimeFromDistance.put(2.66, 1.06333333333333333);
-        lookupAirtimeFromDistance.put(2.91, 1.1666666666666667);
-        lookupAirtimeFromDistance.put(3.19, 1.29);
-        lookupAirtimeFromDistance.put(3.49, 1.41);
-        lookupAirtimeFromDistance.put(3.81, 1.4316666666666667);
-        lookupAirtimeFromDistance.put(4.17, 1.47333333333333);
-        lookupAirtimeFromDistance.put(4.45, 1.6166666666666667);
+        lookupAirtimeFromDistance.put(1.0, 1.0);
 
-        lookupMotorSpeedFromDistance.put(2.93, 2000.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.37, 2000.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.50, 2000.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.55, 2100.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.92, 2100.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(4.28, 2200.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(4.35, 2200.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(4.67, 2250.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(2.02, 1700.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(2.63, 1800.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(2.75, 1800.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(2.86, 1900.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.29, 2000.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(3.48, 2000.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(4.32, 2200.0 / 60.0);
+        // lookupMotorSpeedFromDistance.put(5.0, 2200.0 / 60.0);
         lookupMotorSpeedFromDistance.put(6.0, 2500.0 / 60.0);
 
-        lookupHoodAngleFromDistance.put(2.93, 22.5);
-        lookupHoodAngleFromDistance.put(3.37, 23.5);
-        lookupHoodAngleFromDistance.put(3.50, 25.0);
-        lookupHoodAngleFromDistance.put(3.55, 26.0);
-        lookupHoodAngleFromDistance.put(3.92, 27.0);
-        lookupHoodAngleFromDistance.put(4.28, 28.0);
-        lookupHoodAngleFromDistance.put(4.35, 29.0);
-        lookupHoodAngleFromDistance.put(4.67, 30.0);
+        lookupHoodAngleFromDistance.put(2.02, 20.0);
+        lookupHoodAngleFromDistance.put(2.63, 21.0);
+        lookupHoodAngleFromDistance.put(2.75, 23.0);
+        lookupHoodAngleFromDistance.put(2.86, 24.0);
+        lookupHoodAngleFromDistance.put(3.29, 26.0); 
+        lookupHoodAngleFromDistance.put(3.48, 27.0);
+        lookupHoodAngleFromDistance.put(3.84, 28.0);
+        lookupHoodAngleFromDistance.put(4.32, 29.0);
+        // lookupHoodAngleFromDistance.put(5.0, 23.5);
         lookupHoodAngleFromDistance.put(6.0, 45.0);
     }
 

@@ -208,7 +208,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return cachedState;
     }
 
-    private final StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault().getStructTopic("Drivetrain Target", Pose2d.struct).publish();
+    private final StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Drivetrain Target", Pose2d.struct).publish();
 
     @Override
     public void periodic() {
@@ -218,8 +219,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         SmartDashboard.putNumber("Drivetrain X error", targetPose.getX() - this.getCachedState().Pose.getX());
         SmartDashboard.putNumber("Drivetrain Y error", targetPose.getY() - this.getCachedState().Pose.getY());
-        SmartDashboard.putNumber("Drivetrain Theta error", targetPose.getRotation().getRadians() - this.getCachedState().Pose.getRotation().getRadians());
- 
+        SmartDashboard.putNumber("Drivetrain Theta error",
+                targetPose.getRotation().getRadians() - this.getCachedState().Pose.getRotation().getRadians());
+
         // if (this.targetPose != null) {
         // targetPoseDecomposed[0] = this.targetPose.getX();
         // targetPoseDecomposed[1] = this.targetPose.getY();
@@ -266,52 +268,49 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         double thetaStdDev = 9999;
         boolean reject = false;
         ChassisSpeeds speeds = this.getCachedState().Speeds;
-        double poseDiff = measurement.pose.getTranslation().getDistance(this.getState().Pose.getTranslation());
+        // double poseDiff =
+        // measurement.pose.getTranslation().getDistance(this.getState().Pose.getTranslation());
 
-        reject |= Math.abs(Units.degreesToRotations(this.getPigeon2().getAngularVelocityZWorld().getValueAsDouble())) >= 0.5;
-        reject |= measurement.avgTagArea <= 0.01;
-        reject |= poseDiff <= 0.01; // ignore updates smaller than 1cm to reduce jitter??
+        reject |= Math
+                .abs(Units.degreesToRotations(this.getPigeon2().getAngularVelocityZWorld().getValueAsDouble())) >= 0.5;
+        reject |= measurement.avgTagArea <= 0.02;
+        // reject |= poseDiff <= 0.01; // ignore updates smaller than 1cm to reduce
+        // jitter??
 
         if (reject) {
             return;
         }
 
-        double highestAmbiguity = 0.0;
-        for (RawFiducial tag : measurement.rawFiducials) {
-            if (tag.ambiguity >= highestAmbiguity) {
-                highestAmbiguity = tag.ambiguity;
-            }
-        }
-
-        // if (highestAmbiguity >= 0.5) {
-        //     return;
-        // }
-
         if (DriverStation.isEnabled()) {
+            double highestAmbiguity = 0.0;
+            for (RawFiducial tag : measurement.rawFiducials) {
+                if (tag.ambiguity >= highestAmbiguity) {
+                    highestAmbiguity = tag.ambiguity;
+                }
+            }
+
+            if (highestAmbiguity >= 0.4) {
+                return;
+            }
             if (kind.equals(Vision.EstimateType.MT1)) {
                 if (measurement.tagCount >= 2 && measurement.avgTagArea >= 0.2) {
-                    xyStdDev = 0.5;
-                    thetaStdDev = 90.0;
+                    xyStdDev = 1.0;
                 } else if (measurement.tagCount >= 2 && measurement.avgTagArea >= 0.5) {
-                    xyStdDev = 0.4;
-                    thetaStdDev = 10.0;
-                } else if (measurement.avgTagArea >= 0.15) {
-                    xyStdDev = 1.5;
-                    thetaStdDev = 20.0;
+                    xyStdDev = 0.5;
+                } else if (measurement.avgTagArea >= 0.2) {
+                    xyStdDev = 5;
                 } else if (measurement.avgTagArea > 0.3
-                        && speeds.omegaRadiansPerSecond <= Math.toRadians(10)
+                        && speeds.omegaRadiansPerSecond <= Math.toRadians(5)
                         && Math.abs(speeds.vxMetersPerSecond) + Math.abs(speeds.vxMetersPerSecond) <= 0.5
                         && highestAmbiguity < 0.1) {
-                    xyStdDev = 1.0;
+                    xyStdDev = 2.0;
                     thetaStdDev = 10.0;
                 }
             }
         } else {
             if (kind.equals(Vision.EstimateType.MT1)) {
-                if (highestAmbiguity <= 0.5) {
-                    xyStdDev = 5.0;
+                    xyStdDev = 2.0;
                     thetaStdDev = 5.0;
-                }
             }
         }
         SmartDashboard.putNumber("vision measurement T", timestamp);
@@ -382,8 +381,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return this.runOnce(() -> {
             startTime = Utils.getSystemTimeSeconds();
         }).andThen(this.run(() -> {
-            double vX = teleop_velocity_multiplier * Constants.Drive.MAX_TELEOP_VELOCITY * Util.applyDeadband(-leftStickY.getAsDouble());
-            double vY = teleop_velocity_multiplier * Constants.Drive.MAX_TELEOP_VELOCITY * Util.applyDeadband(-leftStickX.getAsDouble());
+            double vX = teleop_velocity_multiplier * Constants.Drive.MAX_TELEOP_VELOCITY
+                    * Util.applyDeadband(-leftStickY.getAsDouble());
+            double vY = teleop_velocity_multiplier * Constants.Drive.MAX_TELEOP_VELOCITY
+                    * Util.applyDeadband(-leftStickX.getAsDouble());
             double omega = Constants.Drive.MAX_TELEOP_ROTATION * Util.applyDeadband(-rightStickX.getAsDouble());
 
             if (vX == 0.0 && vY == 0.0 && omega == 0) {
@@ -407,14 +408,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public Command slowTeleop() {
-        return Commands.runOnce(() -> this.teleop_velocity_multiplier = Constants.Drive.TELEOP_SHOOTING_VELOCITY_MULTIPLIER).andThen(Commands.idle()).finallyDo(() -> this.teleop_velocity_multiplier = 1.0);
+        return Commands
+                .runOnce(() -> this.teleop_velocity_multiplier = Constants.Drive.TELEOP_SHOOTING_VELOCITY_MULTIPLIER)
+                .andThen(Commands.idle()).finallyDo(() -> this.teleop_velocity_multiplier = 1.0);
     }
 
     public Command stop() {
         return this.runOnce(() -> this.setControl(this.drive
-                    .withVelocityX(0)
-                    .withVelocityY(0)
-                    .withRotationalRate(0)));
+                .withVelocityX(0)
+                .withVelocityY(0)
+                .withRotationalRate(0)));
     }
 
     private final SwerveRequest.FieldCentric auton = new SwerveRequest.FieldCentric()
