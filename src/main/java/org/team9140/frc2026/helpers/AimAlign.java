@@ -36,7 +36,7 @@ public class AimAlign {
         lookupMotorSpeedFromDistance.put(5.10, 2350.0 / 60.0);
         lookupMotorSpeedFromDistance.put(6.50, 2500.0 / 60.0);
         // lookupMotorSpeedFromDistance.put(5.0, 2200.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(7.0, 4000.0 / 60.0);
+        lookupMotorSpeedFromDistance.put(7.0, 3000.0 / 60.0);
         // lookupMotorSpeedFromDistance.put(8.0, 6000.0 / 60.0);
 
         lookupHoodAngleFromDistance.put(2.02, 20.0);
@@ -50,8 +50,8 @@ public class AimAlign {
         lookupHoodAngleFromDistance.put(5.10, 35.0);
         // lookupHoodAngleFromDistance.put(5.0, 23.5);
         lookupHoodAngleFromDistance.put(6.50, 38.0);
-        lookupHoodAngleFromDistance.put(7.0, 45.0);
-        lookupHoodAngleFromDistance.put(8.0, 47.0);
+        lookupHoodAngleFromDistance.put(7.0, 42.0);
+        // lookupHoodAngleFromDistance.put(8.0, 47.0);
     }
 
     static StructPublisher<Pose2d> effectivePosePublisher = NetworkTableInstance.getDefault().getStructTopic("Effective Pose", Pose2d.struct).publish();

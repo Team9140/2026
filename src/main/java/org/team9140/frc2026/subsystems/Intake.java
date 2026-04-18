@@ -29,6 +29,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -104,7 +106,8 @@ public class Intake extends SubsystemBase {
 
         this.rollerMotor.getConfigurator().apply(spinMotorConfigs);
         this.rollerFollower.getConfigurator().apply(spinMotorConfigs);
-        this.rollerFollower.setControl(new Follower(Constants.Ports.INTAKE_SPIN_MOTOR, MotorAlignmentValue.Opposed));
+        this.rollerFollower.setControl(
+                new Follower(Constants.Ports.INTAKE_SPIN_MOTOR, MotorAlignmentValue.Opposed));
         this.extendMotor.getConfigurator().apply(extendMotorConfigs);
 
         if (Utils.isSimulation()) {
@@ -259,9 +262,9 @@ public class Intake extends SubsystemBase {
     }
 
     public Command squeeze() {
-        return this.armIn()
-                .andThen(this.setRollerVolts(Constants.Intake.INTAKE_VOLTAGE))
-                .withDeadline(Commands.waitSeconds(5.0).raceWith(Commands.waitUntil(this.atPosition)))
+        return this.setRollerVolts(Constants.Intake.INTAKE_VOLTAGE).withTimeout(1.0)
+                .andThen(this.armIn())
+                .andThen(new WaitCommand(3.0))
                 .andThen(this.setRollerVolts(0));
     }
 }
