@@ -62,7 +62,10 @@ public class AutonomousRoutines {
     private Command getShootCommand() {
         return shooter.aim(this.drivetrain::getCachedState, () -> AimAlign.getHub().getTranslation())
                 .alongWith(new WaitUntilCommand(shooter.readyToShoot)
-                        .andThen(hopper.feed()));
+                        .andThen(new WaitCommand(1.0))
+                        .andThen(hopper.feed()))
+                        .andThen(new WaitCommand(2.0))
+                        .andThen(intake.squeeze());
     }
 
     private DriverStation.Alliance lastAlliance = Alliance.Red;
@@ -81,7 +84,7 @@ public class AutonomousRoutines {
                                     Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(drivetrain.stop())
                                     .andThen(this.getShootCommand().asProxy()));
                 case "score_from_depot":
-                    return runChoreoAuto("depotShoot", false, true, 0.0, Commands.none()).alongWith(this.intake.intake()).withTimeout(10.0)
+                    return runChoreoAuto("depotShoot", false, true, 0.0, Commands.none()).alongWith(this.intake.intake()).withTimeout(6.0)
                             .andThen(this.drivetrain.stop())
                             .andThen(new WaitCommand(0.5))
                             .andThen(this.getShootCommand());
