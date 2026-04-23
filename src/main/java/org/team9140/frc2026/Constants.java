@@ -128,7 +128,7 @@ public class Constants {
         public static final double EXTEND_KP = 500;
 
         public static final double ARM_OUT_POSITION = 0.29;
-        public static final double ARM_IN_POSITION = ARM_OUT_POSITION / 4.0;
+        public static final double ARM_IN_POSITION = ARM_OUT_POSITION / 2.0;
 
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = ARM_OUT_POSITION / PINION_CIRCUMFERENCE;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;

@@ -63,9 +63,8 @@ public class AutonomousRoutines {
         return shooter.aim(this.drivetrain::getCachedState, () -> AimAlign.getHub().getTranslation())
                 .alongWith(new WaitUntilCommand(shooter.readyToShoot)
                         .andThen(new WaitCommand(1.0))
-                        .andThen(hopper.feed()))
-                        .andThen(new WaitCommand(2.0))
-                        .andThen(intake.squeeze());
+                        .andThen(hopper.feed().alongWith(
+                            new WaitCommand(2.0).andThen(intake.squeeze()))));
     }
 
     private DriverStation.Alliance lastAlliance = Alliance.Red;

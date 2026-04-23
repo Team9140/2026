@@ -31,6 +31,7 @@ import org.team9140.frc2026.helpers.LimelightHelpers.PoseEstimate;
 
 import com.ctre.phoenix6.Utils;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
@@ -39,10 +40,12 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableEvent.Kind;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 
 public class Vision {
     private final EstimateConsumer estConsumer;
     private final String cameraName;
+    private final StructPublisher<Pose2d> posePublisher;
 
     /**
      * @param estConsumer Lamba that will accept a pose estimate and pass it to your
@@ -52,6 +55,7 @@ public class Vision {
     public Vision(String camera_name, EstimateConsumer estConsumer, Transform3d robotToCamera) {
         this.cameraName = camera_name;
         this.estConsumer = estConsumer;
+        this.posePublisher = NetworkTableInstance.getDefault().getStructTopic(cameraName + "Estimate", Pose2d.struct).publish();
 
         if (robotToCamera != null)
             LimelightHelpers.setCameraPose_RobotSpace(this.cameraName, robotToCamera.getX(), robotToCamera.getY(),
@@ -84,6 +88,7 @@ public class Vision {
 
         if (mt1 != null && mt1.tagCount >= 1) {
             this.estConsumer.accept(EstimateType.MT1, timestamp, mt1);
+            this.posePublisher.accept(mt1.pose);
         }
     }
 
