@@ -311,12 +311,16 @@ public class Shooter extends SubsystemBase {
             SwerveDriveState robotState = chassisStateSupplier.get();
             Pose2d turretPose = robotState.Pose;
 
-            Translation2d targetPose = AimAlign.getEffectivePose(turretPose,
-                    targetTranslationSupplier.get(), robotState.Speeds);
+            Translation2d targetPose = targetTranslationSupplier.get();
+            boolean isPassing = targetPose.equals(AimAlign.getHub().getTranslation());
+
+            targetPose = AimAlign.getEffectivePose(turretPose,
+                    targetPose, robotState.Speeds, isPassing);
+            
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
-                    AimAlign.getRequiredSpeed(turretPose, targetPose)));
+                    AimAlign.getRequiredSpeed(turretPose, targetPose, isPassing)));
             this.setHoodPosition(
-                    AimAlign.getRequiredHoodAngle(turretPose, targetPose));
+                    AimAlign.getRequiredHoodAngle(turretPose, targetPose, isPassing));
             double yaw = AimAlign.yawAngleToPos(turretPose, targetPose) / (2.0 * Math.PI);
             if (this.yawMotor.getPosition().getValueAsDouble() > 0 && yaw < -160.0 / 360.0) {
                 yaw += 1;
@@ -334,11 +338,13 @@ public class Shooter extends SubsystemBase {
     public Command shoot(Supplier<SwerveDriveState> chassisStateSupplier) {
         return this.run(() -> {
             Pose2d turretPose = chassisStateSupplier.get().Pose;
-            Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();
+            Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();            
+            boolean isPassing = targetPose.equals(AimAlign.getHub().getTranslation());
+
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
-                    AimAlign.getRequiredSpeed(turretPose, targetPose)));
+                    AimAlign.getRequiredSpeed(turretPose, targetPose, isPassing)));
             this.setHoodPosition(
-                    AimAlign.getRequiredHoodAngle(turretPose, targetPose));
+                    AimAlign.getRequiredHoodAngle(turretPose, targetPose, isPassing));
         }).withName("Shoot without Aiming");
     }
 

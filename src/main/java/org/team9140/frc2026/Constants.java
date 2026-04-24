@@ -149,7 +149,7 @@ public class Constants {
         public static final double SPINNER_STATOR_CURRENT_LIMIT = 80;
         public static final double FEEDER_STATOR_CURRENT_LIMIT = 80;
         public static final double SPINNER_SUPPLY_CURRENT_LIMIT = 40;
-        public static final double FEEDER_SUPPLY_CURRENT_LIMIT = 40;
+        public static final double FEEDER_SUPPLY_CURRENT_LIMIT = 60;
 
         public static final double SPINNER_VOLTAGE = 12;
         public static final double FEEDER_VOLTAGE = 12;

@@ -18,45 +18,65 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AimAlign {
-    private static InterpolatingDoubleTreeMap lookupMotorSpeedFromDistance = new InterpolatingDoubleTreeMap(); //in rotatations per second
-    private static InterpolatingDoubleTreeMap lookupHoodAngleFromDistance = new InterpolatingDoubleTreeMap(); //in rotations
-    private static InterpolatingDoubleTreeMap lookupAirtimeFromDistance = new InterpolatingDoubleTreeMap(); //in seconds
+    private static InterpolatingDoubleTreeMap motorSpeedFromDistanceShooting = new InterpolatingDoubleTreeMap(); //in rotatations per second
+    private static InterpolatingDoubleTreeMap hoodAngleFromDistanceShooting = new InterpolatingDoubleTreeMap(); //in degrees
+    private static InterpolatingDoubleTreeMap airtimeFromDistanceShooting = new InterpolatingDoubleTreeMap(); //in seconds
+
+    private static InterpolatingDoubleTreeMap motorSpeedFromDistancePassing = new InterpolatingDoubleTreeMap(); // in rotations per second
+    private static InterpolatingDoubleTreeMap hoodAngleFromDistancePassing = new InterpolatingDoubleTreeMap(); // in degrees
+    private static InterpolatingDoubleTreeMap airtimeFromDistancePassing = new InterpolatingDoubleTreeMap(); //in seconds
 
     static {
-        lookupAirtimeFromDistance.put(1.0, 1.0);
+        airtimeFromDistanceShooting.put(1.0, 1.0);
+        airtimeFromDistancePassing.put(1.0, 1.0);
 
-        lookupMotorSpeedFromDistance.put(1.84, 1600.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(2.02, 1700.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(2.63, 1800.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(2.75, 1800.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(2.86, 1900.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.29, 2000.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(3.48, 2000.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(4.32, 2200.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(5.10, 2350.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(6.50, 2500.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(1.84, 1600.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(2.02, 1700.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(2.63, 1800.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(2.75, 1800.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(2.86, 1900.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(3.29, 2000.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(3.48, 2000.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(4.32, 2200.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(5.10, 2350.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(6.50, 2500.0 / 60.0);
         // lookupMotorSpeedFromDistance.put(5.0, 2200.0 / 60.0);
-        lookupMotorSpeedFromDistance.put(7.0, 3000.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(7.0, 3000.0 / 60.0);
         // lookupMotorSpeedFromDistance.put(8.0, 6000.0 / 60.0);
 
-        lookupHoodAngleFromDistance.put(2.02, 20.0);
-        lookupHoodAngleFromDistance.put(2.63, 21.0);
-        lookupHoodAngleFromDistance.put(2.75, 23.0);
-        lookupHoodAngleFromDistance.put(2.86, 24.0);
-        lookupHoodAngleFromDistance.put(3.29, 26.0); 
-        lookupHoodAngleFromDistance.put(3.48, 27.0);
-        lookupHoodAngleFromDistance.put(3.84, 28.0);
-        lookupHoodAngleFromDistance.put(4.32, 29.0);
-        lookupHoodAngleFromDistance.put(5.10, 35.0);
+        hoodAngleFromDistanceShooting.put(2.02, 20.0);
+        hoodAngleFromDistanceShooting.put(2.63, 21.0);
+        hoodAngleFromDistanceShooting.put(2.75, 23.0);
+        hoodAngleFromDistanceShooting.put(2.86, 24.0);
+        hoodAngleFromDistanceShooting.put(3.29, 26.0); 
+        hoodAngleFromDistanceShooting.put(3.48, 27.0);
+        hoodAngleFromDistanceShooting.put(3.84, 28.0);
+        hoodAngleFromDistanceShooting.put(4.32, 29.0);
+        hoodAngleFromDistanceShooting.put(5.10, 35.0);
         // lookupHoodAngleFromDistance.put(5.0, 23.5);
-        lookupHoodAngleFromDistance.put(6.50, 38.0);
-        lookupHoodAngleFromDistance.put(7.0, 42.0);
+        hoodAngleFromDistanceShooting.put(6.50, 38.0);
+        hoodAngleFromDistanceShooting.put(7.0, 42.0);
         // lookupHoodAngleFromDistance.put(8.0, 47.0);
+
+        motorSpeedFromDistancePassing.put(1.84, 1600.0 / 60.0);
+        motorSpeedFromDistancePassing.put(2.02, 1700.0 / 60.0);
+        motorSpeedFromDistancePassing.put(2.63, 1800.0 / 60.0);
+        motorSpeedFromDistancePassing.put(2.75, 1800.0 / 60.0);
+        motorSpeedFromDistancePassing.put(2.86, 1900.0 / 60.0);
+        motorSpeedFromDistancePassing.put(3.29, 2000.0 / 60.0);
+        motorSpeedFromDistancePassing.put(3.48, 2000.0 / 60.0);
+        motorSpeedFromDistancePassing.put(4.32, 2200.0 / 60.0);
+        motorSpeedFromDistancePassing.put(5.10, 2350.0 / 60.0);
+        motorSpeedFromDistancePassing.put(6.50, 2500.0 / 60.0);
+        // lookupMotorSpeedFromDistance.put(5.0, 2200.0 / 60.0);
+        motorSpeedFromDistancePassing.put(7.0, 3000.0 / 60.0);
+
+        hoodAngleFromDistancePassing.put(1.0, 46.0);
     }
 
     static StructPublisher<Pose2d> effectivePosePublisher = NetworkTableInstance.getDefault().getStructTopic("Effective Pose", Pose2d.struct).publish();
 
-    public static Translation2d getEffectivePose(Pose2d robotPose, Translation2d goalPose, ChassisSpeeds robotSpeed) {
+    public static Translation2d getEffectivePose(Pose2d robotPose, Translation2d goalPose, ChassisSpeeds robotSpeed, boolean isPassing) {
         robotSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeed, robotPose.getRotation());
         Translation2d robotVelocity = new Translation2d(
             Turret.POSITION_TO_ROBOT.getX(),
@@ -66,16 +86,18 @@ public class AimAlign {
         robotVelocity = robotVelocity.plus(new Translation2d(
                 robotSpeed.vxMetersPerSecond,
                 robotSpeed.vyMetersPerSecond));
+        
+        InterpolatingDoubleTreeMap airtimeLookup = isPassing ? airtimeFromDistancePassing : airtimeFromDistanceShooting;
 
-        double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(goalPose).getNorm(); 
-        double airtime = lookupAirtimeFromDistance.get(distance);
+        double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(goalPose).getNorm();
+        double airtime = airtimeLookup.get(distance);
         Translation2d newPose = goalPose.minus(robotVelocity.times(airtime));
 
         int iterations = 0;
         do {
             iterations++;
             distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(newPose).getNorm();
-            airtime = lookupAirtimeFromDistance.get(distance);
+            airtime = airtimeLookup.get(distance);
             SmartDashboard.putNumber("Estimated Airtime", airtime);
             effectivePosePublisher.set(new Pose2d(newPose, new Rotation2d()));
         } while (newPose.minus(newPose = goalPose.minus(robotVelocity.times(airtime))).getNorm() > 0.05 && iterations < 5);
@@ -85,14 +107,14 @@ public class AimAlign {
         return newPose;
     }
 
-    public static double getRequiredSpeed(Pose2d robotPose, Translation2d effectivePose) {
+    public static double getRequiredSpeed(Pose2d robotPose, Translation2d effectivePose, boolean isPassing) {
         double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(effectivePose).getNorm();
-        return lookupMotorSpeedFromDistance.get(distance);
+        return isPassing ? motorSpeedFromDistancePassing.get(distance) : motorSpeedFromDistanceShooting.get(distance);
     }
 
-    public static double getRequiredHoodAngle(Pose2d robotPose, Translation2d effectivePose) {
+    public static double getRequiredHoodAngle(Pose2d robotPose, Translation2d effectivePose, boolean isPassing) {
         double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(effectivePose).getNorm();
-        return lookupHoodAngleFromDistance.get(distance);
+        return isPassing ? hoodAngleFromDistancePassing.get(distance) : hoodAngleFromDistanceShooting.get(distance);
     }
 
     public static double yawAngleToPos(Pose2d robotPose, Translation2d endPose) {
