@@ -69,7 +69,7 @@ public class Constants {
     }
 
     public static class Shooter {
-        public static final double PEAK_FORWARD_TORQUE = 40.0;
+        public static final double PEAK_FORWARD_TORQUE = 70.0;
         public static final double IDLE_VOLTAGE = 6.7;
 
         public static final double SHOOTER_KS = 0;
@@ -199,7 +199,7 @@ public class Constants {
         public static final double KI = 0.0;
         public static final double KD = 67.0;
 
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.05; // 0.08;
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.08; // 0.08;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0.01;
         public static final double GEAR_RATIO = 36.0 / 8.0 * 170.0 / 10.0;
         public static final double SENSOR_TO_MECHANISM_RATIO = 170.0 / 10.0 * 16.0 / 25.0;

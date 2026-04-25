@@ -30,48 +30,28 @@ public class AimAlign {
         airtimeFromDistanceShooting.put(1.0, 1.0);
         airtimeFromDistancePassing.put(1.0, 1.0);
 
-        motorSpeedFromDistanceShooting.put(1.84, 1600.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(2.02, 1700.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(2.63, 1800.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(2.75, 1800.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(2.86, 1900.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(3.29, 2000.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(3.48, 2000.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(4.32, 2200.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(5.10, 2350.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(6.50, 2500.0 / 60.0);
-        // lookupMotorSpeedFromDistance.put(5.0, 2200.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(7.0, 3000.0 / 60.0);
-        // lookupMotorSpeedFromDistance.put(8.0, 6000.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(1.68, 1725.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(2.31, 1800.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(2.92, 2000.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(3.73, 2150.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(4.04, 2200.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(4.34, 2250.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(4.67, 2550.0 / 60.0);
 
-        hoodAngleFromDistanceShooting.put(2.02, 20.0);
-        hoodAngleFromDistanceShooting.put(2.63, 21.0);
-        hoodAngleFromDistanceShooting.put(2.75, 23.0);
-        hoodAngleFromDistanceShooting.put(2.86, 24.0);
-        hoodAngleFromDistanceShooting.put(3.29, 26.0); 
-        hoodAngleFromDistanceShooting.put(3.48, 27.0);
-        hoodAngleFromDistanceShooting.put(3.84, 28.0);
-        hoodAngleFromDistanceShooting.put(4.32, 29.0);
-        hoodAngleFromDistanceShooting.put(5.10, 35.0);
-        // lookupHoodAngleFromDistance.put(5.0, 23.5);
-        hoodAngleFromDistanceShooting.put(6.50, 38.0);
-        hoodAngleFromDistanceShooting.put(7.0, 42.0);
-        // lookupHoodAngleFromDistance.put(8.0, 47.0);
+        hoodAngleFromDistanceShooting.put(1.68, 20.0);
+        hoodAngleFromDistanceShooting.put(2.01, 21.0);
+        hoodAngleFromDistanceShooting.put(2.31, 24.0);
+        hoodAngleFromDistanceShooting.put(2.45, 25.0);
+        hoodAngleFromDistanceShooting.put(2.92, 28.0);
+        hoodAngleFromDistanceShooting.put(3.30, 31.5);
+        hoodAngleFromDistanceShooting.put(3.73, 33.0);
+        hoodAngleFromDistanceShooting.put(4.04, 34.0);
+        hoodAngleFromDistanceShooting.put(4.34, 35.0);
+        hoodAngleFromDistanceShooting.put(4.67, 38.0);
+        hoodAngleFromDistanceShooting.put(4.98, 38.5);
 
-        motorSpeedFromDistancePassing.put(1.84, 1600.0 / 60.0);
-        motorSpeedFromDistancePassing.put(2.02, 1700.0 / 60.0);
-        motorSpeedFromDistancePassing.put(2.63, 1800.0 / 60.0);
-        motorSpeedFromDistancePassing.put(2.75, 1800.0 / 60.0);
-        motorSpeedFromDistancePassing.put(2.86, 1900.0 / 60.0);
-        motorSpeedFromDistancePassing.put(3.29, 2000.0 / 60.0);
-        motorSpeedFromDistancePassing.put(3.48, 2000.0 / 60.0);
-        motorSpeedFromDistancePassing.put(4.32, 2200.0 / 60.0);
-        motorSpeedFromDistancePassing.put(5.10, 2350.0 / 60.0);
-        motorSpeedFromDistancePassing.put(6.50, 2500.0 / 60.0);
-        // lookupMotorSpeedFromDistance.put(5.0, 2200.0 / 60.0);
-        motorSpeedFromDistancePassing.put(7.0, 3000.0 / 60.0);
-
-        hoodAngleFromDistancePassing.put(1.0, 46.0);
+        motorSpeedFromDistancePassing.put(1.0, 3500.0 / 60.0);
+        hoodAngleFromDistancePassing.put(1.0, 42.0);
     }
 
     static StructPublisher<Pose2d> effectivePosePublisher = NetworkTableInstance.getDefault().getStructTopic("Effective Pose", Pose2d.struct).publish();

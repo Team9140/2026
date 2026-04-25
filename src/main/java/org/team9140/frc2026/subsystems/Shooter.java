@@ -224,7 +224,7 @@ public class Shooter extends SubsystemBase {
                 .withPeakReverseTorqueCurrent(0.0);
 
         CurrentLimitsConfigs shooterCurrentLimits = new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(60)
+                .withStatorCurrentLimit(Constants.Shooter.PEAK_FORWARD_TORQUE)
                 .withStatorCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(40)
                 .withSupplyCurrentLimitEnable(true);
