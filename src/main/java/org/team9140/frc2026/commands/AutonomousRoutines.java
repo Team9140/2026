@@ -60,6 +60,8 @@ public class AutonomousRoutines {
         autoChooser.addOption("1 Pass Then Depot from Left (Delayed)", "one_pass_depot_delayed");
         autoChooser.addOption("1 Pass Then Outpost from Left (Delayed)", "one_pass_outpost_delayed");
 
+        autoChooser.addOption("Multirobot Compatible", "citrus_circuit");
+
         SmartDashboard.putData(autoChooser);
     }
 
@@ -162,6 +164,8 @@ public class AutonomousRoutines {
                             .andThen(runChoreoAuto("Over_Bump_To_Outpost", false, false, 0, null))
                             .andThen(drivetrain.stop()))
                             .andThen(this.getShootAndSqueezeCommand().asProxy());
+                case "citrus_circuit":
+                    return citrusCircuits();
                 default:
                     return doNothing();
             }
@@ -215,5 +219,22 @@ public class AutonomousRoutines {
                                 shooter.idle()))
                         .andThen(drivetrain.stop()))
                         .andThen(this.getShootAndSqueezeCommand().asProxy());
+    }
+
+    public Command citrusCircuits() {
+        FollowPath completeTrajectory = new FollowPath("citrusCircuits", () -> this.drivetrain.getState().Pose,
+                this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
+
+        if (Robot.isSimulation())
+            drivetrain.resetPose(completeTrajectory.getInitialPose());
+        
+        return new WaitCommand(3.0)
+                .andThen(completeTrajectory.getSplit(0).gimmeCommand())
+                .andThen(drivetrain.stop())
+                .andThen(new WaitCommand(2.0))
+                .andThen(completeTrajectory.getSplit(1).gimmeCommand())
+                .andThen(drivetrain.stop())
+                .andThen(new WaitCommand(2.0))
+                .andThen(completeTrajectory.getSplit(2).gimmeCommand());
     }
 }

@@ -123,7 +123,8 @@ public class Constants {
         public static final double ROLLER_SUPPLY_CURRENT_LIMIT = 30.0;
         public static final double EXTEND_SUPPLY_CURRENT_LIMIT = 30.0;
 
-        public static final double MOTION_MAGIC_CRUISE_VELOCITY = 64;
+        public static final double ARM_OUT_VELOCITY = 64;
+        public static final double ARM_IN_VELOCITY = 32;
         public static final double MOTION_MAGIC_ACCELERATION = 64;
         public static final double EXTEND_KP = 500;
 
@@ -198,11 +199,11 @@ public class Constants {
         public static final double KI = 0.0;
         public static final double KD = 67.0;
 
-        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.08;
+        public static final double FORWARD_SOFT_LIMIT_THRESHOLD = 0.05; // 0.08;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0.01;
         public static final double GEAR_RATIO = 36.0 / 8.0 * 170.0 / 10.0;
         public static final double SENSOR_TO_MECHANISM_RATIO = 170.0 / 10.0 * 16.0 / 25.0;
-        public static final double CANCODER_OFFSET_ROTS = 0.064208984375;
+        public static final double CANCODER_OFFSET_ROTS = -0.42;
         public static final double ANGLE_MIN = Units.degreesToRadians(18.0);
     }
 

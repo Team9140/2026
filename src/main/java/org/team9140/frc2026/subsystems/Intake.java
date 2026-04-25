@@ -50,6 +50,8 @@ public class Intake extends SubsystemBase {
     MechanismLigament2d intakeSlide = root
             .append(new MechanismLigament2d("intakeSlide", Constants.Intake.LIGAMENT_LENGTH, 0));
 
+    private final MotionMagicConfigs extendMotionMagicConfigs;
+
     private Intake() {
         this.rollerMotor = new TalonFX(Constants.Ports.INTAKE_SPIN_MOTOR, CANBus.roboRIO());
         this.rollerFollower = new TalonFX(Constants.Ports.INTAKE_SPIN_FOLLOWER_MOTOR, CANBus.roboRIO());
@@ -75,8 +77,8 @@ public class Intake extends SubsystemBase {
 
         this.extendMotor.getSimState().Orientation = ChassisReference.Clockwise_Positive;
 
-        MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs()
-                .withMotionMagicCruiseVelocity(Constants.Intake.MOTION_MAGIC_CRUISE_VELOCITY)
+        extendMotionMagicConfigs = new MotionMagicConfigs()
+                .withMotionMagicCruiseVelocity(Constants.Intake.ARM_OUT_VELOCITY)
                 .withMotionMagicAcceleration(Constants.Intake.MOTION_MAGIC_ACCELERATION);
 
         SoftwareLimitSwitchConfigs softwareLimitSwitchConfigs = new SoftwareLimitSwitchConfigs()
@@ -97,7 +99,7 @@ public class Intake extends SubsystemBase {
         TalonFXConfiguration extendMotorConfigs = new TalonFXConfiguration()
                 .withCurrentLimits(extendCurrentLimits)
                 .withMotorOutput(extendMotorOutputConfigs)
-                .withMotionMagic(motionMagicConfigs)
+                .withMotionMagic(extendMotionMagicConfigs)
                 .withSoftwareLimitSwitch(softwareLimitSwitchConfigs)
                 .withSlot0(new Slot0Configs().withKP(Constants.Intake.EXTEND_KP))
                 .withFeedback(new FeedbackConfigs()
@@ -141,9 +143,11 @@ public class Intake extends SubsystemBase {
      * @param position Target extension in meters
      * @return command that moves the arm to the given position
      */
-    private Command setPosition(double position) {
+    private Command setPosition(double position, double max_velocity) {
         return this.runOnce(() -> {
             this.targetPosition = position;
+            this.extendMotionMagicConfigs.withMotionMagicCruiseVelocity(max_velocity);
+            this.extendMotor.getConfigurator().apply(this.extendMotionMagicConfigs);
             this.extendMotor.setControl(
                     this.motionMagic.withPosition(
                             this.targetPosition / Constants.Intake.PINION_CIRCUMFERENCE));
@@ -158,7 +162,7 @@ public class Intake extends SubsystemBase {
      * @return command that moves the arm to the "in" position (meters)
      */
     public Command armIn() {
-        return this.setPosition(Constants.Intake.ARM_IN_POSITION)
+        return this.setPosition(Constants.Intake.ARM_IN_POSITION, Constants.Intake.ARM_IN_VELOCITY)
                 .withName("Set Intake position to Arm In");
     }
 
@@ -166,7 +170,7 @@ public class Intake extends SubsystemBase {
      * @return command that moves the arm to the "out" position (meters)
      */
     public Command armOut() {
-        return this.setPosition(Constants.Intake.ARM_OUT_POSITION)
+        return this.setPosition(Constants.Intake.ARM_OUT_POSITION, Constants.Intake.ARM_OUT_VELOCITY)
                 .withName("Set Intake position to Arm Out");
     }
 
@@ -262,8 +266,8 @@ public class Intake extends SubsystemBase {
     }
 
     public Command squeeze() {
-        return this.setRollerVolts(Constants.Intake.INTAKE_VOLTAGE).withTimeout(1.0)
-                .andThen(this.armIn())
+        return this.setRollerVolts(Constants.Intake.INTAKE_VOLTAGE).asProxy()
+                .alongWith(this.armIn())
                 .andThen(new WaitCommand(3.0))
                 .andThen(this.setRollerVolts(0));
     }

@@ -68,6 +68,34 @@ public class FollowPath {
         this.trajectory.getFinalSample(false);
     }
 
+    public FollowPath(Trajectory<SwerveSample> trajectory, Supplier<Pose2d> poseSupplier, Consumer<SwerveSample> sampleConsumer,
+            DriverStation.Alliance alliance, Subsystem requirement) {
+        this.trajectory = trajectory;
+        this.loop = new EventLoop();
+        this.timer = new Timer();
+        this.alliance = alliance;
+        this.eventTimes = new TreeMap<>();
+
+        this.activeTrigger = new Trigger(loop, () -> this.active);
+
+        this.poseSupplier = poseSupplier;
+        this.sampleConsumer = sampleConsumer;
+
+        this.requirement = requirement;
+
+        this.finalPose = this.trajectory.getFinalPose(false).get();
+        for (EventMarker e : this.trajectory.events()) {
+            this.eventTimes.put(e.event, atTime(e.timestamp));
+            System.out.println("Added event " + e.event + " at time " + e.timestamp);
+        }
+
+        this.trajectory.getFinalSample(false);
+    }
+
+    public FollowPath getSplit(int splitIndex) {
+        return new FollowPath(trajectory.getSplit(splitIndex).get(), this.poseSupplier, this.sampleConsumer, this.alliance, this.requirement);
+    }
+
     public TreeMap<String, Trigger> getEvents() {
         return eventTimes;
     }

@@ -312,7 +312,7 @@ public class Shooter extends SubsystemBase {
             Pose2d turretPose = robotState.Pose;
 
             Translation2d targetPose = targetTranslationSupplier.get();
-            boolean isPassing = targetPose.equals(AimAlign.getHub().getTranslation());
+            boolean isPassing = !targetPose.equals(AimAlign.getHub().getTranslation());
 
             targetPose = AimAlign.getEffectivePose(turretPose,
                     targetPose, robotState.Speeds, isPassing);
@@ -339,7 +339,7 @@ public class Shooter extends SubsystemBase {
         return this.run(() -> {
             Pose2d turretPose = chassisStateSupplier.get().Pose;
             Translation2d targetPose = AimAlign.getZone(turretPose).getTranslation();            
-            boolean isPassing = targetPose.equals(AimAlign.getHub().getTranslation());
+            boolean isPassing = !targetPose.equals(AimAlign.getHub().getTranslation());
 
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(
                     AimAlign.getRequiredSpeed(turretPose, targetPose, isPassing)));
