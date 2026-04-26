@@ -3,6 +3,7 @@ package org.team9140.frc2026.helpers;
 import java.util.Optional;
 
 import org.team9140.frc2026.FieldConstants;
+import org.team9140.frc2026.SwerveTelemetry;
 import org.team9140.frc2026.Constants.Turret;
 import org.team9140.lib.Util;
 
@@ -12,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -54,7 +54,7 @@ public class AimAlign {
         hoodAngleFromDistancePassing.put(1.0, 42.0);
     }
 
-    static StructPublisher<Pose2d> effectivePosePublisher = NetworkTableInstance.getDefault().getStructTopic("Effective Pose", Pose2d.struct).publish();
+    static StructPublisher<Pose2d> effectivePosePublisher = SwerveTelemetry.getFieldTable().getStructTopic("Effective Pose", Pose2d.struct).publish();
 
     public static Translation2d getEffectivePose(Pose2d robotPose, Translation2d goalPose, ChassisSpeeds robotSpeed, boolean isPassing) {
         robotSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeed, robotPose.getRotation());

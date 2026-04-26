@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.team9140.frc2026.Constants;
+import org.team9140.frc2026.SwerveTelemetry;
 import org.team9140.frc2026.Vision;
 import org.team9140.frc2026.generated.TunerConstants.TunerSwerveDrivetrain;
 import org.team9140.frc2026.helpers.LimelightHelpers.PoseEstimate;
@@ -33,13 +34,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -73,8 +72,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final PhoenixPIDController headingController = new PhoenixPIDController(
             Constants.Drive.HEADING_CONTROLLER_P,
             Constants.Drive.HEADING_CONTROLLER_I, Constants.Drive.HEADING_CONTROLLER_D);// 11.0, 0.0, 0.25
-
-    Field2d dashField2d = new Field2d();
 
     private Pose2d targetPose = new Pose2d();
 
@@ -208,7 +205,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return cachedState;
     }
 
-    private final StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault()
+    private final StructPublisher<Pose2d> targetPosePublisher = SwerveTelemetry.getFieldTable()
             .getStructTopic("Drivetrain Target", Pose2d.struct).publish();
 
     @Override

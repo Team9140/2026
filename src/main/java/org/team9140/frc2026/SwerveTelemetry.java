@@ -29,7 +29,7 @@ public class SwerveTelemetry {
     }
 
     /* What to publish over networktables for telemetry */
-    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    private static final NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
     /* Robot swerve drive state */
     private final NetworkTable driveStateTable = inst.getTable("DriveState");
@@ -43,8 +43,16 @@ public class SwerveTelemetry {
 
     /* Robot pose for field positioning */
     private final NetworkTable table = inst.getTable("Pose");
-    private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
-    private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
+    private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("Robot").publish();
+
+    /* Robot pose for Elastic field */
+    private static final NetworkTable fieldTable = inst.getTable("Field");
+    private final StructPublisher<Pose2d> robotPose = fieldTable.getStructTopic("Robot", Pose2d.struct).publish();
+    
+    {
+        table.getStringTopic(".type").publish().set("Field2d");
+        fieldTable.getStringTopic(".type").publish().set("Field2d");
+    }
 
     /* Mechanisms to represent the swerve module states */
     private final Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {
@@ -88,6 +96,8 @@ public class SwerveTelemetry {
         driveTimestamp.set(state.Timestamp);
         driveOdometryFrequency.set(1.0 / state.OdometryPeriod);
 
+        robotPose.set(state.Pose);
+
         /* Also write to log file */
         m_poseArray[0] = state.Pose.getX();
         m_poseArray[1] = state.Pose.getY();
@@ -105,7 +115,6 @@ public class SwerveTelemetry {
         SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
 
         /* Telemeterize the pose to a Field2d */
-        fieldTypePub.set("Field2d");
         fieldPub.set(m_poseArray);
 
        /* Telemeterize the module states to a Mechanism2d */
@@ -116,5 +125,9 @@ public class SwerveTelemetry {
 
            SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
        }
+    }
+
+    public static NetworkTable getFieldTable() {
+        return fieldTable;
     }
 }

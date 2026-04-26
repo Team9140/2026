@@ -18,6 +18,13 @@
      "val":3.0
     }
    },
+   "citrus_intake_velocity":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"2 m / s",
+     "val":2.0
+    }
+   },
    "intake_velocity":{
     "dimension":"LinVel",
     "var":{

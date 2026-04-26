@@ -90,7 +90,8 @@ public class Hopper extends SubsystemBase {
     }
 
     public Command off() {
-        return this.setSpeeds(0, 0)
+        return this.runOnce(() -> this.spinnerMotor.setVoltage(0.0))
+                .andThen(this.runOnce(() -> this.feederMotor.setVoltage(0.0)))
                 .withName("Hopper Off");
     }
 

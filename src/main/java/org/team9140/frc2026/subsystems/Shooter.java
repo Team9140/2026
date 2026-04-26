@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.Constants.Turret;
 import org.team9140.frc2026.FieldConstants;
+import org.team9140.frc2026.SwerveTelemetry;
 import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.lib.Util;
 
@@ -407,15 +408,15 @@ public class Shooter extends SubsystemBase {
         return this.run(() -> {
             if (this.isManual)
                 return;
-            SwerveDriveState robotState = chassisStateSupplier.get();
-            Pose2d robotPose = robotState.Pose;
+        //     SwerveDriveState robotState = chassisStateSupplier.get();
+        //     Pose2d robotPose = robotState.Pose;
 
-            Translation2d targetPose = AimAlign.getHub().getTranslation();
+        //     Translation2d targetPose = AimAlign.getHub().getTranslation();
 
             this.setHoodPosition(AngleDegrees.getAsDouble());
             this.shooterMotor.setControl(shooterSpeedControl.withVelocity(RPM.getAsDouble() / 60.0));
-            this.yawMotor.setControl(yawMotorControl.withPosition(
-                    AimAlign.yawAngleToPos(robotPose, targetPose) / (2.0 * Math.PI)));
+            this.yawMotor.setControl(yawMotorControl.withPosition(0.0));
+                //     AimAlign.yawAngleToPos(robotPose, targetPose) / (2.0 * Math.PI)));
         }).withName("Tune Hood Angle and Speed Aiming Automatically");
     }
 
@@ -428,7 +429,7 @@ public class Shooter extends SubsystemBase {
     private double oldTargetYaw = this.yawMotorControl.Position;
     private double timeSinceOldTargetYawUpdate;
     private Pose2d turretPose = new Pose2d();
-    private final StructPublisher<Pose2d> turretPublisher = NetworkTableInstance.getDefault()
+    private final StructPublisher<Pose2d> turretPublisher = SwerveTelemetry.getFieldTable()
             .getStructTopic("turretPos", Pose2d.struct).publish();
 
     @Override

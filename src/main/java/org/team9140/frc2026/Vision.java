@@ -55,7 +55,7 @@ public class Vision {
     public Vision(String camera_name, EstimateConsumer estConsumer, Transform3d robotToCamera) {
         this.cameraName = camera_name;
         this.estConsumer = estConsumer;
-        this.posePublisher = NetworkTableInstance.getDefault().getStructTopic(cameraName + "Estimate", Pose2d.struct).publish();
+        this.posePublisher = SwerveTelemetry.getFieldTable().getStructTopic(cameraName + "Estimate", Pose2d.struct).publish();
 
         if (robotToCamera != null)
             LimelightHelpers.setCameraPose_RobotSpace(this.cameraName, robotToCamera.getX(), robotToCamera.getY(),

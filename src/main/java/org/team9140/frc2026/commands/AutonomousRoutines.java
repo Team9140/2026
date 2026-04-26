@@ -2,6 +2,7 @@ package org.team9140.frc2026.commands;
 
 import org.team9140.frc2026.Constants;
 import org.team9140.frc2026.Robot;
+import org.team9140.frc2026.SwerveTelemetry;
 import org.team9140.frc2026.helpers.AimAlign;
 import org.team9140.frc2026.subsystems.CommandSwerveDrivetrain;
 import org.team9140.frc2026.subsystems.Hopper;
@@ -11,7 +12,6 @@ import org.team9140.lib.FollowPath;
 import org.team9140.lib.Util;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -179,7 +179,7 @@ public class AutonomousRoutines {
         return new PrintCommand("Doing Nothing");
     }
 
-    private final StructPublisher<Pose2d> initialPosePublisher = NetworkTableInstance.getDefault()
+    private final StructPublisher<Pose2d> initialPosePublisher = SwerveTelemetry.getFieldTable()
             .getStructTopic("Auto Path Initial Pose", Pose2d.struct).publish();
 
     public Command runChoreoAuto(String pathame, boolean waitUntilAtFinalTarget, boolean reset, double timeBeforeEnd,
@@ -223,19 +223,23 @@ public class AutonomousRoutines {
     }
 
     public Command citrusCircuits() {
-        FollowPath completeTrajectory = new FollowPath("citrusCircuits", () -> this.drivetrain.getState().Pose,
+        FollowPath firstSegment = new FollowPath("citrusCircuits_part1", () -> this.drivetrain.getState().Pose,
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
 
         if (Robot.isSimulation())
-            drivetrain.resetPose(completeTrajectory.getInitialPose());
+            drivetrain.resetPose(firstSegment.getInitialPose());
         
-        return new WaitCommand(3.0)
-                .andThen(completeTrajectory.getSplit(0).gimmeCommand())
+        return new WaitCommand(1.5).andThen(
+            this.intake.intake().withTimeout(5.6).andThen(this.intake.off()).andThen(new WaitCommand(2.5 + 1.0 + 5.0)).andThen(this.intake.intakeDepot()).alongWith(
+                runChoreoAuto("citrusCircuits_part1")
                 .andThen(drivetrain.stop())
-                .andThen(new WaitCommand(2.0))
-                .andThen(completeTrajectory.getSplit(1).gimmeCommand())
+                .andThen(new WaitCommand(1.0))
+                .andThen(runChoreoAuto("citrusCircuits_part2"))
                 .andThen(drivetrain.stop())
-                .andThen(new WaitCommand(2.0))
-                .andThen(completeTrajectory.getSplit(2).gimmeCommand());
+                .andThen(this.getShootCommand().withTimeout(5.0))
+                .andThen(this.hopper.off())
+                .andThen(runChoreoAuto("citrusCircuits_part3"))
+                .andThen(drivetrain.stop())
+                .andThen(this.getShootCommand())));
     }
 }

@@ -174,6 +174,12 @@ public class Intake extends SubsystemBase {
                 .withName("Set Intake position to Arm Out");
     }
 
+    public Command intakeDepot() {
+        return this.setPosition(Constants.Intake.DEPOT_ARM_OUT_POSITION, Constants.Intake.ARM_OUT_VELOCITY)
+                .andThen(setRollerVolts(Constants.Intake.INTAKE_VOLTAGE))
+                .withName("Intake");
+    }
+
     private Command setRollerVolts(double voltage) {
         return this.runOnce(() -> rollerMotor.setVoltage(voltage))
                 .andThen(Commands.idle(this))
@@ -181,7 +187,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command off() {
-        return this.setRollerVolts(Constants.Intake.INTAKE_OFF)
+        return this.runOnce(() -> rollerMotor.setVoltage(Constants.Intake.INTAKE_OFF))
                 .withName("Set Intake Arm Roller Speed to Off");
     }
 
@@ -233,7 +239,7 @@ public class Intake extends SubsystemBase {
             Constants.Intake.MIN_HEIGHT,
             Constants.Intake.MAX_HEIGHT,
             false,
-            0);;
+            0);
     private final DCMotorSim rollerSim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60Foc(1), 0.0005, 1),
             DCMotor.getKrakenX60Foc(1));
