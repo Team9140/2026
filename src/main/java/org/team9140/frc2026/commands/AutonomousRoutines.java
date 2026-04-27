@@ -42,9 +42,10 @@ public class AutonomousRoutines {
         autoChooser.setDefaultOption("Do Nothing", "nothing");
         autoChooser.addOption("Shoot Preload", "preload");
         autoChooser.addOption("Score from Depot starting Middle", "score_from_depot");
-        autoChooser.addOption("Score from Depot starting Left", "depot_shoot_left");
+        
+        // autoChooser.addOption("Score from Depot starting Left", "depot_shoot_left");
         autoChooser.addOption("1 Pass From Left", "one_pass_depot");
-        autoChooser.addOption("1 Pass From Left then Score from Depot", "one_pass_depot_then_depot_shoot");
+        // autoChooser.addOption("1 Pass From Left then Score from Depot", "one_pass_depot_then_depot_shoot");
         autoChooser.addOption("1 Pass From Right", "one_pass_outpost");
         autoChooser.addOption("2 Passes from Right", "two_pass_outpost");
         autoChooser.addOption("2 Passes from Left", "two_pass_depot");
@@ -54,11 +55,11 @@ public class AutonomousRoutines {
         autoChooser.addOption("2 Passes Over Bump from Right", "two_pass_outpost_bump");
         autoChooser.addOption("2 Passes Over Bump from Left", "two_pass_depot_bump");
 
-        autoChooser.addOption("2 Passes Over Bump from Right (Move and Shoot)", "two_pass_outpost_bump_move");
-        autoChooser.addOption("2 Passes Over Bump from Left (Move and Shoot)", "two_pass_depot_bump_move");
+        // autoChooser.addOption("2 Passes Over Bump from Right (Move and Shoot)", "two_pass_outpost_bump_move");
+        // autoChooser.addOption("2 Passes Over Bump from Left (Move and Shoot)", "two_pass_depot_bump_move");
 
-        autoChooser.addOption("1 Pass Then Depot from Left (Delayed)", "one_pass_depot_delayed");
-        autoChooser.addOption("1 Pass Then Outpost from Left (Delayed)", "one_pass_outpost_delayed");
+        // autoChooser.addOption("1 Pass Then Depot from Left (Delayed)", "one_pass_depot_delayed");
+        // autoChooser.addOption("1 Pass Then Outpost from Left (Delayed)", "one_pass_outpost_delayed");
 
         autoChooser.addOption("Multirobot Compatible", "citrus_circuit");
 
@@ -89,12 +90,12 @@ public class AutonomousRoutines {
             switch (lastFetchedAuto) {
                 case "preload":
                     return getShootCommand().withTimeout(15).andThen(intake.armOut());
-                case "depot_shoot_left":
-                    return intake.intake()
-                            .withDeadline(runChoreoAuto("depotShoot_Left", true, true,
-                                    Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
-                                    .andThen(drivetrain.stop()))
-                                    .andThen(this.getShootAndSqueezeCommand().asProxy());
+                // case "depot_shoot_left":
+                //     return intake.intake()
+                //             .withDeadline(runChoreoAuto("depotShoot_Left", true, true,
+                //                     Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
+                //                     .andThen(drivetrain.stop()))
+                //                     .andThen(this.getShootAndSqueezeCommand().asProxy());
                 case "score_from_depot":
                     return intake.intake().withDeadline(runChoreoAuto("depotShoot", false, true, 0.0, Commands.none())
                             .andThen(this.drivetrain.stop())
@@ -128,42 +129,42 @@ public class AutonomousRoutines {
                     return runRepeat("Bump_Outpost_Deep", "Bump_Reset_Outpost", "Bump_Outpost_Shallow");
                 case "two_pass_depot_bump":
                     return runRepeat("Bump_Depot_Deep", "Bump_Reset_Depot", "Bump_Depot_Shallow");
-                case "two_pass_outpost_bump_move":
-                    return runRepeatMoveAndShoot("Bump_Outpost_Deep", "Bump_Reset_Outpost_Shoot",
-                            "Bump_Outpost_Shallow");
-                case "two_pass_depot_bump_move":
-                    return runRepeatMoveAndShoot("Bump_Depot_Deep", "Bump_Reset_Depot_Shoot", "Bump_Depot_Shallow");
-                case "one_pass_depot_then_depot_shoot":
-                    return intake.intake()
-                            .withDeadline(runChoreoAuto("Trench_Depot_Deep", false, true,
-                                    Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
-                                    .andThen(drivetrain.stop())
-                                    .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                                    .andThen(runChoreoAuto("depotShoot_Left", true, false,
-                                            Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())))
-                                    .andThen(drivetrain.stop())
-                                    .andThen(this.getShootAndSqueezeCommand().asProxy());
-                case "one_pass_depot_delayed":
-                    return intake.intake()
-                            .withDeadline(new WaitCommand(3)
-                            .andThen(runChoreoAuto("Trench_Behind_Depot", false, true, 0, null))
-                            .andThen(drivetrain.stop())
-                            .andThen(new WaitCommand(2))
-                            .andThen(runChoreoAuto("Over_Bump_To_Depot", false, false, 0, null))
-                            .andThen(drivetrain.stop())
-                            .andThen(this.getShootCommand().withTimeout(5).asProxy())
-                            .andThen(runChoreoAuto("Over_Depot", true, false, 0, null))
-                            .andThen(drivetrain.stop()))
-                            .andThen(this.getShootAndSqueezeCommand().asProxy());
-                case "one_pass_outpost_delayed":
-                    return intake.intake()
-                            .withDeadline(new WaitCommand(3)
-                            .andThen(runChoreoAuto("Trench_Behind_Outpost", false, true, 0, null))
-                            .andThen(drivetrain.stop())
-                            .andThen(new WaitCommand(2))
-                            .andThen(runChoreoAuto("Over_Bump_To_Outpost", false, false, 0, null))
-                            .andThen(drivetrain.stop()))
-                            .andThen(this.getShootAndSqueezeCommand().asProxy());
+                // case "two_pass_outpost_bump_move":
+                //     return runRepeatMoveAndShoot("Bump_Outpost_Deep", "Bump_Reset_Outpost_Shoot",
+                //             "Bump_Outpost_Shallow");
+                // case "two_pass_depot_bump_move":
+                //     return runRepeatMoveAndShoot("Bump_Depot_Deep", "Bump_Reset_Depot_Shoot", "Bump_Depot_Shallow");
+                // case "one_pass_depot_then_depot_shoot":
+                //     return intake.intake()
+                //             .withDeadline(runChoreoAuto("Trench_Depot_Deep", false, true,
+                //                     Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())
+                //                     .andThen(drivetrain.stop())
+                //                     .andThen(this.getShootCommand().withTimeout(5).asProxy())
+                //                     .andThen(runChoreoAuto("depotShoot_Left", true, false,
+                //                             Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle())))
+                //                     .andThen(drivetrain.stop())
+                //                     .andThen(this.getShootAndSqueezeCommand().asProxy());
+                // case "one_pass_depot_delayed":
+                //     return intake.intake()
+                //             .withDeadline(new WaitCommand(3)
+                //             .andThen(runChoreoAuto("Trench_Behind_Depot", false, true, 0, null))
+                //             .andThen(drivetrain.stop())
+                //             .andThen(new WaitCommand(2))
+                //             .andThen(runChoreoAuto("Over_Bump_To_Depot", false, false, 0, null))
+                //             .andThen(drivetrain.stop())
+                //             .andThen(this.getShootCommand().withTimeout(5).asProxy())
+                //             .andThen(runChoreoAuto("Over_Depot", true, false, 0, null))
+                //             .andThen(drivetrain.stop()))
+                //             .andThen(this.getShootAndSqueezeCommand().asProxy());
+                // case "one_pass_outpost_delayed":
+                //     return intake.intake()
+                //             .withDeadline(new WaitCommand(3)
+                //             .andThen(runChoreoAuto("Trench_Behind_Outpost", false, true, 0, null))
+                //             .andThen(drivetrain.stop())
+                //             .andThen(new WaitCommand(2))
+                //             .andThen(runChoreoAuto("Over_Bump_To_Outpost", false, false, 0, null))
+                //             .andThen(drivetrain.stop()))
+                //             .andThen(this.getShootAndSqueezeCommand().asProxy());
                 case "citrus_circuit":
                     return citrusCircuits();
                 default:
