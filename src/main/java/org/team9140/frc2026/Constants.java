@@ -210,5 +210,25 @@ public class Constants {
     public static class Vision {
         public static final String[] CAMERA_NAMES = {"limelight-a", "limelight-b", "limelight-center"};
         public static Transform3d[] ROBOT_TO_CAM = {null, null, null};
+
+        public static final double LEFT_CAMERA_X = -0.268;
+        public static final double LEFT_CAMERA_Y = 0.350;
+        public static final double LEFT_CAMERA_Z = 0.274;
+        public static final double LEFT_CAMERA_YAW = 90;
+        public static final double LEFT_CAMERA_PITCH = 0.0;
+        public static final double LEFT_CAMERA_ROLL = 0.0;
+
+        public static final double RIGHT_CAMERA_X = -0.268;
+        public static final double RIGHT_CAMERA_Y = -0.350;
+        public static final double RIGHT_CAMERA_Z = 0.274;
+        public static final double RIGHT_CAMERA_YAW = -90;
+        public static final double RIGHT_CAMERA_PITCH = 0.0;
+        public static final double RIGHT_CAMERA_ROLL = 0.0;
+
+        public static final double TURRET_CAMERA_X =  -0.124;
+        public static final double TURRET_CAMERA_Y = -0.159;
+        public static final double TURRET_CAMERA_Z = 0.339;
+        public static final double TURRET_CAMERA_YAW = 180;
+
     }
 }
