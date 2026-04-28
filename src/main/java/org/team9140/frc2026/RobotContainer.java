@@ -51,6 +51,8 @@ public class RobotContainer {
     limeC.start();
 
     autoRoutines = AutonomousRoutines.getInstance(drivetrain);
+
+    SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
   }
 
   private void configureBindings() {

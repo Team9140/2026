@@ -219,6 +219,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("Drivetrain Theta error",
                 targetPose.getRotation().getRadians() - this.getCachedState().Pose.getRotation().getRadians());
 
+        SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
         // if (this.targetPose != null) {
         // targetPoseDecomposed[0] = this.targetPose.getX();
         // targetPoseDecomposed[1] = this.targetPose.getY();
