@@ -29,8 +29,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -272,9 +270,6 @@ public class Intake extends SubsystemBase {
     }
 
     public Command squeeze() {
-        return this.setRollerVolts(Constants.Intake.INTAKE_VOLTAGE).asProxy()
-                .alongWith(this.armIn())
-                .andThen(new WaitCommand(3.0))
-                .andThen(this.setRollerVolts(0));
+        return this.setRollerVolts(Constants.Intake.INTAKE_VOLTAGE).asProxy().alongWith(this.armIn());
     }
 }

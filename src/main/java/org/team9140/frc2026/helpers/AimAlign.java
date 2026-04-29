@@ -13,60 +13,82 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AimAlign {
-    private static InterpolatingDoubleTreeMap motorSpeedFromDistanceShooting = new InterpolatingDoubleTreeMap(); //in rotatations per second
-    private static InterpolatingDoubleTreeMap hoodAngleFromDistanceShooting = new InterpolatingDoubleTreeMap(); //in degrees
-    private static InterpolatingDoubleTreeMap airtimeFromDistanceShooting = new InterpolatingDoubleTreeMap(); //in seconds
+    private static InterpolatingDoubleTreeMap motorSpeedFromDistanceShooting = new InterpolatingDoubleTreeMap(); // in
+                                                                                                                 // rotatations
+                                                                                                                 // per
+                                                                                                                 // second
+    private static InterpolatingDoubleTreeMap hoodAngleFromDistanceShooting = new InterpolatingDoubleTreeMap(); // in
+                                                                                                                // degrees
+    private static InterpolatingDoubleTreeMap airtimeFromDistanceShooting = new InterpolatingDoubleTreeMap(); // in
+                                                                                                              // seconds
 
-    private static InterpolatingDoubleTreeMap motorSpeedFromDistancePassing = new InterpolatingDoubleTreeMap(); // in rotations per second
-    private static InterpolatingDoubleTreeMap hoodAngleFromDistancePassing = new InterpolatingDoubleTreeMap(); // in degrees
-    private static InterpolatingDoubleTreeMap airtimeFromDistancePassing = new InterpolatingDoubleTreeMap(); //in seconds
+    private static InterpolatingDoubleTreeMap motorSpeedFromDistancePassing;// = new InterpolatingDoubleTreeMap(); // in
+                                                                            // rotations per second
+    private static InterpolatingDoubleTreeMap hoodAngleFromDistancePassing = new InterpolatingDoubleTreeMap(); // in
+                                                                                                               // degrees
+    private static InterpolatingDoubleTreeMap airtimeFromDistancePassing;// = new InterpolatingDoubleTreeMap(); //in
+                                                                         // seconds
 
     static {
         airtimeFromDistanceShooting.put(1.0, 1.0);
-        airtimeFromDistancePassing.put(1.0, 1.0);
+        airtimeFromDistancePassing = airtimeFromDistanceShooting;
 
-        motorSpeedFromDistanceShooting.put(1.68, 1725.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(2.31, 1800.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(2.92, 2000.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(3.73, 2150.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(4.04, 2200.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(4.34, 2250.0 / 60.0);
-        motorSpeedFromDistanceShooting.put(4.67, 2550.0 / 60.0);
+        double BUMPER_TO_TURRET_FT = 1.0;
+        double HALF_HUB_FT = 2.0;
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(4 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 1700.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(5 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 1800.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(6 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 1900.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(7 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2000.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(8 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2000.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(9 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2000.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(10 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2050.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(11 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2100.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(12 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2150.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(13 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2200.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(14 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2300.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(15 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2400.0 / 60.0);
+        motorSpeedFromDistanceShooting.put(Units.feetToMeters(16 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2500.0 / 60.0);
 
-        hoodAngleFromDistanceShooting.put(1.68, 20.0);
-        hoodAngleFromDistanceShooting.put(2.01, 21.0);
-        hoodAngleFromDistanceShooting.put(2.31, 24.0);
-        hoodAngleFromDistanceShooting.put(2.45, 25.0);
-        hoodAngleFromDistanceShooting.put(2.92, 28.0);
-        hoodAngleFromDistanceShooting.put(3.30, 31.5);
-        hoodAngleFromDistanceShooting.put(3.73, 33.0);
-        hoodAngleFromDistanceShooting.put(4.04, 34.0);
-        hoodAngleFromDistanceShooting.put(4.34, 35.0);
-        hoodAngleFromDistanceShooting.put(4.67, 38.0);
-        hoodAngleFromDistanceShooting.put(4.98, 38.5);
+        motorSpeedFromDistancePassing = motorSpeedFromDistanceShooting;
 
-        motorSpeedFromDistancePassing.put(1.0, 3500.0 / 60.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(4 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 21.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(5 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 21.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(6 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 21.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(7 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 23.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(8 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 26.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(9 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 29.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(10 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 31.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(11 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 32.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(12 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 33.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(13 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 33.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(14 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 34.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(15 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 35.0);
+        hoodAngleFromDistanceShooting.put(Units.feetToMeters(16 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 37.0);
+
         hoodAngleFromDistancePassing.put(1.0, 42.0);
     }
 
-    static StructPublisher<Pose2d> effectivePosePublisher = SwerveTelemetry.getFieldTable().getStructTopic("Effective Pose", Pose2d.struct).publish();
+    static StructPublisher<Pose2d> effectivePosePublisher = SwerveTelemetry.getFieldTable()
+            .getStructTopic("Effective Pose", Pose2d.struct).publish();
 
-    public static Translation2d getEffectivePose(Pose2d robotPose, Translation2d goalPose, ChassisSpeeds robotSpeed, boolean isPassing) {
+    public static Translation2d getEffectivePose(Pose2d robotPose, Translation2d goalPose, ChassisSpeeds robotSpeed,
+            boolean isPassing) {
         robotSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeed, robotPose.getRotation());
         Translation2d robotVelocity = new Translation2d(
-            Turret.POSITION_TO_ROBOT.getX(),
-            Turret.POSITION_TO_ROBOT.getY()
-        );
-        robotVelocity = robotVelocity.rotateBy(robotPose.getRotation().plus(new Rotation2d(Math.PI/2))).times(-robotSpeed.omegaRadiansPerSecond);
+                Turret.POSITION_TO_ROBOT.getX(),
+                Turret.POSITION_TO_ROBOT.getY());
+        robotVelocity = robotVelocity.rotateBy(robotPose.getRotation().plus(new Rotation2d(Math.PI / 2)))
+                .times(-robotSpeed.omegaRadiansPerSecond);
         robotVelocity = robotVelocity.plus(new Translation2d(
                 robotSpeed.vxMetersPerSecond,
                 robotSpeed.vyMetersPerSecond));
-        
+
         InterpolatingDoubleTreeMap airtimeLookup = isPassing ? airtimeFromDistancePassing : airtimeFromDistanceShooting;
 
         double distance = robotPose.plus(Turret.POSITION_TO_ROBOT).getTranslation().minus(goalPose).getNorm();
@@ -80,7 +102,8 @@ public class AimAlign {
             airtime = airtimeLookup.get(distance);
             SmartDashboard.putNumber("Estimated Airtime", airtime);
             effectivePosePublisher.set(new Pose2d(newPose, new Rotation2d()));
-        } while (newPose.minus(newPose = goalPose.minus(robotVelocity.times(airtime))).getNorm() > 0.05 && iterations < 5);
+        } while (newPose.minus(newPose = goalPose.minus(robotVelocity.times(airtime))).getNorm() > 0.05
+                && iterations < 5);
 
         SmartDashboard.putNumber("NumIterations", iterations);
 
