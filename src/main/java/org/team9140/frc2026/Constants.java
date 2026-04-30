@@ -130,7 +130,7 @@ public class Constants {
 
         public static final double ARM_OUT_POSITION = 0.29;
         public static final double ARM_IN_POSITION = ARM_OUT_POSITION / 2.0;
-        public static final double DEPOT_ARM_OUT_POSITION = ARM_OUT_POSITION * 0.8;
+        public static final double DEPOT_ARM_OUT_POSITION = 0.24;
 
         public static final double FORWARD_SOFT_LIMIT_THRESHOLD = ARM_OUT_POSITION / PINION_CIRCUMFERENCE;
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0;
@@ -183,7 +183,7 @@ public class Constants {
         public static final Transform2d POSITION_TO_ROBOT = new Transform2d(-0.124, -0.159, new Rotation2d(-Math.PI));
 
         public static final double TURN_SHOOTER_OFF_TIME = 1.0;
-        public static final double CANCODER_OFFSET_ROTS = 0.242919921875;
+        public static final double CANCODER_OFFSET_ROTS = 0.246;
     }
 
     public static class Hood {

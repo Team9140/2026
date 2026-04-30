@@ -171,6 +171,10 @@ public class FollowPath {
         return this.finalPose;
     }
 
+    public double getPathTime() {
+        return this.trajectory.getTotalTime();
+    }
+
     public Command gimmeCommand(boolean waitUntilAtFinalTarget) {
         return new FunctionalCommand(
                 () -> {

@@ -41,7 +41,6 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -589,11 +588,11 @@ public class Shooter extends SubsystemBase {
 
     private final Trigger yawIsAtPosition = new Trigger(
             () -> Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(),
-                    this.yawMotorControl.Position, Units.degreesToRotations(2.5)));
+                    this.yawMotorControl.Position, Units.degreesToRotations(4.0)));
 
     public final Trigger hoodIsAtPosition = new Trigger(
             () -> Util.epsilonEquals(this.hoodMotor.getPosition(false).getValueAsDouble(),
-                    this.hoodMotorControl.Position, Units.degreesToRotations(1.0)));
+                    this.hoodMotorControl.Position, Units.degreesToRotations(2.0)));
 
     LinearFilter RPMfilter = LinearFilter.movingAverage(10);
 

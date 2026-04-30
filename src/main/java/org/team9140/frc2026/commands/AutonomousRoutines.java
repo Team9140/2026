@@ -69,9 +69,9 @@ public class AutonomousRoutines {
     private Command getShootAndSqueezeCommand() {
         return shooter.aim(this.drivetrain::getCachedState, () -> AimAlign.getHub().getTranslation())
                 .alongWith(new WaitUntilCommand(shooter.readyToShoot)
-                        .andThen(new WaitCommand(1.0))
+                        .andThen(new WaitCommand(0.5))
                         .andThen(hopper.feed().alongWith(
-                                new WaitCommand(2.0).andThen(intake.squeeze()))));
+                                new WaitCommand(4.0).andThen(intake.squeeze()))));
     }
 
     private Command getShootCommand() {
@@ -97,20 +97,20 @@ public class AutonomousRoutines {
                 //                     .andThen(drivetrain.stop()))
                 //                     .andThen(this.getShootAndSqueezeCommand().asProxy());
                 case "score_from_depot":
-                    return intake.intake().withDeadline(runChoreoAuto("depotShoot", false, true, 0.0, Commands.none())
+                    return intake.intakeDepot().withDeadline(runChoreoAuto("depotShoot", false, true, 0.0, Commands.none()))
                             .andThen(this.drivetrain.stop())
-                            .andThen(new WaitCommand(0.5)))
-                            .andThen(this.getShootAndSqueezeCommand().asProxy());
+                            .andThen(this.intake.intake().withTimeout(2.0))
+                            .andThen(this.getShootAndSqueezeCommand().withTimeout(12.0));
                 case "one_pass_outpost":
                     return intake.intake()
                             .withDeadline(runChoreoAuto("Trench_Outpost_Deep", true, true,
                                     Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(drivetrain.stop()))
-                            .andThen(this.getShootAndSqueezeCommand().asProxy());
+                            .andThen(this.getShootAndSqueezeCommand());
                 case "one_pass_depot":
                     return intake.intake()
                             .withDeadline(runChoreoAuto("Trench_Depot_Deep", true, true,
                                     Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(drivetrain.stop()))
-                            .andThen(this.getShootAndSqueezeCommand().asProxy());
+                            .andThen(this.getShootAndSqueezeCommand());
                 case "two_pass_outpost":
                     return runRepeat("Trench_Outpost_Deep", "Trench_Reset_Outpost", "Trench_Outpost_Shallow");
                 case "two_pass_depot":
@@ -119,12 +119,12 @@ public class AutonomousRoutines {
                     return intake.intake()
                             .withDeadline(runChoreoAuto("Bump_Outpost_Deep", true, true,
                                     Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(drivetrain.stop()))
-                            .andThen(this.getShootAndSqueezeCommand().asProxy());
+                            .andThen(this.getShootAndSqueezeCommand());
                 case "one_pass_depot_bump":
                     return intake.intake()
                             .withDeadline(runChoreoAuto("Bump_Depot_Deep", true, true,
                                     Constants.Shooter.AUTO_IDLE_TIMESTAMP, shooter.idle()).andThen(drivetrain.stop()))
-                            .andThen(this.getShootAndSqueezeCommand().asProxy());
+                            .andThen(this.getShootAndSqueezeCommand());
                 case "two_pass_outpost_bump":
                     return runRepeat("Bump_Outpost_Deep", "Bump_Reset_Outpost", "Bump_Outpost_Shallow");
                 case "two_pass_depot_bump":
@@ -188,11 +188,13 @@ public class AutonomousRoutines {
                 this.drivetrain::followSample, Util.getAlliance().get(), drivetrain);
         if (Robot.isSimulation() && reset)
             drivetrain.resetPose(path.getInitialPose());
-        if (pathCommand != null) {
-            path.atTimeFromEnd(timeBeforeEnd).onTrue(pathCommand);
+        
+        if (pathCommand == null) {
+            pathCommand = Commands.none();
         }
+
         initialPosePublisher.set(path.getInitialPose());
-        return path.gimmeCommand(waitUntilAtFinalTarget);
+        return path.gimmeCommand(waitUntilAtFinalTarget).deadlineFor(new WaitCommand(path.getPathTime() - timeBeforeEnd).andThen(pathCommand));
     }
 
     public Command runChoreoAuto(String pathame) {
@@ -231,19 +233,19 @@ public class AutonomousRoutines {
         if (Robot.isSimulation())
             drivetrain.resetPose(firstSegment.getInitialPose());
 
-        return this.getShootCommand().withTimeout(1.5)
-                .andThen(this.hopper.off())
+        return this.getShootCommand().withTimeout(0.5)
+                .andThen(this.hopper.off().alongWith(this.shooter.off()))
                 .andThen(
                         this.intake.intake().withTimeout(5.6).andThen(this.intake.off())
                                 .andThen(new WaitCommand(2.5 + 1.0 + 5.0)).andThen(this.intake.intakeDepot()).alongWith(
                                         runChoreoAuto("citrusCircuits_part1")
                                                 .andThen(drivetrain.stop())
-                                                .andThen(new WaitCommand(1.0))
-                                                .andThen(runChoreoAuto("citrusCircuits_part2"))
+                                                .andThen(new WaitCommand(0.1))
+                                                .andThen(runChoreoAuto("citrusCircuits_part2", true, false, 0.0, null))
                                                 .andThen(drivetrain.stop())
                                                 .andThen(this.getShootCommand().withTimeout(5.0))
-                                                .andThen(this.hopper.off())
-                                                .andThen(runChoreoAuto("citrusCircuits_part3"))
+                                                .andThen(this.hopper.off().alongWith(this.shooter.off()))
+                                                .andThen(runChoreoAuto("citrusCircuits_part3", true, false, 0.0, null))
                                                 .andThen(drivetrain.stop())
                                                 .andThen(this.getShootCommand())));
     }
