@@ -40,6 +40,7 @@ import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -588,14 +589,16 @@ public class Shooter extends SubsystemBase {
 
     private final Trigger yawIsAtPosition = new Trigger(
             () -> Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(),
-                    this.yawMotorControl.Position, Units.degreesToRotations(5)));
+                    this.yawMotorControl.Position, Units.degreesToRotations(2.5)));
 
     public final Trigger hoodIsAtPosition = new Trigger(
             () -> Util.epsilonEquals(this.hoodMotor.getPosition(false).getValueAsDouble(),
-                    this.hoodMotorControl.Position, 0.01));
+                    this.hoodMotorControl.Position, Units.degreesToRotations(1.0)));
+
+    LinearFilter RPMfilter = LinearFilter.movingAverage(10);
 
     public final Trigger shooterIsAtVelocity = new Trigger(
-            () -> Util.epsilonEquals(this.shooterMotor.getVelocity(false).getValueAsDouble(),
+            () -> Util.epsilonEquals(RPMfilter.calculate(this.shooterMotor.getVelocity(false).getValueAsDouble()),
                     this.shooterSpeedControl.Velocity, 5));
 
     public final Trigger yawWillOverturnSoon = new Trigger(() -> this.yawMotorControl.Position
@@ -604,8 +607,7 @@ public class Shooter extends SubsystemBase {
             || this.yawMotorControl.Position + this.targetYawRateOfChange
                     * Turret.OVERTURN_LOOKAHEAD_TIME < Constants.Turret.REVERSE_SOFT_LIMIT_THRESHOLD);
 
-    public final Trigger readyToShoot = new Trigger(shooterIsAtVelocity.and(yawIsAtPosition))
-            .debounce(0.5, DebounceType.kBoth);
+    public final Trigger readyToShoot = new Trigger(shooterIsAtVelocity.and(yawIsAtPosition));
 
     @SuppressWarnings("unused")
     private final SysIdRoutine flywheelRoutine = new SysIdRoutine(

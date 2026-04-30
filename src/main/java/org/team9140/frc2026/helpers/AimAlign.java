@@ -19,6 +19,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AimAlign {
+    /*
+     * Tags on hubs for LL filter: 2,3,4,5,8,9,10,11,18,19,20,21,24,25,26,27
+     */
+
     private static InterpolatingDoubleTreeMap motorSpeedFromDistanceShooting = new InterpolatingDoubleTreeMap(); // in
                                                                                                                  // rotatations
                                                                                                                  // per
@@ -28,7 +32,7 @@ public class AimAlign {
     private static InterpolatingDoubleTreeMap airtimeFromDistanceShooting = new InterpolatingDoubleTreeMap(); // in
                                                                                                               // seconds
 
-    private static InterpolatingDoubleTreeMap motorSpeedFromDistancePassing;// = new InterpolatingDoubleTreeMap(); // in
+    private static InterpolatingDoubleTreeMap motorSpeedFromDistancePassing = new InterpolatingDoubleTreeMap(); // in
                                                                             // rotations per second
     private static InterpolatingDoubleTreeMap hoodAngleFromDistancePassing = new InterpolatingDoubleTreeMap(); // in
                                                                                                                // degrees
@@ -55,7 +59,26 @@ public class AimAlign {
         motorSpeedFromDistanceShooting.put(Units.feetToMeters(15 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2400.0 / 60.0);
         motorSpeedFromDistanceShooting.put(Units.feetToMeters(16 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2500.0 / 60.0);
 
-        motorSpeedFromDistancePassing = motorSpeedFromDistanceShooting;
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(1 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 1400.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(2 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 1500.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(3 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 1600.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(4 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 1700.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(5 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 1800.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(6 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 1900.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(7 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2000.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(8 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2000.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(9 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2000.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(10 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2050.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(11 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2100.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(12 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2150.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(13 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2200.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(14 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2300.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(15 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2400.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(16 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2500.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(17 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2600.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(18 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2700.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(19 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2800.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(20 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2900.0 / 60.0);
 
         hoodAngleFromDistanceShooting.put(Units.feetToMeters(4 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 21.0);
         hoodAngleFromDistanceShooting.put(Units.feetToMeters(5 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 21.0);

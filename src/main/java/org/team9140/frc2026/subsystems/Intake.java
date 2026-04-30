@@ -195,6 +195,12 @@ public class Intake extends SubsystemBase {
                 .withName("Intake");
     }
 
+    public Command squeeze() {
+        return this.armIn().andThen(
+                setRollerVolts(Constants.Intake.INTAKE_VOLTAGE))
+                .withName("Intake");
+    }
+
     public Command reverse() {
         return this.armOut().andThen(
                 setRollerVolts(-Constants.Intake.INTAKE_VOLTAGE))
@@ -267,9 +273,5 @@ public class Intake extends SubsystemBase {
         this.rollerMotor.getSimState().setRotorVelocity(this.rollerSim.getAngularVelocityRPM() / 60.0);
         this.rollerMotor.getSimState().setRotorAcceleration(
                 this.rollerSim.getAngularAccelerationRadPerSecSq() / 2.0 / Math.PI);
-    }
-
-    public Command squeeze() {
-        return this.setRollerVolts(Constants.Intake.INTAKE_VOLTAGE).asProxy().alongWith(this.armIn());
     }
 }
