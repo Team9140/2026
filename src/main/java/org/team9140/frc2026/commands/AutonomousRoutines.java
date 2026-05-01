@@ -100,7 +100,8 @@ public class AutonomousRoutines {
                     return intake.intakeDepot().withDeadline(runChoreoAuto("depotShoot", false, true, 0.0, Commands.none()))
                             .andThen(this.drivetrain.stop())
                             .andThen(this.intake.intake().withTimeout(2.0))
-                            .andThen(this.getShootAndSqueezeCommand().withTimeout(12.0));
+                            .andThen(this.getShootAndSqueezeCommand().withTimeout(10.0))
+                            .andThen(runChoreoAuto("cornerToNeutral", false, false, 0.0, Commands.none()));
                 case "one_pass_outpost":
                     return intake.intake()
                             .withDeadline(runChoreoAuto("Trench_Outpost_Deep", true, true,
