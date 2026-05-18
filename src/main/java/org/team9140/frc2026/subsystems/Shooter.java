@@ -352,8 +352,6 @@ public class Shooter extends SubsystemBase {
 
     public Command idle() {
         return this.runOnce(() -> {
-            if (this.isManual)
-                return;
             // point turret forward / starting orientation / whatever
             this.yawMotor.setControl(yawMotorControl.withPosition(0));
             this.hoodMotor.setControl(hoodMotorControl.withPosition(0));
@@ -588,17 +586,17 @@ public class Shooter extends SubsystemBase {
 
     private final Trigger yawIsAtPosition = new Trigger(
             () -> Util.epsilonEquals(this.yawMotor.getPosition(false).getValueAsDouble(),
-                    this.yawMotorControl.Position, Units.degreesToRotations(4.0)));
+                    this.yawMotorControl.Position, Units.degreesToRotations(15.0)));
 
     public final Trigger hoodIsAtPosition = new Trigger(
             () -> Util.epsilonEquals(this.hoodMotor.getPosition(false).getValueAsDouble(),
                     this.hoodMotorControl.Position, Units.degreesToRotations(2.0)));
 
-    LinearFilter RPMfilter = LinearFilter.movingAverage(10);
+    LinearFilter RPMfilter = LinearFilter.movingAverage(20);
 
     public final Trigger shooterIsAtVelocity = new Trigger(
-            () -> Util.epsilonEquals(RPMfilter.calculate(this.shooterMotor.getVelocity(false).getValueAsDouble()),
-                    this.shooterSpeedControl.Velocity, 5));
+            () -> RPMfilter.calculate(this.shooterMotor.getVelocity(false)
+                    .getValueAsDouble()) >= this.shooterSpeedControl.Velocity - 4.0);
 
     public final Trigger yawWillOverturnSoon = new Trigger(() -> this.yawMotorControl.Position
             + this.targetYawRateOfChange
@@ -606,7 +604,7 @@ public class Shooter extends SubsystemBase {
             || this.yawMotorControl.Position + this.targetYawRateOfChange
                     * Turret.OVERTURN_LOOKAHEAD_TIME < Constants.Turret.REVERSE_SOFT_LIMIT_THRESHOLD);
 
-    public final Trigger readyToShoot = new Trigger(shooterIsAtVelocity.and(yawIsAtPosition));
+    public final Trigger readyToShoot = shooterIsAtVelocity.and(yawIsAtPosition);
 
     @SuppressWarnings("unused")
     private final SysIdRoutine flywheelRoutine = new SysIdRoutine(

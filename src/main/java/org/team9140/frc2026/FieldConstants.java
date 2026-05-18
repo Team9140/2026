@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 
 public class FieldConstants {
-    public static final FieldType fieldType = FieldType.ANDYMARK;
+    public static final FieldType fieldType = FieldType.WELDED;
     public static final double FIELD_LENGTH = AprilTagLayoutType.OFFICIAL.getLayout().getFieldLength();
     public static final double FIELD_WIDTH = AprilTagLayoutType.OFFICIAL.getLayout().getFieldWidth();
 
@@ -77,8 +77,8 @@ public class FieldConstants {
     }
 
     public static class FeedingPositions {
-        public static final Pose2d FEEDING_POS_LOWER = new Pose2d(1, 3, new Rotation2d());
-        public static final Pose2d FEEDING_POS_UPPER = new Pose2d(1, 5, new Rotation2d());
+        public static final Pose2d FEEDING_POS_LOWER = new Pose2d(2, 3, new Rotation2d());
+        public static final Pose2d FEEDING_POS_UPPER = new Pose2d(2, 5, new Rotation2d());
         public static final Pose2d FEEDING_POS_LOWER_RED = new Pose2d(FIELD_LENGTH - FEEDING_POS_LOWER.getX(), FEEDING_POS_LOWER.getY(), Rotation2d.k180deg);
         public static final Pose2d FEEDING_POS_UPPER_RED = new Pose2d(FIELD_LENGTH - FEEDING_POS_UPPER.getX(), FEEDING_POS_UPPER.getY(), Rotation2d.k180deg);
     }

@@ -79,11 +79,11 @@ public class AimAlign {
         motorSpeedFromDistancePassing.put(Units.feetToMeters(13 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2200.0 / 60.0);
         motorSpeedFromDistancePassing.put(Units.feetToMeters(14 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2300.0 / 60.0);
         motorSpeedFromDistancePassing.put(Units.feetToMeters(15 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2400.0 / 60.0);
-        motorSpeedFromDistancePassing.put(Units.feetToMeters(16 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2500.0 / 60.0);
-        motorSpeedFromDistancePassing.put(Units.feetToMeters(17 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2600.0 / 60.0);
-        motorSpeedFromDistancePassing.put(Units.feetToMeters(18 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2700.0 / 60.0);
-        motorSpeedFromDistancePassing.put(Units.feetToMeters(19 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2800.0 / 60.0);
-        motorSpeedFromDistancePassing.put(Units.feetToMeters(20 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2900.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(16 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2600.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(17 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 2800.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(18 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 3000.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(19 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 3100.0 / 60.0);
+        motorSpeedFromDistancePassing.put(Units.feetToMeters(20 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 3200.0 / 60.0);
 
         hoodAngleFromDistanceShooting.put(Units.feetToMeters(4 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 21.0);
         hoodAngleFromDistanceShooting.put(Units.feetToMeters(5 + BUMPER_TO_TURRET_FT + HALF_HUB_FT), 21.0);

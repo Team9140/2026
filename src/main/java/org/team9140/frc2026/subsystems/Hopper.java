@@ -85,7 +85,7 @@ public class Hopper extends SubsystemBase {
     }
 
     public Command unjam() {
-        return this.setSpeeds(-Constants.Hopper.SPINNER_VOLTAGE, -Constants.Hopper.FEEDER_VOLTAGE)
+        return this.setSpeeds(Constants.Hopper.SPINNER_REVERSE_VOLTAGE, -Constants.Hopper.FEEDER_VOLTAGE)
                 .withName("Unjam Hopper");
     }
 

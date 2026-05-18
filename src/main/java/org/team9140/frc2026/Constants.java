@@ -70,7 +70,7 @@ public class Constants {
 
     public static class Shooter {
         public static final double PEAK_FORWARD_TORQUE = 70.0;
-        public static final double IDLE_VOLTAGE = 6.7;
+        public static final double IDLE_VOLTAGE = 4.0;
 
         public static final double SHOOTER_KS = 0;
         public static final double SHOOTER_KV = 0;
@@ -148,13 +148,14 @@ public class Constants {
     }
 
     public static class Hopper {
-        public static final double SPINNER_STATOR_CURRENT_LIMIT = 80;
-        public static final double FEEDER_STATOR_CURRENT_LIMIT = 80;
+        public static final double SPINNER_STATOR_CURRENT_LIMIT = 40.0;
+        public static final double FEEDER_STATOR_CURRENT_LIMIT = 40.0;
         public static final double SPINNER_SUPPLY_CURRENT_LIMIT = 40;
         public static final double FEEDER_SUPPLY_CURRENT_LIMIT = 60;
 
-        public static final double SPINNER_VOLTAGE = 12;
+        public static final double SPINNER_VOLTAGE = 10.0;
         public static final double FEEDER_VOLTAGE = 12;
+        public static final double SPINNER_REVERSE_VOLTAGE = -2.0;
 
         public static final double REVERSE_FEEDER_TIME = 1.0;
     }
@@ -204,7 +205,7 @@ public class Constants {
         public static final double REVERSE_SOFT_LIMIT_THRESHOLD = 0.01;
         public static final double GEAR_RATIO = 36.0 / 8.0 * 170.0 / 10.0;
         public static final double SENSOR_TO_MECHANISM_RATIO = 170.0 / 10.0 * 16.0 / 25.0;
-        public static final double CANCODER_OFFSET_ROTS = -0.42;
+        public static final double CANCODER_OFFSET_ROTS = -0.32;
         public static final double ANGLE_MIN = Units.degreesToRadians(18.0);
     }
 
